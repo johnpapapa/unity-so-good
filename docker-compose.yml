@@ -1,0 +1,38 @@
+# version: '3'
+services:
+ app:
+   ports:
+     - "8001:80"
+   build: ./docker/app
+   container_name: laravel_app
+   volumes:
+     - ./src:/var/www/html
+ db:
+   image: mysql:5.7
+   container_name: unitydb
+   environment:
+     MYSQL_ROOT_PASSWORD: root
+     MYSQL_DATABASE: unitydb
+     MYSQL_USER: user
+     MYSQL_PASSWORD: pass
+     TZ: 'Asia/Tokyo'
+   command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+   volumes:
+     - ./docker/db/data:/var/lib/mysql
+     - ./docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
+   ports:
+     - 3306:3306
+   platform: linux/x86_64
+ phpmyadmin:
+  image: phpmyadmin/phpmyadmin
+  depends_on:
+    - db
+  environment:
+    - PMA_ARBITRARY=1
+    - PMA_HOSTS='db'
+  ports:
+    - "3000:80"
+  volumes:
+    - ./docker/phpmyadmin/sessions:/sessions
+  platform: linux/x86_64
+    
