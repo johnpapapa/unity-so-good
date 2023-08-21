@@ -40,6 +40,11 @@ class UsersTable extends Table
         $this->setTable('users');
         $this->setDisplayField('id');
         $this->setPrimaryKey('id');
+
+        $this->hasMany('Events', [
+            'foreignKey' => 'organizer_id',
+        ]);
+
         $this->addBehavior('Timestamp', [
             'events' => [
                 'Model.beforeSave' => [
