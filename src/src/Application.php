@@ -66,7 +66,7 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
          * Debug Kit should not be installed on a production system
          */
         if (Configure::read('debug')) {
-            $this->addPlugin('DebugKit');
+            // $this->addPlugin('DebugKit'); //DebugKit bootstrap
         }
 
         // Load more plugins here
@@ -118,7 +118,7 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
     public function getAuthenticationService(ServerRequestInterface $request): AuthenticationServiceInterface
     {
         $authenticationService = new AuthenticationService([
-            'unauthenticatedRedirect' => '/users/login',
+            'unauthenticatedRedirect' => '/login',
             'queryParam' => 'redirect',
         ]);
 
@@ -137,7 +137,7 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
                 'username' => 'username',
                 'password' => 'password',
             ],
-            'loginUrl' => '/users/login',
+            'loginUrl' => '/login',
         ]);
 
         return $authenticationService;
