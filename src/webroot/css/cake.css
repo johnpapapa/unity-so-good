@@ -72,7 +72,7 @@ th {
 }
 
 /* Nav bar */
-.top-nav {
+/* .top-nav {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -98,7 +98,7 @@ th {
 .side-nav-item {
     display: block;
     padding: 0.5rem 0;
-}
+} */
 
 /* View action */
 .view.content .text {

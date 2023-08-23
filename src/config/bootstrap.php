@@ -79,6 +79,7 @@ use Cake\Utility\Security;
 try {
     Configure::config('default', new PhpConfig());
     Configure::load('app', 'default', false);
+    Configure::load('const', 'default'); //config/const.phpの有効化
 } catch (\Exception $e) {
     exit($e->getMessage() . "\n");
 }

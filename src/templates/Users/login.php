@@ -5,3 +5,5 @@
     <?= $this->Form->control('password') ?>
     <button type="submit" name="login">login</button>
 </form>
+
+<a href="<?= $this->Url->build(["controller"=>"Users","action"=>"add"]); ?>">ユーザー登録</a>

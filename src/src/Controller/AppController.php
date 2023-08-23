@@ -45,6 +45,9 @@ class AppController extends Controller
         $this->loadComponent('Flash');
         $this->loadComponent('Authentication.Authentication'); //認証ロジック
 
+        //ログインユーザ情報の取得
+        $this->set("current_user", $this->Authentication->getResult()->getData());
+        
         /*
          * Enable the following component for recommended CakePHP form protection settings.
          * see https://book.cakephp.org/4/en/controllers/components/form-protection.html

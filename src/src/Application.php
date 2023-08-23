@@ -66,7 +66,7 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
          * Debug Kit should not be installed on a production system
          */
         if (Configure::read('debug')) {
-            // $this->addPlugin('DebugKit'); //DebugKit bootstrap
+            $this->addPlugin('DebugKit'); //DebugKitを無効にする場合コメントアウト
         }
 
         // Load more plugins here

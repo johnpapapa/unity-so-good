@@ -20,9 +20,10 @@ class UsersController extends AppController
     public function login()
     {
         $result = $this->Authentication->getResult();
+        // debug($result);
         if ($result->isValid()) {
             // ログインしていればログイン後の画面にリダイレクト
-            $target = $this->Authentication->getLoginRedirect() ?? '/';
+            $target = $this->Authentication->getLoginRedirect() ?? '/events/index';
             return $this->redirect($target);
         }
         // ログイン認証に失敗した場合はエラーを表示する
