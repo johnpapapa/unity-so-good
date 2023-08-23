@@ -1,8 +1,5 @@
 <?= $this->Html->css(['event-item']) ?>
-<?php
-
-use Cake\Core\Configure; ?>
-<!-- <script src="js/event-item.js"></script> -->
+<?php use Cake\Core\Configure; ?>
 <?= $this->Html->script('event-item', array('inline' => false)); ?>
 
 <div class="event-item">

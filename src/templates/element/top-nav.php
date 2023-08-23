@@ -25,7 +25,15 @@
     <li><a href="#">About</a></li>
     <li><a href="#">Contact</a></li>
   </ul>
-  <span class="material-symbols-outlined">person</span>
+  <div style="color:white">
+    <span class="material-symbols-outlined">person</span>
+    <?php if($current_user): ?>
+      <?= $current_user->display_name ?>
+    <?php else: ?>
+      ゲスト
+    <?php endif; ?>
+  </div>
+  
 </nav>
 
 

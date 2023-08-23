@@ -133,10 +133,33 @@ class EventsController extends AppController
         //ユーザの参加情報取出
         if ($uid){
             $user_event_responses = Hash::extract($event, 'event_responses.{n}[responder_id='.$uid.']');
-            $event['user_response_state'] = isset($user_event_responses->response_state) ? $user_event_responses->response_state : null;
+            $event['user_response_state'] = isset($user_event_responses[0]['response_state']) ? $user_event_responses[0]['response_state'] : null;
         }
 
         $this->set(compact('event'));
+    }
+
+    public function ajaxChangeResponseState(){
+        $this->autoRender = false;
+        $data = $this->request->getData();
+
+        // $user = $this->EventResponses->newEmptyEntity();
+        $this->loadModel('EventResponses');
+        // $this->fetchTable('EventResponses');
+        $event_response = $this->EventResponses->find('all', ['conditions'=>['responder_id'=>$data['user_id'],'event_id'=>$data['event_id']]])->first();
+        if(!$event_response){
+            $event_response = $this->EventResponses->newEntity(['responder_id'=>$data['user_id'],'event_id'=>$data['event_id']]);
+        }
+        $event_response = $this->EventResponses->patchEntity($event_response, ['response_state'=>$data['response_state']]);
+        // $response = ['er'=>$event_response];
+        if ($this->EventResponses->save($event_response)) {
+            $response = ['status'=>'ok'];
+        } else {
+            $response = ['status'=>'bad'];
+        }
+
+        $this->RequestHandler->respondAs('application/json; charset=UTF-8');
+        return $this->response->withStringBody(json_encode($response));
     }
 
 

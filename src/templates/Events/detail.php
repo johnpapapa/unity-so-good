@@ -1,42 +1,71 @@
-<table class="display-flex ">
-    <tr>
-        <th>場所</th>
-        <th>コート</th>
-        <th>日付</th>
-        <th>時間</th>
-        <th>人数制限</th>
-        <th>参加情報</th>
-        <th>ユーザー参加情報</th>
-        <th>参加表明</th>
-        <th>参加者一覧</th>
-    </tr>
-    <tr>
-        <td><?= $event->location->display_name ?>あああああああああ</td>
-        <td><?= is_null($event->area) ? '' : $event->area . ',1,2,3,4,5,6,7,8,9コート' ?></td>
-        <td><?= $event->date_y ?>年 <?= $event->date_m ?>月 <?= $event->date_m ?>日(<?= $event->day_of_week ?>)</td>
-        <td><?= $event->start_time->i18nFormat('HH:mm'); ?> ~ <?= $event->end_time->i18nFormat('HH:mm');  ?></td>
-        <td><?= $event->participants_limit <= 0 ? 'なし' : $event->participants_limit . '人' ?></td>
-        <td>
+<?php //$this->Html->css(['event-item']) 
+?>
+<?php
+
+use Cake\Core\Configure; ?>
+<?php $response_states = Configure::read('response_states'); ?>
+<?= $this->Html->script('event-response', array('inline' => false)); ?>
+<script>
+    let current_user = <?= json_encode($current_user) ?>;
+    let event_data = <?= json_encode($event) ?>;
+    let response_ajax_send_url = "<?= $this->Url->build(['controller' => 'Events', 'action' => 'ajaxChangeResponseState']) ?>";
+    let response_ajax_send_token = "<?= $this->request->getAttribute('csrfToken') ?>";
+</script>
+
+<div class="container">
+    <div class="row">
+        <div class="column">場所</div>
+        <div class="column"><?= $event->location->display_name ?>あああああああああ</div>
+    </div>
+    <div class="row">
+        <div class="column">コート</div>
+        <div class="column"><?= is_null($event->area) ? '' : $event->area . ',1,2,3,4,5,6,7,8,9コート' ?></div>
+    </div>
+    <div class="row">
+        <div class="column">日付</div>
+        <div class="column"><?= $event->date_y ?>年 <?= $event->date_m ?>月 <?= $event->date_m ?>日(<?= $event->day_of_week ?>)</div>
+    </div>
+    <div class="row">
+        <div class="column">時間</div>
+        <div class="column"><?= $event->start_time->i18nFormat('HH:mm'); ?> ~ <?= $event->end_time->i18nFormat('HH:mm');  ?></div>
+    </div>
+    <div class="row">
+        <div class="column">人数制限</div>
+        <div class="column"><?= $event->participants_limit <= 0 ? 'なし' : $event->participants_limit . '人' ?></div>
+    </div>
+    <div class="row">
+        <div class="column">参加情報</div>
+        <div class="column">
             ?:<?= $event->participants_0_count ?>
             o:<?= $event->participants_1_count ?>
             x:<?= $event->participants_2_count ?>
-        </td>
-        <td>asdf</td>
-        <td>
-            <button>参加未定</button>
-            <button>参加</button>
-            <button>不参加</button>
-        </td>
-        <td>
-            asldkfjaflkj
-            asldkfjalkdsfj
-            asdlkfjasldfkj
-            asdlfkjasdlfkj
-            dflkdfjlksj
-            
-
-        </td>
-    </tr>
-</table>
-
-
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">ユーザー参加情報</div>
+        <div class="column">
+            <?php if ($event->user_response_state) : ?>
+                <?php //$user_response_state = $response_states[$event->user_response_state]['text']; ?>
+                <?= $response_states[$event->user_response_state]['text']; ?>
+            <?php else : ?>
+                未表明
+            <?php endif; ?>
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">参加表明</div>
+        <div class="column">
+            <button class="undecided" value="0">参加未定</button>
+            <button class="present" value="1">参加</button>
+            <button class="absent" value="2">不参加</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">参加者一覧</div>
+        <div class="column">
+            <?php foreach ($event['event_responses'] as $event_responses) : ?>
+                <?= $response_states[$event_responses->response_state]['text']; ?> | <?= $event_responses->user->display_name ?><br>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</div>
