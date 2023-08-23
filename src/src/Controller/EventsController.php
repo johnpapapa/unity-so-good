@@ -84,6 +84,11 @@ class EventsController extends AppController
 
     public function detail($id = null)
     {
+        $uid = null;
+        if ($this->Authentication->getResult()->isValid()){
+            $uid = $this->Authentication->getResult()->getData()['id'];
+        }
+
         if(!$id){
             $this->Flash->success(__('The event has not exist.'));
             return $this->redirect(['action' => 'index']);
@@ -98,6 +103,38 @@ class EventsController extends AppController
         ])
         ->contain('EventResponses.Users')
         ->first();
+
+        $day_of_week=['月','火','水','木','金','土','日']; //日付変換用の定数
+        //開催日の取出
+        $date = $event->start_time->i18nFormat('yyyy-MM-dd');
+        $event['day_of_week'] = "{$day_of_week[$event->start_time->dayOfWeek-1]}";
+        [$date_y, $date_m, $date_d] = explode('-', $date);
+        $event['date_y'] = $date_y;
+        $event['date_m'] = $date_m;
+        $event['date_d'] = $date_d;
+                    
+        //時刻の比較
+        $now_datetime = strtotime("now");
+        $start_datetime = strtotime($event->start_time->i18nFormat('yyyy-MM-dd HH:mm:ss'));
+        $end_datetime = strtotime($event->end_time->i18nFormat('yyyy-MM-dd HH:mm:ss'));
+        if($now_datetime < $start_datetime){
+            $event['event_state'] = 0;
+        } elseif($now_datetime > $end_datetime) {
+            $event['event_state'] = 2;
+        } else {
+            $event['event_state'] = 1;
+        }
+
+        //参加人数の取出
+        $event['participants_0_count'] = count(Hash::extract($event, 'event_responses.{n}[response_state=0]'));
+        $event['participants_1_count'] = count(Hash::extract($event, 'event_responses.{n}[response_state=1]'));
+        $event['participants_2_count'] = count(Hash::extract($event, 'event_responses.{n}[response_state=2]'));
+
+        //ユーザの参加情報取出
+        if ($uid){
+            $user_event_responses = Hash::extract($event, 'event_responses.{n}[responder_id='.$uid.']');
+            $event['user_response_state'] = isset($user_event_responses->response_state) ? $user_event_responses->response_state : null;
+        }
 
         $this->set(compact('event'));
     }
