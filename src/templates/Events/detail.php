@@ -55,9 +55,9 @@ use Cake\Core\Configure; ?>
     <div class="row">
         <div class="column">参加表明</div>
         <div class="column">
-            <button class="undecided" value="0">参加未定</button>
-            <button class="present" value="1">参加</button>
-            <button class="absent" value="2">不参加</button>
+            <button class="undecided" value="0" <?= ($event->user_response_state == 0)? 'disabled':'' ?>>参加未定</button>
+            <button class="present" value="1" <?= ($event->user_response_state == 1)? 'disabled':'' ?>>参加</button>
+            <button class="absent" value="2" <?= ($event->user_response_state == 2)? 'disabled':'' ?>>不参加</button>
         </div>
     </div>
     <div class="row">
