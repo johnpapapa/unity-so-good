@@ -8,7 +8,7 @@
             <div class="schedule disp-iblock">
                 <div class="date disp-inline"><?= $event->date_y ?>年</div>
                 <div class="date disp-inline"><?= $event->date_m ?>月</div>
-                <div class="date disp-inline"><?= $event->date_m ?>日</div>
+                <div class="date disp-inline"><?= $event->date_d ?>日</div>
                 <div class="date disp-inline">(<?= $event->day_of_week ?>)</div>
             </div>
 
@@ -17,10 +17,12 @@
                 <?= $event_state['text'] ?>
             </div>
 
-            <?php $user_response_state = Configure::read('response_states')[$event->event_state]; ?>
-            <div class="state-tag disp-iblock" , style="background-color: <?= $user_response_state['tag_color'] ?>;">
-                <?= $user_response_state['text'] ?>
-            </div>
+            <?php if($event->user_response_state): ?>
+                <?php $user_response_state = Configure::read('response_states')[$event->user_response_state]; ?>
+                <div class="state-tag disp-iblock" , style="background-color: <?= $user_response_state['tag_color'] ?>;">
+                    <?= $user_response_state['text'] ?>
+                </div>
+            <?php endif; ?>
         </div>
         <div class="location">
             <?= $event->location->display_name ?>あああああああああ
@@ -47,10 +49,6 @@
                 </a>
             </div>
         </div>
-
-
-
-
 
         <?php if ($current_user) : ?>
             <div class="description_toggle" id="desc_<?= $event->id ?>">

@@ -2,8 +2,8 @@
 declare(strict_types=1);
 
 namespace App\Controller;
+
 use Cake\Utility\Hash;
-use DateTime;
 
 /**
  * Events Controller
@@ -24,24 +24,92 @@ class EventsController extends AppController
      *
      * @return \Cake\Http\Response|null|void Renders view
      */
+    public function test(){
+        // $this->autoRender = false;
+
+        $this->EventResponses = $this->fetchTable('EventResponses');
+
+        // $responsed_event_id = $this->EventResponses->find("all", [
+        //     "conditions" => [
+        //         "EventResponses.responder_id" => 1,
+        //         "Events.start_time >" => date("Y-m-d H:i:s")
+        //     ]
+        // ])
+        // ->select('EventResponses.event_id')
+        // ->contain('Events')
+        // ->all()->toArray();
+        // $responsed_event_id = Hash::extract($responsed_event_id, '{n}.event_id');
+
+        // $events = $this->Events->find("all", [
+        //     "conditions"=>[
+        //         "Events.id IN" => $responsed_event_id
+        //     ]
+        // ])->all()->toArray();
+
+
+        // debug($events);
+
+
+        // SELECT event_responses.event_id, event_responses.response_state, count(event_responses.response_state)
+        // FROM events
+        // INNER JOIN event_responses ON events.id = event_responses.event_id
+        // WHERE 1
+        // GROUP BY event_responses.event_id, event_responses.response_state
+    
+        // // $events = $this->Events->find("all")
+        // // ->contain('EventResponses')
+        // // ->group('EventResponses.event_state')
+        // // ->all()->toArray();
+        // // debug($events);
+        // $events = $this->Events->find("all")
+        // ->contain([
+        //     'EventResponses' => function ($q) {
+        //         return $q->select([
+        //             'EventResponses.event_id',
+        //             'EventResponses.response_state'
+        //         ]);
+        //     }
+        // ])
+        // ->select("EventResponses.event_id")
+        // // ->group('EventResponses.event_id')
+        // ->limit(10)
+        // ->all()->toArray();
+        
+
+
+        
+        
+    }
+
     public function index()
     {
         $uid = null;
         if ($this->Authentication->getResult()->isValid()){
             $uid = $this->Authentication->getResult()->getData()['id'];
         }
-        
 
-        $events = $this->Events->find("all")
+        $conditions = [];
+        $query_param = $this->request->getQuery();
+        $conditions[] = ['Events.end_time >=' => date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s") . "-14days"))]; //14日前までのイベントを表示
+
+        if(isset($query_param['organizer'])){ //作成したユーザで絞り込み
+            $organizer = $query_param['organizer'];
+            if (is_numeric($organizer) && $organizer > 0){
+                $conditions[] = ['Events.organizer_id' => $organizer];
+            }
+        }
+        // $conditions[] = ['not exists '.'(select event_responses.event_id,event_responses.responder_id from event_responses '.'where event_responses.responder_id = '.'1)'];
+        
+        $events_query = $this->Events->find("all", ['conditions'=>$conditions])
         ->contain([
             'Users', 
             'Locations',
             'EventResponses' => ['sort' => ['response_state' => 'DESC']]
         ])
         ->contain('EventResponses.Users')
-        ->order(['events.start_time'=>'DESC'])
-        ->limit(30)
-        ->all()->toArray();
+        ->order(['events.start_time'=>'ASC'])
+        ->limit(10);
+        $events = $events_query->all()->toArray();
         
         $day_of_week=['月','火','水','木','金','土','日']; //日付変換用の定数
         $events = Hash::map($events, '{n}', function($event) use ($day_of_week, $uid) { //各データの整形
@@ -73,12 +141,11 @@ class EventsController extends AppController
             //ユーザの参加情報取出
             if ($uid){
                 $user_event_responses = Hash::extract($event, 'event_responses.{n}[responder_id='.$uid.']');
-                $event['user_response_state'] = isset($user_event_responses->response_state) ? $user_event_responses->response_state : null;
+                $event['user_response_state'] = isset($user_event_responses[0]['response_state']) ? $user_event_responses[0]['response_state'] : null;
             }
 
             return $event;
         });
-
         $this->set(compact('events'));
     }
 
