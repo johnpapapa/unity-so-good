@@ -1,3 +1,5 @@
+<?php $this->assign('title', 'Events'); ?>
+<?php $this->assign('content-title', 'イベント詳細'); ?>
 <?php 
     use Cake\Core\Configure; 
     $response_states = Configure::read('response_states');
