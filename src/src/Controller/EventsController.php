@@ -145,6 +145,96 @@ class EventsController extends AppController
         $this->set(compact('events'));
     }
 
+    public function participate(){ //表明済み
+        if ($this->Authentication->getResult()->isValid()){
+            $uid = $this->Authentication->getResult()->getData()['id'];
+        } else {
+            $this->Flash->error(__('Failed to get member information. Please login.'));
+            return $this->redirect(['action' => 'index']);
+        }
+
+        $this->EventResponses = $this->fetchTable('EventResponses');
+        $conditions = [
+            
+        ];
+        $event_responses = $this->EventResponses->find("all", ["conditions"=>$conditions])
+        ->contain(['Events'])
+        ->where([
+            "EventResponses.responder_id" => $uid, //自分
+            'EventResponses.response_state IN' => [0, 1], //未定or参加
+            'Events.deleted_at IS' => NULL, //未削除
+            'Events.end_time >=' => date("Y-m-d H:i:s"), //現在日時より後
+        ])
+        ->select([
+            'Events.id',
+            'Events.end_time',
+            'EventResponses.event_id',
+            'EventResponses.responder_id',
+            'EventResponses.response_state'
+        ])
+        ->all()
+        ->toArray();
+
+        $event_ids = implode(',', Hash::extract($event_responses, '{n}.event_id'));
+        
+
+        $this->Locations = $this->fetchTable('Locations');
+        $conditions = [
+            'Events.id IN' => $event_ids
+        ]; 
+        $events_query = $this->Events->find("all", ['conditions'=>$conditions]);
+        $events_query = $events_query
+        ->contain([
+            // 'Users', //開催者
+            'Locations',
+            'EventResponses' => [
+                'sort' => [
+                    'response_state' => 'DESC', 
+                    'EventResponses.updated_at' => 'ASC'
+                ]
+            ]
+        ])
+        ->select($this->Events)
+        ->select($this->Locations)
+        ->contain('EventResponses.Users') //EventResponses以下Usersオブジェクト作成
+        ->order(['events.start_time'=>'ASC']);
+        // ->limit(10);
+        $events = $events_query->all()->toArray();
+        
+        $day_of_week=['月','火','水','木','金','土','日']; //日付変換用の定数
+        $events = Hash::map($events, '{n}', function($event) use ($day_of_week, $uid) { //各データの整形
+            //開催日の取出
+            $event['date'] = $event->start_time->i18nFormat('yyyy-MM-dd');
+            $event['day_of_week'] = "{$day_of_week[$event->start_time->dayOfWeek-1]}";
+
+            //時刻の比較
+            $now_datetime = strtotime("now");
+            $start_datetime = strtotime($event->start_time->i18nFormat('yyyy-MM-dd HH:mm:ss'));
+            $end_datetime = strtotime($event->end_time->i18nFormat('yyyy-MM-dd HH:mm:ss'));
+            if($now_datetime < $start_datetime){
+                $event['event_state'] = 0;
+            } elseif($now_datetime > $end_datetime) {
+                $event['event_state'] = 2;
+            } else {
+                $event['event_state'] = 1;
+            }
+            $event['event_state'] = 0;
+
+            //参加人数の取出
+            $event['participants_count'] = array_count_values(Hash::extract($event, 'event_responses.{n}.response_state'));
+
+            //ユーザの参加情報取出
+            if ($uid){
+                $user_event_responses = Hash::extract($event, 'event_responses.{n}[responder_id='.$uid.']');
+                $event['user_response_state'] = isset($user_event_responses[0]['response_state']) ? $user_event_responses[0]['response_state'] : null;
+            }
+
+            return $event;
+        });
+
+        $this->set(compact('events'));
+    }
+
     public function detail($id = null)
     {
         $uid = null;
