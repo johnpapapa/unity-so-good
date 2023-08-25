@@ -1,16 +1,20 @@
-<?php //$this->Html->css(['event-item']) 
+<?php 
+    use Cake\Core\Configure; 
+    $response_states = Configure::read('response_states');
+    
+    echo $this->Html->script('event-response', array('inline' => false)); 
+    // echo $this->Html->css(['event-item']) 
 ?>
-<?php
-
-use Cake\Core\Configure; ?>
-<?php $response_states = Configure::read('response_states'); ?>
-<?= $this->Html->script('event-response', array('inline' => false)); ?>
 <script>
     let current_user = <?= json_encode($current_user) ?>;
     let event_data = <?= json_encode($event) ?>;
     let response_ajax_send_url = "<?= $this->Url->build(['controller' => 'Events', 'action' => 'ajaxChangeResponseState']) ?>";
     let response_ajax_send_token = "<?= $this->request->getAttribute('csrfToken') ?>";
 </script>
+
+
+<div><a onclick="history.back()">直前のページに戻る</a></div>
+
 
 <div class="container">
     <div class="row">

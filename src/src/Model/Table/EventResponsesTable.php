@@ -52,6 +52,15 @@ class EventResponsesTable extends Table
             'foreignKey' => 'event_id',
             'joinType' => 'INNER',
         ]);
+
+        $this->addBehavior('Timestamp', [
+            'events' => [
+                'Model.beforeSave' => [
+                    'created_at' => 'new',
+                    'updated_at' => 'always',
+                ],
+            ],
+        ]);
     }
 
     /**

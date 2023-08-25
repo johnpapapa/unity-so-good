@@ -1,3 +1,5 @@
+<!-- this element argument is [event, displayResponseBtn] -->
+
 <?= $this->Html->css(['event-item']) ?>
 <?php use Cake\Core\Configure; ?>
 <?= $this->Html->script('event-item', array('inline' => false)); ?>
@@ -6,9 +8,7 @@
     <div class="event-item-inner">
         <div class="event-item-innter-top disp-flex align-center">
             <div class="schedule disp-iblock">
-                <div class="date disp-inline"><?= $event->date_y ?>年</div>
-                <div class="date disp-inline"><?= $event->date_m ?>月</div>
-                <div class="date disp-inline"><?= $event->date_d ?>日</div>
+                <div class="date disp-inline"><?= $event->date ?></div>
                 <div class="date disp-inline">(<?= $event->day_of_week ?>)</div>
             </div>
 
@@ -37,9 +37,9 @@
                 </div>
                 <div class="limit disp-iblock">人数制限:<?= $event->participants_limit <= 0 ? 'なし' : $event->participants_limit . '人' ?></div>
                 <div class="count disp-iblock">
-                    ?:<?= $event->participants_0_count ?>
-                    o:<?= $event->participants_1_count ?>
-                    x:<?= $event->participants_2_count ?>
+                    ?:<?= $event->participants_count['0'] ?>
+                    o:<?= $event->participants_count['1'] ?>
+                    x:<?= $event->participants_count['2'] ?>
                 </div>
             </div>
 

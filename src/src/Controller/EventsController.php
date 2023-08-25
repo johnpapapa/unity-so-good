@@ -2,8 +2,8 @@
 declare(strict_types=1);
 
 namespace App\Controller;
-
 use Cake\Utility\Hash;
+use Cake\Datasource\ConnectionManager;
 
 /**
  * Events Controller
@@ -87,26 +87,27 @@ class EventsController extends AppController
         if ($this->Authentication->getResult()->isValid()){
             $uid = $this->Authentication->getResult()->getData()['id'];
         }
-
-        $conditions = [];
-        $query_param = $this->request->getQuery();
-        $conditions[] = ['Events.end_time >=' => date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s") . "-14days"))]; //14日前までのイベントを表示
-
-        if(isset($query_param['organizer'])){ //作成したユーザで絞り込み
-            $organizer = $query_param['organizer'];
-            if (is_numeric($organizer) && $organizer > 0){
-                $conditions[] = ['Events.organizer_id' => $organizer];
-            }
-        }
-        // $conditions[] = ['not exists '.'(select event_responses.event_id,event_responses.responder_id from event_responses '.'where event_responses.responder_id = '.'1)'];
         
-        $events_query = $this->Events->find("all", ['conditions'=>$conditions])
+        $this->Locations = $this->fetchTable('Locations');
+        $conditions = [
+            'Events.deleted_at IS' => NULL,
+            'Events.end_time >=' => date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s") . "-14days"))
+        ]; 
+        $events_query = $this->Events->find("all", ['conditions'=>$conditions]);
+        $events_query = $events_query
         ->contain([
-            'Users', 
+            // 'Users', //開催者
             'Locations',
-            'EventResponses' => ['sort' => ['response_state' => 'DESC']]
+            'EventResponses' => [
+                'sort' => [
+                    'response_state' => 'DESC', 
+                    'EventResponses.updated_at' => 'ASC'
+                ]
+            ]
         ])
-        ->contain('EventResponses.Users')
+        ->select($this->Events)
+        ->select($this->Locations)
+        ->contain('EventResponses.Users') //EventResponses以下Usersオブジェクト作成
         ->order(['events.start_time'=>'ASC'])
         ->limit(10);
         $events = $events_query->all()->toArray();
@@ -114,13 +115,9 @@ class EventsController extends AppController
         $day_of_week=['月','火','水','木','金','土','日']; //日付変換用の定数
         $events = Hash::map($events, '{n}', function($event) use ($day_of_week, $uid) { //各データの整形
             //開催日の取出
-            $date = $event->start_time->i18nFormat('yyyy-MM-dd');
+            $event['date'] = $event->start_time->i18nFormat('yyyy-MM-dd');
             $event['day_of_week'] = "{$day_of_week[$event->start_time->dayOfWeek-1]}";
-            [$date_y, $date_m, $date_d] = explode('-', $date);
-            $event['date_y'] = $date_y;
-            $event['date_m'] = $date_m;
-            $event['date_d'] = $date_d;
-                        
+
             //時刻の比較
             $now_datetime = strtotime("now");
             $start_datetime = strtotime($event->start_time->i18nFormat('yyyy-MM-dd HH:mm:ss'));
@@ -132,11 +129,10 @@ class EventsController extends AppController
             } else {
                 $event['event_state'] = 1;
             }
+            $event['event_state'] = 0;
 
             //参加人数の取出
-            $event['participants_0_count'] = count(Hash::extract($event, 'event_responses.{n}[response_state=0]'));
-            $event['participants_1_count'] = count(Hash::extract($event, 'event_responses.{n}[response_state=1]'));
-            $event['participants_2_count'] = count(Hash::extract($event, 'event_responses.{n}[response_state=2]'));
+            $event['participants_count'] = array_count_values(Hash::extract($event, 'event_responses.{n}.response_state'));
 
             //ユーザの参加情報取出
             if ($uid){
@@ -166,7 +162,7 @@ class EventsController extends AppController
         ->contain([
             'Users', 
             'Locations',
-            'EventResponses' => ['sort' => ['response_state' => 'DESC']]
+            'EventResponses' => ['sort' => ['response_state' => 'DESC', 'EventResponses.updated_at' => 'ASC']]
         ])
         ->contain('EventResponses.Users')
         ->first();
@@ -210,15 +206,12 @@ class EventsController extends AppController
         $this->autoRender = false;
         $data = $this->request->getData();
 
-        // $user = $this->EventResponses->newEmptyEntity();
-        $this->loadModel('EventResponses');
-        // $this->fetchTable('EventResponses');
+        $this->EventResponses = $this->fetchTable('EventResponses');
         $event_response = $this->EventResponses->find('all', ['conditions'=>['responder_id'=>$data['user_id'],'event_id'=>$data['event_id']]])->first();
         if(!$event_response){
             $event_response = $this->EventResponses->newEntity(['responder_id'=>$data['user_id'],'event_id'=>$data['event_id']]);
         }
-        $event_response = $this->EventResponses->patchEntity($event_response, ['response_state'=>$data['response_state']]);
-        // $response = ['er'=>$event_response];
+        $event_response = $this->EventResponses->patchEntity($event_response, ['response_state' => $data['response_state']]);
         if ($this->EventResponses->save($event_response)) {
             $response = ['status'=>'ok'];
         } else {
