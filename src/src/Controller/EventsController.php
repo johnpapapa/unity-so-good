@@ -48,9 +48,6 @@ class EventsController extends AppController
         // ])->all()->toArray();
 
 
-        // debug($events);
-
-
         // SELECT event_responses.event_id, event_responses.response_state, count(event_responses.response_state)
         // FROM events
         // INNER JOIN event_responses ON events.id = event_responses.event_id
@@ -61,7 +58,6 @@ class EventsController extends AppController
         // // ->contain('EventResponses')
         // // ->group('EventResponses.event_state')
         // // ->all()->toArray();
-        // // debug($events);
         // $events = $this->Events->find("all")
         // ->contain([
         //     'EventResponses' => function ($q) {
@@ -138,7 +134,11 @@ class EventsController extends AppController
             //ユーザの参加情報取出
             if ($uid){
                 $user_event_responses = Hash::extract($event, 'event_responses.{n}[responder_id='.$uid.']');
-                $event['user_response_state'] = isset($user_event_responses[0]['response_state']) ? $user_event_responses[0]['response_state'] : null;
+                if(count($user_event_responses) <= 0){
+                    $event['user_response_state'] = null;
+                } else {
+                    $event['user_response_state'] = $user_event_responses[0]['response_state'];
+                }
             }
 
             return $event;
@@ -227,7 +227,11 @@ class EventsController extends AppController
             //ユーザの参加情報取出
             if ($uid){
                 $user_event_responses = Hash::extract($event, 'event_responses.{n}[responder_id='.$uid.']');
-                $event['user_response_state'] = is_null($user_event_responses[0]['response_state']) ? $user_event_responses[0]['response_state'] : null;
+                if(count($user_event_responses) <= 0){
+                    $event['user_response_state'] = null;
+                } else {
+                    $event['user_response_state'] = $user_event_responses[0]['response_state'];
+                }
             }
 
             return $event;
@@ -314,7 +318,11 @@ class EventsController extends AppController
             //ユーザの参加情報取出
             if ($uid){
                 $user_event_responses = Hash::extract($event, 'event_responses.{n}[responder_id='.$uid.']');
-                $event['user_response_state'] = isset($user_event_responses[0]['response_state']) ? $user_event_responses[0]['response_state'] : null;
+                if(count($user_event_responses) <= 0){
+                    $event['user_response_state'] = null;
+                } else {
+                    $event['user_response_state'] = $user_event_responses[0]['response_state'];
+                }
             }
 
             return $event;
@@ -517,18 +525,6 @@ class EventsController extends AppController
         $locations = Hash::combine($locations, '{n}.display_name', '{n}');
         $this->set(compact('event', 'locations'));
 
-        // 'display_name' => '新杉田テニスコート',
-        // 'address' => '',
-        // 'usage_price' => '',
-        // 'night_price' => '',
-        // 'location_id' => '',
-        // 'area' => 'A B',
-        // 'participants_limit' => '8',
-        // 'comment' => 'test3',
-        // 'event_date' => '2023/08/29',
-        // 'start_time' => '2200',
-        // 'end_time' => '1230',
-
         if ($this->request->is('post')) {
             $data = $this->request->getData();
             $save_data = [];
@@ -561,8 +557,6 @@ class EventsController extends AppController
                 "comment"=>h($data['comment']),
                 "location_id"=>$data['location_id'],
             ]);
-            // debug($event_data);
-            // return ;
 
             $result_event = $this->Events->save($event_data);
             if ($result_event) {

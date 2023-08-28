@@ -17,7 +17,8 @@
                 <?= $event_state['text'] ?>
             </div>
 
-            <?php if($event->user_response_state): ?>
+            <?php if(!is_null($event->user_response_state)): ?>
+
                 <?php $user_response_state = Configure::read('response_states')[$event->user_response_state]; ?>
                 <div class="state-tag disp-iblock" , style="background-color: <?= $user_response_state['tag_color'] ?>;">
                     <?= $user_response_state['text'] ?>
