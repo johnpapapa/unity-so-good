@@ -12,9 +12,8 @@ use Cake\ORM\Entity;
  * @property \Cake\I18n\FrozenTime|null $created_at
  * @property \Cake\I18n\FrozenTime|null $updated_at
  * @property \Cake\I18n\FrozenTime|null $deleted_at
- * @property \Cake\I18n\FrozenDate $date
- * @property \Cake\I18n\Time $start_time
- * @property \Cake\I18n\Time $end_time
+ * @property \Cake\I18n\FrozenTime $start_time
+ * @property \Cake\I18n\FrozenTime $end_time
  * @property string|null $area
  * @property int $participants_limit
  * @property string|null $comment
@@ -40,7 +39,6 @@ class Event extends Entity
         'created_at' => true,
         'updated_at' => true,
         'deleted_at' => true,
-        'date' => true,
         'start_time' => true,
         'end_time' => true,
         'area' => true,

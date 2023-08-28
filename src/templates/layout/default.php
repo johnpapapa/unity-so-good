@@ -28,6 +28,9 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
 
     <link href="https://fonts.googleapis.com/css?family=Raleway:400,700" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.7.0.js"  integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1/i18n/jquery.ui.datepicker-ja.min.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 
     <?= $this->Html->css(['normalize.min', 'milligram.min', 'default', 'top-nav', 'bottom-nav']) ?>
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
@@ -42,11 +45,11 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
         <?= $this->element('bottom-nav'); ?>
     </header>
     <main class="main">
+        <?php echo $this->Flash->render(); ?>
         <div class="container">
             <h1 class="content-title"><?= $this->fetch('content-title') ?></h1>
             <?= $this->Flash->render() ?>
             <?= $this->fetch('content') ?>
-
         </div>
     </main>
     <footer>

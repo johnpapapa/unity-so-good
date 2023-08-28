@@ -56,6 +56,15 @@ class EventsTable extends Table
         $this->hasMany('EventResponses', [
             'foreignKey' => 'event_id',
         ]);
+
+        $this->addBehavior('Timestamp', [
+            'events' => [
+                'Model.beforeSave' => [
+                    'created_at' => 'new',
+                    'updated_at' => 'always',
+                ],
+            ],
+        ]);
         
     }
 
@@ -80,17 +89,12 @@ class EventsTable extends Table
             ->allowEmptyDateTime('deleted_at');
 
         $validator
-            ->date('date')
-            ->requirePresence('date', 'create')
-            ->notEmptyDate('date');
-
-        $validator
-            ->time('start_time')
+            ->datetime('start_time')
             ->requirePresence('start_time', 'create')
             ->notEmptyTime('start_time');
 
         $validator
-            ->time('end_time')
+            ->datetime('end_time')
             ->requirePresence('end_time', 'create')
             ->notEmptyTime('end_time');
 

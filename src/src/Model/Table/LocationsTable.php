@@ -66,17 +66,17 @@ class LocationsTable extends Table
             ->scalar('address')
             ->maxLength('address', 255)
             ->requirePresence('address', 'create')
-            ->notEmptyString('address');
+            ->allowEmptyString('address');
 
         $validator
             ->integer('usage_price')
             ->requirePresence('usage_price', 'create')
-            ->notEmptyString('usage_price');
+            ->allowEmptyString('usage_price');
 
         $validator
             ->integer('night_price')
             ->requirePresence('night_price', 'create')
-            ->notEmptyString('night_price');
+            ->allowEmptyString('night_price');
 
         return $validator;
     }

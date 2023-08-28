@@ -264,19 +264,19 @@ class Initial extends AbstractMigration
                 'null' => false,
             ])
             ->addColumn('address', 'string', [
-                'default' => null,
+                'default' => '',
                 'limit' => 255,
-                'null' => false,
+                'null' => true,
             ])
             ->addColumn('usage_price', 'integer', [
-                'default' => null,
+                'default' => 0,
                 'limit' => null,
-                'null' => false,
+                'null' => true,
             ])
             ->addColumn('night_price', 'integer', [
-                'default' => null,
+                'default' => 0,
                 'limit' => null,
-                'null' => false,
+                'null' => true,
             ])
             ->create();
 
