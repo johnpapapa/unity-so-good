@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 namespace App\Controller;
+
 use Cake\Utility\Hash;
 use Cake\Datasource\ConnectionManager;
 
@@ -378,7 +379,11 @@ class EventsController extends AppController
             //ユーザの参加情報取出
             if ($uid){
                 $user_event_responses = Hash::extract($event, 'event_responses.{n}[responder_id='.$uid.']');
-                $event['user_response_state'] = is_null($user_event_responses[0]['response_state']) ? $user_event_responses[0]['response_state'] : null;
+                if(count($user_event_responses) <= 0){
+                    $event['user_response_state'] = null;
+                } else {
+                    $event['user_response_state'] = $user_event_responses[0]['response_state'];
+                }
             }
 
             return $event;
@@ -441,7 +446,19 @@ class EventsController extends AppController
             $event['user_response_state'] = isset($user_event_responses[0]['response_state']) ? $user_event_responses[0]['response_state'] : null;
         }
 
-        $this->set(compact('event'));
+        // $prev = Product::where('id', '<', $base)->orderBy('id', 'desc')->limit('1')->first();
+        // $next = Product::where('id', '>', $base)->orderBy('id')->limit('1')->first();
+        $event_prev = $this->Events->find("all", [
+            "conditions" => ["events.id <" => $id]
+        ])->select('id')->order(['events.id'=>'DESC'])->limit(1)->first();
+        $event_next = $this->Events->find("all", [
+            "conditions" => ["events.id >" => $id]
+        ])->select('id')->order(['events.id'=>'ASC'])->limit(1)->first();
+
+        $event_prev_id = (isset($event_prev->id)) ? $event_prev->id : null;
+        $event_next_id = (isset($event_next->id)) ? $event_next->id : null;
+
+        $this->set(compact('event', 'event_prev_id', 'event_next_id'));
     }
 
     public function ajaxChangeResponseState(){
@@ -488,19 +505,72 @@ class EventsController extends AppController
      */
     public function add()
     {
+        if ($this->Authentication->getResult()->isValid()){
+            $uid = $this->Authentication->getResult()->getData()['id'];
+        } else {
+            $this->Flash->error(__('Failed to get member information. Please login.'));
+            return $this->redirect(['action' => 'index']);
+        }
+        $this->Locations = $this->fetchTable('Locations');
         $event = $this->Events->newEmptyEntity();
-        if ($this->request->is('post')) {
-            $event = $this->Events->patchEntity($event, $this->request->getData());
-            if ($this->Events->save($event)) {
-                $this->Flash->success(__('The event has been saved.'));
+        $locations = $this->Locations->find('all', ["conditions"=>[]])->all()->toArray();
+        $locations = Hash::combine($locations, '{n}.display_name', '{n}');
+        $this->set(compact('event', 'locations'));
 
+        // 'display_name' => '新杉田テニスコート',
+        // 'address' => '',
+        // 'usage_price' => '',
+        // 'night_price' => '',
+        // 'location_id' => '',
+        // 'area' => 'A B',
+        // 'participants_limit' => '8',
+        // 'comment' => 'test3',
+        // 'event_date' => '2023/08/29',
+        // 'start_time' => '2200',
+        // 'end_time' => '1230',
+
+        if ($this->request->is('post')) {
+            $data = $this->request->getData();
+            $save_data = [];
+
+            if(isset($data['location_new_check'])){
+                $location_data = $this->Locations->newEntity([
+                    "display_name"=>h($data['display_name']),
+                    "address"=>h($data['address']),
+                    "usage_price"=>$data['usage_price'],
+                    "night_price"=>$data['night_price'],
+                ]);
+                $result_location = $this->Locations->save($location_data);
+                if(!$result_location){
+                    $this->Flash->error(__('The location could not be saved. Please, try again.'));
+                    return;
+                }
+                $data["location_id"] = $result_location->id;
+            }
+
+            $data['event_date'] = str_replace('/','-',$data['event_date']); //日付のフォーマット
+            $data['start_time'] = wordwrap($data['start_time'], 2, ':', true); //時刻のフォーマット
+            $data['end_time'] = wordwrap($data['end_time'], 2, ':', true); //時刻のフォーマット
+
+            $event_data = $this->Events->newEntity([
+                "organizer_id" => $uid,
+                "start_time"=>$data['event_date'] . ' ' . $data['start_time'] . ':00',
+                "end_time"=>$data['event_date'] . ' ' . $data['end_time'] . ':00',
+                "area"=>h($data['area']),
+                "participants_limit"=>$data['participants_limit'],
+                "comment"=>h($data['comment']),
+                "location_id"=>$data['location_id'],
+            ]);
+            // debug($event_data);
+            // return ;
+
+            $result_event = $this->Events->save($event_data);
+            if ($result_event) {
+                $this->Flash->success(__('The event has been saved.'));
                 return $this->redirect(['action' => 'index']);
             }
             $this->Flash->error(__('The event could not be saved. Please, try again.'));
         }
-        $users = $this->Events->Users->find('list', ['limit' => 200])->all();
-        $locations = $this->Events->Locations->find('list', ['limit' => 200])->all();
-        $this->set(compact('event', 'users', 'locations'));
     }
 
     /**

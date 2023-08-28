@@ -14,7 +14,13 @@
     let response_ajax_send_token = "<?= $this->request->getAttribute('csrfToken') ?>";
 </script>
 
+<? if($event_prev_id): ?>
+<a href="<?= $this->Url->build(['controller' => 'events','action' => 'detail', $event_prev_id]); ?>">前のイベントへ移動</a>
+<? endif; ?>
 
+<? if($event_next_id): ?>
+<a href="<?= $this->Url->build(['controller' => 'events','action' => 'detail', $event_next_id]); ?>">次のイベントへ移動</a>
+<? endif; ?>
 <div><a onclick="history.back()">直前のページに戻る</a></div>
 
 
@@ -61,9 +67,9 @@
     <div class="row">
         <div class="column">参加表明</div>
         <div class="column">
-            <button class="undecided" value="0" <?= ($event->user_response_state == 0)? 'disabled':'' ?>>参加未定</button>
-            <button class="present" value="1" <?= ($event->user_response_state == 1)? 'disabled':'' ?>>参加</button>
-            <button class="absent" value="2" <?= ($event->user_response_state == 2)? 'disabled':'' ?>>不参加</button>
+            <button class="undecided" value="0" <?= ($event->user_response_state === 0)? 'disabled':'' ?>>参加未定</button>
+            <button class="present" value="1" <?= ($event->user_response_state === 1)? 'disabled':'' ?>>参加</button>
+            <button class="absent" value="2" <?= ($event->user_response_state === 2)? 'disabled':'' ?>>不参加</button>
         </div>
     </div>
     <div class="row">

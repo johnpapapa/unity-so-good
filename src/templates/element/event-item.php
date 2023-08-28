@@ -37,9 +37,9 @@
                 </div>
                 <div class="limit disp-iblock">人数制限:<?= $event->participants_limit <= 0 ? 'なし' : $event->participants_limit . '人' ?></div>
                 <div class="count disp-iblock">
-                    ?:<?= $event->participants_count['0'] ?>
-                    o:<?= $event->participants_count['1'] ?>
-                    x:<?= $event->participants_count['2'] ?>
+                    ?:<?= (isset($event->participants_count['0'])) ? $event->participants_count['0']:0 ?>
+                    o:<?= (isset($event->participants_count['1'])) ? $event->participants_count['1']:0 ?>
+                    x:<?= (isset($event->participants_count['2'])) ? $event->participants_count['2']:0 ?>
                 </div>
             </div>
 
