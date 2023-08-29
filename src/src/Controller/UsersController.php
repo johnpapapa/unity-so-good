@@ -41,6 +41,34 @@ class UsersController extends AppController
         return $this->redirect(['controller' => 'Users', 'action' => 'login']);
     }
 
+    public function detail(){
+        if (!$this->Authentication->getResult()->isValid()){
+            $this->Flash->error(__('Failed to get member information. Please login.'));
+            return $this->redirect(['action' => 'index']);
+        }
+
+        $current_user = $this->Authentication->getResult()->getData();
+        $this->set(compact('current_user'));
+
+        if ($this->request->is('post')) {
+            $data = $this->request->getData();
+            
+            $save_data = [];
+
+            if(isset($data['display_name'])){ $save_data['display_name'] = $data['display_name']; }
+            if(isset($data['username'])){ $save_data['username'] = $data['username']; }
+            if(isset($data['password'])){ $save_data['password'] = $data['password']; }
+
+            $user_data = $this->Users->patchEntity($current_user, $save_data);
+            $result_user = $this->Users->save($user_data);
+            if ($result_user) {
+                $this->Flash->success(__('The event has been saved.'));
+                return $this->redirect(['controller'=>'events', 'action' => 'index']);
+            }
+            $this->Flash->error(__('The event could not be saved. Please, try again.'));
+        }
+    }
+
     /**
      * Index method
      *

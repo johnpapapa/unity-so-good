@@ -28,9 +28,14 @@
   <div style="color:white">
     <span class="material-symbols-outlined">person</span>
     <?php if($current_user): ?>
-      <?= $current_user->display_name ?>
+      
+      <a href="<?= $this->Url->build(['controller' => 'users','action' => 'detail',]); ?>">
+        <?= $current_user->display_name ?>
+      </a>
     <?php else: ?>
-      ゲスト
+      <a href="<?= $this->Url->build(['controller' => 'users','action' => 'login',]); ?>">
+        ゲスト
+      </a>
     <?php endif; ?>
   </div>
   
