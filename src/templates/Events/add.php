@@ -1,10 +1,3 @@
-<!-- - コート名
-- コート番号
-- 日時
-- 定員
-- コメント・注意事項
-- 保存ボタン -->
-
 <script>
     let locations = <?= json_encode($locations) ?>;
 </script>
