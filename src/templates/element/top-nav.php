@@ -22,18 +22,18 @@
   <ul class="nav-links">
     <!-- <i class="uil uil-times navCloseBtn"></i> -->
     <span class="material-symbols-outlined navCloseBtn">close</span>
-    <li><a href="#">About</a></li>
+    <li><a href="<?= $this->Url->build(['controller' => 'informations','action' => 'about']); ?>">About</a></li>
     <li><a href="#">Contact</a></li>
   </ul>
   <div style="color:white">
     <span class="material-symbols-outlined">person</span>
     <?php if($current_user): ?>
       
-      <a href="<?= $this->Url->build(['controller' => 'users','action' => 'detail',]); ?>">
+      <a href="<?= $this->Url->build(['controller' => 'users','action' => 'detail']); ?>">
         <?= $current_user->display_name ?>
       </a>
     <?php else: ?>
-      <a href="<?= $this->Url->build(['controller' => 'users','action' => 'login',]); ?>">
+      <a href="<?= $this->Url->build(['controller' => 'users','action' => 'login']); ?>">
         ゲスト
       </a>
     <?php endif; ?>
