@@ -50,7 +50,7 @@ class EventsController extends AppController
 
         // SELECT event_responses.event_id, event_responses.response_state, count(event_responses.response_state)
         // FROM events
-        // INNER JOIN event_responses ON events.id = event_responses.event_id
+        // INNER JOIN event_responses ON Events.id = event_responses.event_id
         // WHERE 1
         // GROUP BY event_responses.event_id, event_responses.response_state
     
@@ -105,7 +105,7 @@ class EventsController extends AppController
         ->select($this->Events)
         ->select($this->Locations)
         ->contain('EventResponses.Users') //EventResponses以下Usersオブジェクト作成
-        ->order(['events.start_time'=>'DESC'])
+        ->order(['Events.start_time'=>'DESC'])
         ->limit(10);
         $events = $events_query->all()->toArray();
         
@@ -198,7 +198,7 @@ class EventsController extends AppController
         ->select($this->Events)
         ->select($this->Locations)
         ->contain('EventResponses.Users') //EventResponses以下Usersオブジェクト作成
-        ->order(['events.start_time'=>'ASC']);
+        ->order(['Events.start_time'=>'ASC']);
         // ->limit(10);
         $events = $events_query->all()->toArray();
         
@@ -288,7 +288,7 @@ class EventsController extends AppController
         ->select($this->Events)
         ->select($this->Locations)
         ->contain('EventResponses.Users') //EventResponses以下Usersオブジェクト作成
-        ->order(['events.start_time'=>'ASC'])
+        ->order(['Events.start_time'=>'ASC'])
         ->limit(10);
 
         $events = $events_query->all()->toArray();
@@ -358,7 +358,7 @@ class EventsController extends AppController
         ->select($this->Events)
         ->select($this->Locations)
         ->contain('EventResponses.Users') //EventResponses以下Usersオブジェクト作成
-        ->order(['events.start_time'=>'ASC']);
+        ->order(['Events.start_time'=>'ASC']);
         // ->limit(10);
         $events = $events_query->all()->toArray();
         
@@ -412,7 +412,7 @@ class EventsController extends AppController
             return $this->redirect(['action' => 'index']);
         }
         $event = $this->Events->find("all", [
-            "conditions" => ["events.id" => $id]
+            "conditions" => ["Events.id" => $id]
         ])
         ->contain([
             'Users', 
@@ -457,11 +457,11 @@ class EventsController extends AppController
         // $prev = Product::where('id', '<', $base)->orderBy('id', 'desc')->limit('1')->first();
         // $next = Product::where('id', '>', $base)->orderBy('id')->limit('1')->first();
         $event_prev = $this->Events->find("all", [
-            "conditions" => ["events.id <" => $id]
-        ])->select('id')->order(['events.id'=>'DESC'])->limit(1)->first();
+            "conditions" => ["Events.id <" => $id]
+        ])->select('id')->order(['Events.id'=>'DESC'])->limit(1)->first();
         $event_next = $this->Events->find("all", [
-            "conditions" => ["events.id >" => $id]
-        ])->select('id')->order(['events.id'=>'ASC'])->limit(1)->first();
+            "conditions" => ["Events.id >" => $id]
+        ])->select('id')->order(['Events.id'=>'ASC'])->limit(1)->first();
 
         $event_prev_id = (isset($event_prev->id)) ? $event_prev->id : null;
         $event_next_id = (isset($event_next->id)) ? $event_next->id : null;
