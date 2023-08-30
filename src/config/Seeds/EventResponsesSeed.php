@@ -23,7 +23,7 @@ class EventResponsesSeed extends AbstractSeed
     {
         $location_count = 30;
         $user_count = 100;
-        $event_count = 1000;
+        $event_count = 100;
         $event_response_count = 70;
 
         // $user_id_between_min = 1;
