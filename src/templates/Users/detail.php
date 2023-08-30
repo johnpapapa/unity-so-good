@@ -6,6 +6,11 @@
         <div class="container">
             <div class="row">
                 <div class="column">
+                    <a href="<?= $this->Url->build(['controller' => 'users','action' => 'logout']); ?>">ログアウトする</a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="column">
                     <label for="display_name">表示名</label>
                     <input type="text" id="display_name" name="display_name" required="required" data-validity-message="This field cannot be left empty" value="<?= $current_user->display_name ?>" maxlength="255">
                 </div>

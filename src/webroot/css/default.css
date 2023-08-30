@@ -5,16 +5,8 @@
     
 }
 
-
 body {
-    /* max-width: 800px; */
-    /* padding: 0px 2rem; */
     margin: 0 auto 50px;
-    /* background-color: #b3b3b3; */
-    /* background: #f0faff; */
-    /* overflow: hidden; */
-    /* background-color: #f1f1f1; */
-    /* padding: 0px 10px; */
 }
 
 .container {
@@ -44,8 +36,12 @@ body {
     align-items: center;
 }
 
+input[type=text], input[type=number], input[type=password] {
+    font-size: 20px !important;
+}
 @media screen and (max-width: 768px) {
     body {
         font-size: 14px;
     }
+    
 }
