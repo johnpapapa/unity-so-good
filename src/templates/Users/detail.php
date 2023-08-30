@@ -6,13 +6,13 @@
         <div class="container">
             <div class="row">
                 <div class="column">
-                    <label for="display_name">Display Name</label>
+                    <label for="display_name">表示名</label>
                     <input type="text" id="display_name" name="display_name" required="required" data-validity-message="This field cannot be left empty" value="<?= $current_user->display_name ?>" maxlength="255">
                 </div>
             </div>
             <div class="row">
                 <div class="column">
-                    <label for="username">Username</label>
+                    <label for="username">ID</label>
                     <input type="text" id="username" name="username" required="required" data-validity-message="This field cannot be left empty" value="<?= $current_user->username ?>" maxlength="255">
                 </div>           
             </div>

@@ -1,3 +1,5 @@
+<?php $this->assign('title', 'Users'); ?>
+<?php $this->assign('content-title', 'ユーザ新規登録'); ?>
 <div class="users form">
 <?= $this->Form->create($user) ?>
     <fieldset>
