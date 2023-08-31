@@ -1,14 +1,26 @@
+<?php $this->assign('title', 'add event'); ?>
+<?php $this->assign('content-title', 'イベントの追加'); ?>
 <script>
     let locations = <?= json_encode($locations) ?>;
 </script>
 <style>
-    :disabled {
+    .disabled {
         background-color: gray !important;
         cursor: not-allowed;
     }
+
+    /* input[type=textarea] {
+        padding: 0.5em 0.6em;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-shadow: inset 0 1px 3px #ddd;
+    border-radius: 4px;
+    vertical-align: middle;
+    box-sizing: border-box;
+    } */
 </style>
 
-<div class="events form">
+<div class="events form pure-form pure-form-stacked">
 <?= $this->Form->create() ?>
     <fieldset>
         <div class="location_name_input">
@@ -17,7 +29,7 @@
                 入力フォームの候補に該当するコートが存在する場合、<br>
                 候補のタップを優先してください(新規コートのチェックを外せます)<br>
             </p>
-            <input type="text" name="display_name" id="display_name" autocomplete="on" list="locations">
+            <input type="text" class="pure-u-1" name="display_name" id="display_name" autocomplete="on" list="locations" placeholder="コート名">
             <datalist id="locations">
                 <?php foreach($locations as $location): ?>
                     <option value="<?= $location->display_name ?>"></option>
@@ -46,13 +58,13 @@
             </div>
             <div class="location_data_input" style="display: none;">
                 <label for="address">住所</label>
-                <input type="text" name="address" id="address">
+                <input type="text" name="address" id="address" placeholder="住所">
     
                 <label for="usage_price">コート使用料</label>
-                <input type="number" name="usage_price" id="usage_price">
+                <input type="number" name="usage_price" id="usage_price" placeholder="コート使用料">
                 
                 <label for="night_price">コート使用料(ナイター)</label>
-                <input type="number" name="night_price" id="night_price">
+                <input type="number" name="night_price" id="night_price" placeholder="コート使用料(ナイター)">
 
                 <input type="hidden" id="location_id" name="location_id" value="">
             </div>
@@ -62,12 +74,12 @@
         <div class="input text">
             <label for="area">コート番号</label>
             <p style="font-size: 12px; color:gray;">無入力可</p>
-            <input type="text" name="area" id="area" value="" maxlength="255">
+            <input type="text" name="area" id="area" value="" maxlength="255"  placeholder="コート番号">
         </div>        
         <div class="input number required">
             <label for="participants_limit">参加人数上限</label>
             <input type="number" id="participants_limit" name="participants_limit" required="required" 
-                data-validity-message="This field cannot be left empty" aria-required="true" value="8">
+                data-validity-message="This field cannot be left empty" aria-required="true" value="8"  placeholder="参加人数上限" read>
             <div class="participants_limit_none">
                 <input type="checkbox" id="participants_limit_none_check">
                 参加人数無制限
@@ -76,12 +88,13 @@
         <div class="input text">
             <label for="comment">コメント・注意事項</label>
             <p style="font-size: 12px; color:gray;">無入力可</p>
-            <input type="text" name="comment" id="comment" maxlength="255">
+            <!-- <input type="textarea" name="comment" id="comment" maxlength="255" placeholder="コメント・注意事項" rows="5"> -->
+            <textarea name="comment" id="comment" maxlength="255" placeholder="コメント・注意事項" rows="5"></textarea>
         </div>
 
         <div class="input date">
             <label for="event_date">日付</label>
-            <input type="text" name="event_date" id="event_date" required="required">
+            <input type="text" name="event_date" id="event_date" required="required" placeholder="日付">
         </div>
         <div class="input datetime required">
             <label for="start_time">開始時刻</label>
@@ -89,7 +102,7 @@
                 時刻を表現する半角英数字4文字を入力してください<br>
                 (例)9時45分=>0945, 23時05分=>2305 (24時間形式)
             </p>
-            <input type="text" name="start_time" id="start_time" required="required" maxlength="4" pattern="^([01][0-9]|2[0-3])[0-5][0-9]$" title="Please enter 4 characters that can represent the time.">
+            <input type="text" name="start_time" id="start_time" required="required" maxlength="4" pattern="^([01][0-9]|2[0-3])[0-5][0-9]$" title="Please enter 4 characters that can represent the time." placeholder="開始時刻">
         </div>        
         <div class="input datetime required">
             <label for="end_time">終了時刻</label>
@@ -97,7 +110,7 @@
                 時刻を表現する半角英数字4文字を入力してください<br>
                 (例)9時45分=>0945, 23時05分=>2305 (24時間形式)
             </p>
-            <input type="text" name="end_time" id="end_time" required="required" maxlength="4" pattern="^([01][0-9]|2[0-3])[0-5][0-9]$" title="Please enter 4 characters that can represent the time.">
+            <input type="text" name="end_time" id="end_time" required="required" maxlength="4" pattern="^([01][0-9]|2[0-3])[0-5][0-9]$" title="Please enter 4 characters that can represent the time." placeholder="終了時刻">
         </div>
    </fieldset>
 <?= $this->Form->button(__('Submit')); ?>
@@ -137,11 +150,13 @@
 
         $(obj_participants_limit_none_check).on('click', function(){
             if ($(this).prop("checked")){
-                obj_participants_limit.prop('disabled', true);
-                obj_participants_limit.val(-1)
+                obj_participants_limit.prop('readonly', true);
+                obj_participants_limit.addClass('disabled');
+                obj_participants_limit.val(-1);
             } else {
-                obj_participants_limit.prop('disabled', false);
-                obj_participants_limit.val(8)
+                obj_participants_limit.prop('readonly', false);
+                obj_participants_limit.removeClass('disabled');
+                obj_participants_limit.val(8);
             }
         });
 

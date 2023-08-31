@@ -1,21 +1,6 @@
-// $("#kicker").on("change", function(){
-//     var send_data = {selected:$('option:selected').val(), add_key:'add_value'};
-
-//     $.ajax({
-//         type: "post",
-//         url: "<?= $this->Url->build(['controller' => 'Samples', 'action' => 'receiver']) ?>",
-//         data: send_data,
-//         headers: { 'X-CSRF-Token' : "<?= $this->request->getAttribute('csrfToken') ?>" },
-//     }).done(function(response){
-//         $("#target").val($.parseJSON(response));
-//     }).fail(function(jqXHR){
-//         console.error('Error : ', jqXHR.status, jqXHR.statusText);
-//     });
-// });
-
-
 $(function(){
     $('button').on('click', function(){
+        console.log("sdf");
         let button_current = $(this);
         button_current.prop('disabled', true);
         let button_siblings = $(this).siblings();
@@ -36,7 +21,7 @@ $(function(){
             headers: { 'X-CSRF-Token' : response_ajax_send_token },
         }).done(function(response){
             // $("#target").val($.parseJSON(response));
-            console.log(response)
+            window.location.reload();
         }).fail(function(jqXHR){
             console.error('Error : ', jqXHR.status, jqXHR.statusText);
         });

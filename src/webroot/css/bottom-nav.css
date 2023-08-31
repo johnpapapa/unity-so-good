@@ -1,7 +1,6 @@
-.bottom-nav {
+ .bottom-nav {
     left: 0;
     width: 100%;
-    /* padding: 15px 200px; */
     background: #6a6766;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     position: fixed;
@@ -23,11 +22,12 @@
     text-align: center;
 }
 .bottom-nav .nav-links a{
-    padding: 10px;
+    padding: 20px 10px;
     display: block;
     width: 100%;
     height: 100%;
     color: white;
+    text-decoration: none;
 }
 
 .bottom-nav .nav-links a:hover {
@@ -36,21 +36,9 @@
     transition: all 0.2s linear;
 }
 
-
-#bottom-bar {
-  display:table;
-  width:100%;
-}
-
-.bottom-elm {
-  border-right:1px solid black;
-  color: white;
-  display:table-cell;
-  text-align:center;
-  vertical-align:middle;
-  width: 1%;
-  
-  &:last-child {
-    border-right:none;
+@media screen and (max-width: 768px) {
+  .bottom-nav .nav-links a{
+    padding: 20px 10px;
+    font-size: 18px;
   }
 }
