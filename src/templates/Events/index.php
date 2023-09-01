@@ -1,4 +1,4 @@
-<?php $this->assign('title', 'Events'); ?>
+<?php $this->assign('title', 'event index'); ?>
 <?php $this->assign('content-title', 'イベント一覧'); ?>
 
 <?php foreach($events as $event): ?>

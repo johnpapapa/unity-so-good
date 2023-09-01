@@ -1,4 +1,4 @@
-<?php $this->assign('title', 'add event'); ?>
+<?php $this->assign('title', 'event add'); ?>
 <?php $this->assign('content-title', 'イベントの追加'); ?>
 <script>
     let locations = <?= json_encode($locations) ?>;

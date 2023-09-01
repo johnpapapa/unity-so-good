@@ -5,11 +5,16 @@
 .disp-iblock {display: inline-block;}
 .align-center {align-items: center;}
 .just-center {justify-content: center;}
+.just-space {justify-content: space-around;}
 .text-center {text-align: center;}
+
+.g10 {gap: 10px;}
+
+.fl {float: left;}
+.fr {float: right;}
 
 .w100 {width: 100%;}
 .w50 {width: 50%;}
-
 
 .pt10 {padding-top: 10px;}
 .p10 {padding: 10px;}

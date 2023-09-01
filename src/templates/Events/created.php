@@ -1,4 +1,4 @@
-<?php $this->assign('title', 'Events'); ?>
+<?php $this->assign('title', 'event created'); ?>
 <?php $this->assign('content-title', '作成済イベント一覧'); ?>
 
 

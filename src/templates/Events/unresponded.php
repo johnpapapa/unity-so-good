@@ -1,4 +1,4 @@
-<?php $this->assign('title', 'Events'); ?>
+<?php $this->assign('title', 'event unresponded'); ?>
 <?php $this->assign('content-title', '未表明イベント'); ?>
 
 <?php foreach($events as $event): ?>

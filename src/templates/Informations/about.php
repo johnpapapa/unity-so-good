@@ -1,4 +1,4 @@
-<?php $this->assign('title', 'About'); ?>
+<?php $this->assign('title', 'information about'); ?>
 <?php $this->assign('content-title', '概要'); ?>
 
 <h3>ここはてきとうにいろいろかくぺーじ</h3>

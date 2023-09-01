@@ -1,4 +1,4 @@
-<?php $this->assign('title', 'register'); ?>
+<?php $this->assign('title', 'user register'); ?>
 <?php $this->assign('content-title', 'ユーザー新規登録'); ?>
 
 

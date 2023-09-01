@@ -1,12 +1,12 @@
-<?php // $this->Html->css(['event-item']) ?>
 <?= $this->Html->script('event-item', array('inline' => false)); ?>
 <?php
     use Cake\Core\Configure;
     $user_response_state = (!is_null($event->user_response_state)) ? Configure::read('response_states')[$event->user_response_state] : null;
     $event_state = Configure::read('event_states')[$event->event_state];
+    $day_of_weeks = Configure::read('day_of_weeks');
 ?>
 
-<div class="event-outer mb20">
+<div class="event-item event-outer mb20">
     <div class="event-inner ">
 
         <div class="tags mb5">
@@ -28,18 +28,18 @@
         </div>
 
         <div class="schedule mb5 bold">
-            <?= $event->date ?>
-            <span>(<?= $event->day_of_week ?>)</span>
+            <?= $event->start_time->i18nFormat('yyyy-MM-dd'); ?>
+            <span>(<?= $day_of_weeks[$event->start_time->dayOfWeek] ?>)</span>
         </div>
 
         <div class="location mb10 bold over-ellipsis">
-            <?= $event->location->display_name ?>県立長浜新杉田本牧テニスコート
+            <?= h($event->location->display_name) ?>
         </div>
 
         <div class="inner-content disp-flex mb10">
             <div class="content-left w50">
                 <div class="area over-ellipsis mb5">
-                    <?= is_null($event->area) ? '' : $event->area . ',1,2,B,6,C,8,9コート' ?>
+                    <?= is_null($event->area) ? '' : h($event->area) . ',1,2,B,6,C,8,9コート' ?>
                 </div>
 
                 <div class="time mb5">
@@ -47,7 +47,7 @@
                 </div>
 
                 <div class="limit mb5">
-                    人数制限:<?= $event->participants_limit <= 0 ? 'なし' : $event->participants_limit . '人' ?>
+                    人数制限:<?= $event->participants_limit <= 0 ? 'なし' : h($event->participants_limit) . '人' ?>
                 </div>
 
                 <div class="count mb5">
@@ -76,12 +76,12 @@
             <div class="description mb10" style="display: none;">
                 <div class="states disp-flex">
                     <?php for($state_idx=0; $state_idx<=2; $state_idx++): ?>
-                        <div class="state-<?= $state_idx ?> pure-u-1-3 text-center p10">
-                            <div class="state-text mb10">
+                        <div class="state pure-u-1-3 text-center p10">
+                            <div class="state-title mb10">
                                 <?= Configure::read('response_states')[$state_idx]["text"] ?>
                             </div>
                             <?php foreach($event->event_responses[$state_idx] as $event_response): ?>
-                                <div class="over-ellipsis"><?= $event_response; ?></div>
+                                <div class="over-ellipsis"><?= h($event_response); ?></div>
                             <?php endforeach; ?>
                         </div>
                     <?php endfor; ?>
