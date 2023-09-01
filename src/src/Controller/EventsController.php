@@ -114,7 +114,6 @@ class EventsController extends AppController
         $events_formated = [];
         foreach($events as $event){
             $event_formated = $event;
-
             //開催日の取出
             // $event_formated['date'] = $event->start_time->i18nFormat('yyyy-MM-dd');
             // $event_formated['day_of_week'] = "{$day_of_week[$event->start_time->dayOfWeek]}";
