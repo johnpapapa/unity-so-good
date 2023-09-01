@@ -2,10 +2,7 @@
 <?php $this->assign('content-title', 'ログイン'); ?>
 
 <style>
-    .login-content a, .login-content a:visited {
-        color: black;
-        text-decoration: none;
-    }
+    
 </style>
 
 <div class="login-content disp-flex just-center">
@@ -24,6 +21,12 @@
             <div class="mb10">
                 <button type="submit" name="login" class="pure-button pure-button-primary">login</button>
             </div>
+
+            <a href="https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=2000439541&redirect_uri=http://localhost:8001/users/lineLogin&state=12345abcde&scope=profile%20openid&nonce=09876xyz">
+                <button class="pure-button" type="button">
+                    LINE
+                </button>
+            </a>
 
             <a href="<?= $this->Url->build(["controller"=>"Users","action"=>"add"]); ?>">
                 <button class="pure-button" type="button">
