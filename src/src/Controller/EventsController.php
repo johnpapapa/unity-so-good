@@ -177,65 +177,67 @@ class EventsController extends AppController
         ->toArray();
 
         $event_ids = Hash::extract($event_responses, '{n}.event_id');
-        
+        $events = [];
 
-        $this->Locations = $this->fetchTable('Locations');
-        $conditions = [
-            'Events.id IN' => $event_ids
-        ]; 
-        $events_query = $this->Events->find("all", ['conditions'=>$conditions]);
-        $events_query = $events_query
-        ->contain([
-            // 'Users', //開催者
-            'Locations',
-            'EventResponses' => [
-                'sort' => [
-                    'response_state' => 'DESC', 
-                    'EventResponses.updated_at' => 'ASC'
+        if(count($event_ids) > 0){   
+            $this->Locations = $this->fetchTable('Locations');
+            $conditions = [
+                'Events.id IN' => $event_ids
+            ]; 
+            $events_query = $this->Events->find("all", ['conditions'=>$conditions]);
+            $events_query = $events_query
+            ->contain([
+                // 'Users', //開催者
+                'Locations',
+                'EventResponses' => [
+                    'sort' => [
+                        'response_state' => 'DESC', 
+                        'EventResponses.updated_at' => 'ASC'
+                    ]
                 ]
-            ]
-        ])
-        ->select($this->Events)
-        ->select($this->Locations)
-        ->contain('EventResponses.Users') //EventResponses以下Usersオブジェクト作成
-        ->order(['Events.start_time'=>'ASC']);
-        // ->limit(10);
-        $events = $events_query->all()->toArray();
-        
-        $day_of_week=['月','火','水','木','金','土','日']; //日付変換用の定数
-        $events = Hash::map($events, '{n}', function($event) use ($day_of_week, $uid) { //各データの整形
-            //開催日の取出
-            $event['date'] = $event->start_time->i18nFormat('yyyy-MM-dd');
-            $event['day_of_week'] = "{$day_of_week[$event->start_time->dayOfWeek-1]}";
+            ])
+            ->select($this->Events)
+            ->select($this->Locations)
+            ->contain('EventResponses.Users') //EventResponses以下Usersオブジェクト作成
+            ->order(['Events.start_time'=>'ASC']);
+            // ->limit(10);
+            $events = $events_query->all()->toArray();
+            
+            $day_of_week=['月','火','水','木','金','土','日']; //日付変換用の定数
+            $events = Hash::map($events, '{n}', function($event) use ($day_of_week, $uid) { //各データの整形
+                //開催日の取出
+                $event['date'] = $event->start_time->i18nFormat('yyyy-MM-dd');
+                $event['day_of_week'] = "{$day_of_week[$event->start_time->dayOfWeek-1]}";
 
-            //時刻の比較
-            $now_datetime = strtotime("now");
-            $start_datetime = strtotime($event->start_time->i18nFormat('yyyy-MM-dd HH:mm:ss'));
-            $end_datetime = strtotime($event->end_time->i18nFormat('yyyy-MM-dd HH:mm:ss'));
-            if($now_datetime < $start_datetime){
-                $event['event_state'] = 0;
-            } elseif($now_datetime > $end_datetime) {
-                $event['event_state'] = 2;
-            } else {
-                $event['event_state'] = 1;
-            }
-            $event['event_state'] = 0;
-
-            //参加人数の取出
-            $event['participants_count'] = array_count_values(Hash::extract($event, 'event_responses.{n}.response_state'));
-
-            //ユーザの参加情報取出
-            if ($uid){
-                $user_event_responses = Hash::extract($event, 'event_responses.{n}[responder_id='.$uid.']');
-                if(count($user_event_responses) <= 0){
-                    $event['user_response_state'] = null;
+                //時刻の比較
+                $now_datetime = strtotime("now");
+                $start_datetime = strtotime($event->start_time->i18nFormat('yyyy-MM-dd HH:mm:ss'));
+                $end_datetime = strtotime($event->end_time->i18nFormat('yyyy-MM-dd HH:mm:ss'));
+                if($now_datetime < $start_datetime){
+                    $event['event_state'] = 0;
+                } elseif($now_datetime > $end_datetime) {
+                    $event['event_state'] = 2;
                 } else {
-                    $event['user_response_state'] = $user_event_responses[0]['response_state'];
+                    $event['event_state'] = 1;
                 }
-            }
+                $event['event_state'] = 0;
 
-            return $event;
-        });
+                //参加人数の取出
+                $event['participants_count'] = array_count_values(Hash::extract($event, 'event_responses.{n}.response_state'));
+
+                //ユーザの参加情報取出
+                if ($uid){
+                    $user_event_responses = Hash::extract($event, 'event_responses.{n}[responder_id='.$uid.']');
+                    if(count($user_event_responses) <= 0){
+                        $event['user_response_state'] = null;
+                    } else {
+                        $event['user_response_state'] = $user_event_responses[0]['response_state'];
+                    }
+                }
+
+                return $event;
+            });
+        }
 
         $this->set(compact('events'));
     }
@@ -266,67 +268,70 @@ class EventsController extends AppController
         ->toArray();
 
         $event_ids = Hash::extract($event_responses, '{n}.event_id');
+        $events = [];
 
-        $this->Locations = $this->fetchTable('Locations');
-        $conditions = [
-            'Events.id NOT IN' => $event_ids,
-            'Events.end_time >=' => date("Y-m-d H:i:s"), //現在日時より後
-            'Events.deleted_at IS' => NULL, //未削除
-        ]; 
-        $events_query = $this->Events->find("all", ['conditions'=>$conditions]);
-        $events_query = $events_query
-        ->contain([
-            // 'Users', //開催者
-            'Locations',
-            'EventResponses' => [
-                'sort' => [
-                    'response_state' => 'DESC',
-                    'EventResponses.updated_at' => 'ASC'
+        if(count($event_ids) > 0){  
+            $this->Locations = $this->fetchTable('Locations');
+            $conditions = [
+                'Events.id NOT IN' => $event_ids,
+                'Events.end_time >=' => date("Y-m-d H:i:s"), //現在日時より後
+                'Events.deleted_at IS' => NULL, //未削除
+            ]; 
+            $events_query = $this->Events->find("all", ['conditions'=>$conditions]);
+            $events_query = $events_query
+            ->contain([
+                // 'Users', //開催者
+                'Locations',
+                'EventResponses' => [
+                    'sort' => [
+                        'response_state' => 'DESC',
+                        'EventResponses.updated_at' => 'ASC'
+                    ]
                 ]
-            ]
-        ])
-        ->select($this->Events)
-        ->select($this->Locations)
-        ->contain('EventResponses.Users') //EventResponses以下Usersオブジェクト作成
-        ->order(['Events.start_time'=>'ASC'])
-        ->limit(10);
+            ])
+            ->select($this->Events)
+            ->select($this->Locations)
+            ->contain('EventResponses.Users') //EventResponses以下Usersオブジェクト作成
+            ->order(['Events.start_time'=>'ASC'])
+            ->limit(10);
 
-        $events = $events_query->all()->toArray();
+            $events = $events_query->all()->toArray();
 
-        $day_of_week=['月','火','水','木','金','土','日']; //日付変換用の定数
-        $events = Hash::map($events, '{n}', function($event) use ($day_of_week, $uid) { //各データの整形
-            //開催日の取出
-            $event['date'] = $event->start_time->i18nFormat('yyyy-MM-dd');
-            $event['day_of_week'] = "{$day_of_week[$event->start_time->dayOfWeek-1]}";
+            $day_of_week=['月','火','水','木','金','土','日']; //日付変換用の定数
+            $events = Hash::map($events, '{n}', function($event) use ($day_of_week, $uid) { //各データの整形
+                //開催日の取出
+                $event['date'] = $event->start_time->i18nFormat('yyyy-MM-dd');
+                $event['day_of_week'] = "{$day_of_week[$event->start_time->dayOfWeek-1]}";
 
-            //時刻の比較
-            $now_datetime = strtotime("now");
-            $start_datetime = strtotime($event->start_time->i18nFormat('yyyy-MM-dd HH:mm:ss'));
-            $end_datetime = strtotime($event->end_time->i18nFormat('yyyy-MM-dd HH:mm:ss'));
-            if($now_datetime < $start_datetime){
-                $event['event_state'] = 0;
-            } elseif($now_datetime > $end_datetime) {
-                $event['event_state'] = 2;
-            } else {
-                $event['event_state'] = 1;
-            }
-            $event['event_state'] = 0;
-
-            //参加人数の取出
-            $event['participants_count'] = array_count_values(Hash::extract($event, 'event_responses.{n}.response_state'));
-
-            //ユーザの参加情報取出
-            if ($uid){
-                $user_event_responses = Hash::extract($event, 'event_responses.{n}[responder_id='.$uid.']');
-                if(count($user_event_responses) <= 0){
-                    $event['user_response_state'] = null;
+                //時刻の比較
+                $now_datetime = strtotime("now");
+                $start_datetime = strtotime($event->start_time->i18nFormat('yyyy-MM-dd HH:mm:ss'));
+                $end_datetime = strtotime($event->end_time->i18nFormat('yyyy-MM-dd HH:mm:ss'));
+                if($now_datetime < $start_datetime){
+                    $event['event_state'] = 0;
+                } elseif($now_datetime > $end_datetime) {
+                    $event['event_state'] = 2;
                 } else {
-                    $event['user_response_state'] = $user_event_responses[0]['response_state'];
+                    $event['event_state'] = 1;
                 }
-            }
+                $event['event_state'] = 0;
 
-            return $event;
-        });
+                //参加人数の取出
+                $event['participants_count'] = array_count_values(Hash::extract($event, 'event_responses.{n}.response_state'));
+
+                //ユーザの参加情報取出
+                if ($uid){
+                    $user_event_responses = Hash::extract($event, 'event_responses.{n}[responder_id='.$uid.']');
+                    if(count($user_event_responses) <= 0){
+                        $event['user_response_state'] = null;
+                    } else {
+                        $event['user_response_state'] = $user_event_responses[0]['response_state'];
+                    }
+                }
+
+                return $event;
+            });
+        }
 
         $this->set(compact('events'));
     }
