@@ -53,6 +53,7 @@ return static function (RouteBuilder $routes) {
         $builder->connect('/', ['controller' => 'Events', 'action' => 'index']);
         $builder->connect('/login', ['controller' => 'Users', 'action' => 'login']);
         $builder->connect('/logout', ['controller' => 'Users', 'action' => 'logout']);
+        $builder->connect('/line_login', ['controller' => 'Users', 'action' => 'line_login']);
 
         /*
          * ...and connect the rest of 'Pages' controller's URLs.

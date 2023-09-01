@@ -408,13 +408,13 @@ class Initial extends AbstractMigration
             ->addPrimaryKey(['id'])
             ->addColumn('display_name', 'string', [
                 'default' => null,
-                'limit' => 255,
+                'limit' => 50,
                 'null' => false,
             ])
-            ->addColumn('username', 'string', [
+            ->addColumn('user_id', 'string', [
                 'default' => null,
-                'limit' => 255,
-                'null' => false,
+                'limit' => 50,
+                'null' => true,
             ])
             ->addColumn('line_user_id', 'string', [
                 'default' => null,
@@ -428,7 +428,7 @@ class Initial extends AbstractMigration
             ])
             ->addColumn('remember_token', 'string', [
                 'default' => null,
-                'limit' => 100,
+                'limit' => 50,
                 'null' => true,
             ])
             ->addColumn('created_at', 'timestamp', [
@@ -448,10 +448,10 @@ class Initial extends AbstractMigration
             ])
             ->addIndex(
                 [
-                    'username',
+                    'user_id',
                 ],
                 [
-                    'name' => 'users_username_unique',
+                    'name' => 'users_user_id_unique',
                     'unique' => true,
                 ]
             )

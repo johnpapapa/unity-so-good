@@ -70,11 +70,10 @@ class UsersTable extends Table
             ->notEmptyString('display_name');
 
         $validator
-            ->scalar('username')
-            ->maxLength('username', 255)
-            ->requirePresence('username', 'create')
-            ->notEmptyString('username')
-            ->add('username', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
+            ->scalar('user_id')
+            ->maxLength('user_id', 255)
+            ->allowEmptyString('user_id')
+            ->add('user_id', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
 
         $validator
             ->scalar('line_user_id')
@@ -116,7 +115,7 @@ class UsersTable extends Table
      */
     public function buildRules(RulesChecker $rules): RulesChecker
     {
-        $rules->add($rules->isUnique(['username']), ['errorField' => 'username']);
+        $rules->add($rules->isUnique(['user_id']), ['errorField' => 'user_id']);
         $rules->add($rules->isUnique(['line_user_id'], ['allowMultipleNulls' => true]), ['errorField' => 'line_user_id']);
 
         return $rules;

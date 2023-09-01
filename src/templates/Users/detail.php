@@ -16,8 +16,8 @@
         </div>
 
         <div class="mb30">
-            <label for="username">ID</label>
-            <input type="text" class="pure-u-1" id="username" name="username" required="required" data-validity-message="This field cannot be left empty" value="<?= $current_user->username ?>" maxlength="255">
+            <label for="user_id">ID</label>
+            <input type="text" class="pure-u-1" id="user_id" name="user_id" required="required" data-validity-message="This field cannot be left empty" value="<?= $current_user->user_id ?>" maxlength="255">
         </div>
 
         <div class="mb30">

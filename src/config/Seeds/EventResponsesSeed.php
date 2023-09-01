@@ -60,7 +60,7 @@ class EventResponsesSeed extends AbstractSeed
         for($i = 1; $i < $user_count+1; $i++){
             $user_data[] = [
                 'display_name' => $faker->unique()->name,
-                'username' => $faker->unique()->userName,
+                'user_id' => $faker->unique()->userName,
                 'line_user_id' => null,
                 'password' => null,
                 'remember_token' => null,
