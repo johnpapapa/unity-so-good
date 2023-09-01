@@ -1,42 +1,44 @@
-<?php $this->assign('title', 'Users'); ?>
+<?php $this->assign('title', 'user detail'); ?>
 <?php $this->assign('content-title', 'ユーザー詳細'); ?>
 
-<?= $this->Form->create() ?>
-    <fieldset>
-        <div class="container">
-            <div class="row">
-                <div class="column">
-                    <a href="<?= $this->Url->build(['controller' => 'users','action' => 'logout']); ?>">ログアウトする</a>
-                </div>
-            </div>
-            <div class="row">
-                <div class="column">
-                    <label for="display_name">表示名</label>
-                    <input type="text" id="display_name" name="display_name" required="required" data-validity-message="This field cannot be left empty" value="<?= $current_user->display_name ?>" maxlength="255">
-                </div>
-            </div>
-            <div class="row">
-                <div class="column">
-                    <label for="username">ID</label>
-                    <input type="text" id="username" name="username" required="required" data-validity-message="This field cannot be left empty" value="<?= $current_user->username ?>" maxlength="255">
-                </div>           
-            </div>
-            <div class="row">
-                <div class="column">
-                    <label for="password">Password</label>
-                    <input type="password" name="password" id="password" value="">
-                </div>
+<div class="user-detail-content disp-flex just-center">
+    <div class="detail form pure-g pure-form pure-form-stacked">
+        <?= $this->Form->create() ?>
+        <a class="nostyle-a" href="<?= $this->Url->build(['controller' => 'users','action' => 'logout']); ?>">
+            <button class="pure-button mb10" type="button">
+                ログアウトする
+            </button>
+        </a>
 
-                <div class="column">
-                    <label for="password_confirm">Password Confirm</label>
-                    <input type="password" name="password_confirm" id="password_confirm" value="">
-                </div>
+        <div class="mb10">
+            <label for="display_name">表示名</label>
+            <input type="text" class="pure-u-1" id="display_name" name="display_name" required="required" data-validity-message="This field cannot be left empty" value="<?= $current_user->display_name ?>" maxlength="255">
+        </div>
+
+        <div class="mb30">
+            <label for="username">ID</label>
+            <input type="text" class="pure-u-1" id="username" name="username" required="required" data-validity-message="This field cannot be left empty" value="<?= $current_user->username ?>" maxlength="255">
+        </div>
+
+        <div class="mb30">
+            <div class="mb10">
+                <label for="password">パスワード</label>
+                <p class="note-p">パスワードを変更しない場合は空欄にしてください</p>
+                <input type="password" class="pure-u-1" name="password" id="password" value="">
+            </div>
+
+            <div class="mb10">
+                <label for="password_confirm">パスワード再確認</label>
+                <input type="password" class="pure-u-1" name="password_confirm" id="password_confirm" value="">
             </div>
         </div>
-    </fieldset>
-<?= $this->Form->button(__('変更を保存')); ?>
-<?= $this->Form->end() ?>
 
+        <div class="mb10">
+            <button type="submit" name="login" class="pure-button pure-button-primary">変更を保存</button>
+        </div>
+        <?= $this->Form->end() ?>
+    </div>
+</div>
 
 <script>
     let obj_password = $('#password');

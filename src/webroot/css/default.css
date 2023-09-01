@@ -5,10 +5,6 @@
     
 }
 
-body {
-    margin: 0 auto 50px;
-}
-
 .container {
     padding: 0px 1rem;
     max-width: 800px;
@@ -16,9 +12,8 @@ body {
 }
 
 .content-title {
-    font-size: 3rem;
+    font-size: 2rem;
     padding: 10px;
-
 }
 
 .disp-block {
@@ -35,6 +30,33 @@ body {
 }
 .align-center {
     align-items: center;
+}
+.just-center {
+    justify-content: center;
+}
+
+.w100 {width: 100%;}
+.w50 {width: 50%;}
+
+.pt10 {padding-top: 10px;}
+
+.mb5 {margin-bottom: 5px;}
+.mb10 {margin-bottom: 10px;}
+.mb20 {margin-bottom: 20px;}
+.mb30 {margin-bottom: 30px;}
+.mb100 {margin-bottom: 100px;}
+
+.bold {font-weight: bold;}
+
+.nostyle-a {text-decoration: none;}
+.note-p {
+    font-size: 12px; 
+    color:gray;
+}
+.over-ellipsis {
+    overflow:hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 input[type=text],input[type=textarea],input[type=number],input[type=password] {
