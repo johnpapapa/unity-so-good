@@ -1,3 +1,86 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    
+}
+
+input[type=text],input[type=textarea],input[type=number],input[type=password] {
+    font-size: 20px !important;
+}
+@media screen and (max-width: 768px) {
+    body {
+        font-size: 14px;
+    }
+}
+
+/* =========== */
+/* default.php */
+/* =========== */
+.container {
+    padding: 0px 1rem;
+    max-width: 800px;
+    
+}
+
+.content-title {
+    font-size: 2rem;
+    padding: 10px;
+}
+
+/* ============== */
+/* bottom-nav.php */
+/* ============== */
+
+.bottom-nav {
+    left: 0;
+    width: 100%;
+    background: #6a6766;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    bottom: 0;
+    z-index: 99;
+}
+
+.bottom-nav .nav-links{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.bottom-nav .nav-links li{
+    margin-bottom: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    text-align: center;
+}
+.bottom-nav .nav-links a{
+    padding: 20px 10px;
+    display: block;
+    width: 100%;
+    height: 100%;
+    color: white;
+    text-decoration: none;
+}
+
+.bottom-nav .nav-links a:hover {
+    background-color: white;
+    color: black;
+    transition: all 0.2s linear;
+}
+
+@media screen and (max-width: 768px) {
+  .bottom-nav .nav-links a{
+    padding: 20px 10px;
+    font-size: 18px;
+  }
+}
+
+/* =========== */
+/* top-nav.php */
+/* =========== */
+
 /* Google Fonts */
 /* @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap'); */ 
 /* font-family: 'Orbitron', sans-serif; */
@@ -131,3 +214,35 @@
     cursor: pointer;
   }
 }
+
+/* ============== */
+/* event-item.php */
+/* ============== */
+.event-outer {
+    border: 2px solid;
+    border-radius: 5px;
+    box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
+}
+
+.event-inner {
+    margin: 5px;
+}
+
+.tag {
+    padding: 5px;
+    border-radius: 5px;
+    font-size: .5rem;
+}
+
+.location {
+    font-size: 1.5rem;
+}
+
+.state-text {
+    color: #00000055;
+    font-size: 1.2rem;
+}
+
+.state-0 {background-color: #d3d3d37F;}
+.state-1 {background-color: #90ee907F;}
+.state-2 {background-color: #f080807F;}

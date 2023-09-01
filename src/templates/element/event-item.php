@@ -6,28 +6,6 @@
     $event_state = Configure::read('event_states')[$event->event_state];
 ?>
 
-<style>
-    .event-outer {
-        border: 2px solid;
-        border-radius: 5px;
-        box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
-    }
-
-    .event-inner {
-        margin: 5px;
-    }
-
-    .tag {
-        padding: 5px;
-        border-radius: 5px;
-        font-size: .5rem;
-    }
-
-    .location {
-        font-size: 1.5rem;
-    }
-</style>
-
 <div class="event-outer mb20">
     <div class="event-inner ">
 
@@ -73,9 +51,9 @@
                 </div>
 
                 <div class="count mb5">
-                    ?:<?= (isset($event->participants_count['0'])) ? $event->participants_count['0']:0 ?>
-                    o:<?= (isset($event->participants_count['1'])) ? $event->participants_count['1']:0 ?>
-                    x:<?= (isset($event->participants_count['2'])) ? $event->participants_count['2']:0 ?>
+                    ?:<?= count($event->event_responses[0]) ?>
+                    o:<?= count($event->event_responses[1]) ?>
+                    x:<?= count($event->event_responses[2]) ?>
                 </div>
             </div>
 
@@ -90,15 +68,25 @@
         </div>
         
         <?php if ($current_user) : ?>
-            <div class="description_toggle disp-flex just-center align-center">
+            <div class="description_toggle disp-flex just-center align-center mb10">
                 <span class="material-symbols-outlined">expand_all</span>
                 参加者
             </div>
 
-            <div class="description" style="display: none;">
-                <?php foreach ($event['event_responses'] as $event_responses) : ?>
-                    <?= Configure::read('response_states')[$event_responses->response_state]["icon"] ?> | <?= $event_responses->user->display_name ?><br>
-                <?php endforeach; ?>
+            <div class="description mb10" style="display: none;">
+                <div class="states disp-flex">
+                    <?php for($state_idx=0; $state_idx<=2; $state_idx++): ?>
+                        <div class="state-<?= $state_idx ?> pure-u-1-3 text-center p10">
+                            <div class="state-text mb10">
+                                <?= Configure::read('response_states')[$state_idx]["text"] ?>
+                            </div>
+                            <?php foreach($event->event_responses[$state_idx] as $event_response): ?>
+                                <div class="over-ellipsis"><?= $event_response; ?></div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endfor; ?>
+                </div>
+                
             </div>
         <?php endif; ?>
     </div>

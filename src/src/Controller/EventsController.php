@@ -106,43 +106,58 @@ class EventsController extends AppController
         ->select($this->Locations)
         ->contain('EventResponses.Users') //EventResponses以下Usersオブジェクト作成
         ->order(['Events.start_time'=>'DESC'])
-        ->limit(10);
+        ->limit(50);
         $events = $events_query->all()->toArray();
         
         $day_of_week=['月','火','水','木','金','土','日']; //日付変換用の定数
-        $events = Hash::map($events, '{n}', function($event) use ($day_of_week, $uid) { //各データの整形
+
+        $events_formated = [];
+        foreach($events as $idx=>$event){
             //開催日の取出
-            $event['date'] = $event->start_time->i18nFormat('yyyy-MM-dd');
-            $event['day_of_week'] = "{$day_of_week[$event->start_time->dayOfWeek-1]}";
+            $event_formated = $events[$idx];
+
+            $event_formated['date'] = $event->start_time->i18nFormat('yyyy-MM-dd');
+            $event_formated['day_of_week'] = "{$day_of_week[$event->start_time->dayOfWeek-1]}";
 
             //時刻の比較
             $now_datetime = strtotime("now");
             $start_datetime = strtotime($event->start_time->i18nFormat('yyyy-MM-dd HH:mm:ss'));
             $end_datetime = strtotime($event->end_time->i18nFormat('yyyy-MM-dd HH:mm:ss'));
             if($now_datetime < $start_datetime){
-                $event['event_state'] = 0;
+                $event_formated['event_state'] = 0;
             } elseif($now_datetime > $end_datetime) {
-                $event['event_state'] = 2;
+                $event_formated['event_state'] = 2;
             } else {
-                $event['event_state'] = 1;
+                $event_formated['event_state'] = 1;
             }
-            $event['event_state'] = 0;
+            // $event_formated['event_state'] = 0;
 
             //参加人数の取出
-            $event['participants_count'] = array_count_values(Hash::extract($event, 'event_responses.{n}.response_state'));
+            // $event_formated['participants_count'] = array_count_values(Hash::extract($event, 'event_responses.{n}.response_state'));
+            //参加情報取出
+            $event_responder_list = [0=>[], 1=>[], 2=>[]];
+            foreach($event->event_responses as $event_response){
+                $event_responder_list[$event_response->response_state][] = $event_response->user->display_name;
+            }
+            $event_formated['event_responses'] = $event_responder_list;
 
             //ユーザの参加情報取出
             if ($uid){
                 $user_event_responses = Hash::extract($event, 'event_responses.{n}[responder_id='.$uid.']');
                 if(count($user_event_responses) <= 0){
-                    $event['user_response_state'] = null;
+                    $event_formated['user_response_state'] = null;
                 } else {
-                    $event['user_response_state'] = $user_event_responses[0]['response_state'];
+                    $event_formated['user_response_state'] = $user_event_responses[0]['response_state'];
                 }
             }
-
-            return $event;
-        });
+            $events_formated[] = $event_formated;
+        }
+        
+        $events = $events_formated;
+        // debug($events);
+        // $this->autoRender = false;
+        // return ;
+        
         $this->set(compact('events'));
     }
 
