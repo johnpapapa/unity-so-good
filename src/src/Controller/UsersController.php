@@ -54,13 +54,19 @@ class UsersController extends AppController
             $data = $this->request->getData();
             
             $save_data = [];
-
+            
             if(isset($data['display_name'])){ $save_data['display_name'] = $data['display_name']; }
             if(isset($data['username'])){ $save_data['username'] = $data['username']; }
-            if(isset($data['password'])){ $save_data['password'] = $data['password']; }
-
+            
+            if($data['password'] != ''){     
+                $save_data['password'] = $data['password']; 
+            } else {
+                unset($save_data['password']);
+            }
             $user_data = $this->Users->patchEntity($current_user, $save_data);
+            
             $result_user = $this->Users->save($user_data);
+
             if ($result_user) {
                 $this->Flash->success(__('The event has been saved.'));
                 return $this->redirect(['controller'=>'events', 'action' => 'index']);
