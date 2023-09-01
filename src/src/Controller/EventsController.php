@@ -105,7 +105,7 @@ class EventsController extends AppController
         ->select($this->Events)
         ->select($this->Locations)
         ->contain('EventResponses.Users') //EventResponses以下Usersオブジェクト作成
-        ->order(['Events.start_time'=>'DESC'])
+        ->order(['Events.start_time'=>'ASC'])
         ->limit(50);
         $events = $events_query->all()->toArray();
         

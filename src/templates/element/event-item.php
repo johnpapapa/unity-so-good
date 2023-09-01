@@ -75,7 +75,7 @@
             <div class="description mb10" style="display: none;">
                 <div class="states disp-flex">
                     <?php for($state_idx=0; $state_idx<=2; $state_idx++): ?>
-                        <div class="state pure-u-1-3 text-center p10">
+                        <div class="state state-<?= $state_idx ?> pure-u-1-3 text-center p10">
                             <div class="state-title mb10">
                                 <?= Configure::read('response_states')[$state_idx]["text"] ?>
                             </div>
