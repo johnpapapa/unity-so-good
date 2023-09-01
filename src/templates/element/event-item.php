@@ -7,8 +7,7 @@
 ?>
 
 <div class="event-item event-outer mb20">
-    <div class="event-inner ">
-
+    <div class="event-inner">
         <div class="tags mb5">
             <div class="tag disp-iblock" style="background-color: <?= $event_state['tag_color'] ?>;">
                 <?= $event_state['text'] ?>

@@ -1,5 +1,5 @@
 $(function(){
-    $('response-btn').on('click', function(){
+    $('.response-btn').on('click', function(){
         let button_current = $(this);
         button_current.prop('disabled', true);
         let button_siblings = $(this).siblings();
@@ -19,8 +19,10 @@ $(function(){
             data: send_data,
             headers: { 'X-CSRF-Token' : response_ajax_send_token },
         }).done(function(response){
-            $("#target").val($.parseJSON(response));
+            // $("#target").val($.parseJSON(response));
+            console.log(response);
             window.location.reload();
+
         }).fail(function(jqXHR){
             console.error('Error : ', jqXHR.status, jqXHR.statusText);
         });

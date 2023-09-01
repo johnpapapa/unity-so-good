@@ -95,8 +95,7 @@
             <div class="label mb5">ユーザー参加情報</div>
             <div class="content">
                 <?php if ($event->user_response_state) : ?>
-                    <?php //$user_response_state = $response_states[$event->user_response_state]['text']; ?>
-                    <?= $response_states[$event->user_response_state]['text']; ?>
+                    <?= $user_response_state['text']; ?>
                 <?php else : ?>
                     未表明
                 <?php endif; ?>

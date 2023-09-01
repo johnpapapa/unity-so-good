@@ -131,13 +131,6 @@ class EventsController extends AppController
                 $event_formated['event_state'] = 1;
             }
 
-            //参加情報取出
-            $event_responder_list = [0=>[], 1=>[], 2=>[]];
-            foreach($event->event_responses as $event_response){
-                $event_responder_list[$event_response->response_state][] = $event_response->user->display_name;
-            }
-            $event_formated['event_responses'] = $event_responder_list;
-
             //ユーザの参加情報取出
             if ($uid){
                 $user_event_responses = Hash::extract($event, 'event_responses.{n}[responder_id='.$uid.']');
@@ -147,6 +140,15 @@ class EventsController extends AppController
                     $event_formated['user_response_state'] = $user_event_responses[0]['response_state'];
                 }
             }
+
+            //参加情報取出
+            $event_responder_list = [0=>[], 1=>[], 2=>[]];
+            foreach($event->event_responses as $event_response){
+                $event_responder_list[$event_response->response_state][] = $event_response->user->display_name;
+            }
+            $event_formated['event_responses'] = $event_responder_list;
+
+            
             $events_formated[] = $event_formated;
         }
         $events = $events_formated;
@@ -224,13 +226,6 @@ class EventsController extends AppController
                     $event['event_state'] = 1;
                 }
 
-                //参加情報取出
-                $event_responder_list = [0=>[], 1=>[], 2=>[]];
-                foreach($event->event_responses as $event_response){
-                    $event_responder_list[$event_response->response_state][] = $event_response->user->display_name;
-                }
-                $event_formated['event_responses'] = $event_responder_list;
-
                 //ユーザの参加情報取出
                 if ($uid){
                     $user_event_responses = Hash::extract($event, 'event_responses.{n}[responder_id='.$uid.']');
@@ -240,6 +235,15 @@ class EventsController extends AppController
                         $event['user_response_state'] = $user_event_responses[0]['response_state'];
                     }
                 }
+
+                //参加情報取出
+                $event_responder_list = [0=>[], 1=>[], 2=>[]];
+                foreach($event->event_responses as $event_response){
+                    $event_responder_list[$event_response->response_state][] = $event_response->user->display_name;
+                }
+                $event_formated['event_responses'] = $event_responder_list;
+
+                
                 $events_formated[] = $event_formated;
 
                 
@@ -324,13 +328,6 @@ class EventsController extends AppController
                 }
                 $event['event_state'] = 0;
 
-                //参加情報取出
-                $event_responder_list = [0=>[], 1=>[], 2=>[]];
-                foreach($event->event_responses as $event_response){
-                    $event_responder_list[$event_response->response_state][] = $event_response->user->display_name;
-                }
-                $event_formated['event_responses'] = $event_responder_list;
-
                 //ユーザの参加情報取出
                 if ($uid){
                     $user_event_responses = Hash::extract($event, 'event_responses.{n}[responder_id='.$uid.']');
@@ -340,6 +337,15 @@ class EventsController extends AppController
                         $event['user_response_state'] = $user_event_responses[0]['response_state'];
                     }
                 }
+
+                //参加情報取出
+                $event_responder_list = [0=>[], 1=>[], 2=>[]];
+                foreach($event->event_responses as $event_response){
+                    $event_responder_list[$event_response->response_state][] = $event_response->user->display_name;
+                }
+                $event_formated['event_responses'] = $event_responder_list;
+
+                
 
                 $events_formated[] = $event_formated;
             };
@@ -396,13 +402,6 @@ class EventsController extends AppController
                 $event['event_state'] = 1;
             }
 
-            //参加情報取出
-            $event_responder_list = [0=>[], 1=>[], 2=>[]];
-            foreach($event->event_responses as $event_response){
-                $event_responder_list[$event_response->response_state][] = $event_response->user->display_name;
-            }
-            $event_formated['event_responses'] = $event_responder_list;
-
             //ユーザの参加情報取出
             if ($uid){
                 $user_event_responses = Hash::extract($event, 'event_responses.{n}[responder_id='.$uid.']');
@@ -412,6 +411,15 @@ class EventsController extends AppController
                     $event['user_response_state'] = $user_event_responses[0]['response_state'];
                 }
             }
+
+            //参加情報取出
+            $event_responder_list = [0=>[], 1=>[], 2=>[]];
+            foreach($event->event_responses as $event_response){
+                $event_responder_list[$event_response->response_state][] = $event_response->user->display_name;
+            }
+            $event_formated['event_responses'] = $event_responder_list;
+
+            
             $events_formated[] = $event_formated;
 
         };
@@ -454,15 +462,8 @@ class EventsController extends AppController
             $event['event_state'] = 1;
         }
 
-        //参加情報取出
-        $event_responder_list = [0=>[], 1=>[], 2=>[]];
-        foreach($event->event_responses as $event_response){
-            $event_responder_list[$event_response->response_state][] = ["name"=>$event_response->user->display_name, "time"=>$event_response->updated_at];
-        }
-        $event['event_responses'] = $event_responder_list;
-
-        //ユーザの参加情報取出
-        if ($uid){
+         //ユーザの参加情報取出
+         if ($uid){
             $user_event_responses = Hash::extract($event, 'event_responses.{n}[responder_id='.$uid.']');
             if(count($user_event_responses) <= 0){
                 $event['user_response_state'] = null;
@@ -470,6 +471,13 @@ class EventsController extends AppController
                 $event['user_response_state'] = $user_event_responses[0]['response_state'];
             }
         }
+
+        //参加情報取出
+        $event_responder_list = [0=>[], 1=>[], 2=>[]];
+        foreach($event->event_responses as $event_response){
+            $event_responder_list[$event_response->response_state][] = ["name"=>$event_response->user->display_name, "time"=>$event_response->updated_at];
+        }
+        $event['event_responses'] = $event_responder_list;
 
         $event_prev = $this->Events->find("all", [
             "conditions" => ["Events.id <" => $id]
