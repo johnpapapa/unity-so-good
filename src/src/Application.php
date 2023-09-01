@@ -125,7 +125,7 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
         // メールアドレスとパスワードを認証情報とする
         $authenticationService->loadIdentifier('Authentication.Password', [
             'fields' => [
-                'username' => 'username',
+                'username' => 'user_id',
                 'password' => 'password',
             ]
         ]);
@@ -134,7 +134,7 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
         // メールアドレスとパスワードを認証情報としてチェックする設定
         $authenticationService->loadAuthenticator('Authentication.Form', [
             'fields' => [
-                'username' => 'username',
+                'username' => 'user_id',
                 'password' => 'password',
             ],
             'loginUrl' => '/login',

@@ -21,7 +21,7 @@ class UsersFixture extends TestFixture
             [
                 'id' => 1,
                 'display_name' => 'Lorem ipsum dolor sit amet',
-                'username' => 'Lorem ipsum dolor sit amet',
+                'user_id' => 'Lorem ipsum dolor sit amet',
                 'line_user_id' => 'Lorem ipsum dolor sit amet',
                 'password' => 'Lorem ipsum dolor sit amet',
                 'remember_token' => 'Lorem ipsum dolor sit amet',

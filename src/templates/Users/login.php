@@ -12,8 +12,8 @@
     <div class="login form pure-g pure-form pure-form-stacked mb10">
         <?= $this->Form->create() ?>
             <div class="mb10">
-                <label for="username">ユーザーID</label>
-                <input type="text" name="username" id="username">
+                <label for="user_id">ユーザーID</label>
+                <input type="text" name="user_id" id="user_id">
             </div>
 
             <div class="mb10">
