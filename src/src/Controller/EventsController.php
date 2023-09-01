@@ -115,7 +115,7 @@ class EventsController extends AppController
         foreach($events as $event){
             $event_formated = $event;
 
-
+            //*
             
             //開催日の取出
             // $event_formated['date'] = $event->start_time->i18nFormat('yyyy-MM-dd');
