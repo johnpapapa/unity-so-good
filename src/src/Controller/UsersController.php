@@ -148,10 +148,6 @@ class UsersController extends AppController
         $this->Authentication->setIdentity($user_data);
         $this->Flash->success(__('Login successful'));
         return $this->redirect(['controller'=>'Events','action'=>'index']);
-
-        // // userId => 'Ud0a66a80049799caf86ba85a009a5ab6'
-        // // displayName => 'ジョンパ@LAGRIMAS'
-        // // pictureUrl => 'https://profile.line-scdn.net/0hrxFoQvu0LVdrFgGOF9NTKBtGLj1IZ3RFT3BrZV8QdG8DJ28BEnBlNlwVJjQCc2ICEnVjNwkfJ2VnBVoxdUDRY2wmcGZXJ28DT3RnsQ'
     }
 
     /**
