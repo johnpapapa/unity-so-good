@@ -38,7 +38,7 @@
         <div class="inner-content disp-flex mb10">
             <div class="content-left w50">
                 <div class="area over-ellipsis mb5">
-                    <?= is_null($event->area) ? '' : h($event->area) . ',1,2,B,6,C,8,9コート' ?>
+                    <?= is_null($event->area) ? '' : h($event->area) . 'コート' ?>
                 </div>
 
                 <div class="time mb5">
