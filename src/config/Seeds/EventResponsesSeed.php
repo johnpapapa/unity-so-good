@@ -24,7 +24,6 @@ class EventResponsesSeed extends AbstractSeed
         $location_count = 30;
         $user_count = 150;
         $event_count = 1000;
-        $event_response_count = 100;
         
         $event_datetime_min = strtotime('2023-1-1 00:00:00');
         $event_datetime_max = strtotime('2023-12-31 00:00:00');
@@ -42,7 +41,7 @@ class EventResponsesSeed extends AbstractSeed
         $user_table->insert($user_data)->save();
 
         //events
-        [$event_data, $event_response_data] = $this->gen_event_data(
+        $this->gen_event_data(
             $faker, 
             $event_count, 
             $user_count, 
@@ -50,18 +49,6 @@ class EventResponsesSeed extends AbstractSeed
             $event_datetime_min, 
             $event_datetime_max
         );
-
-        $event_table = $this->table('events');
-        // $event_table->insert($event_data)->save();
-        
-
-        $chunk_count = 12; //event_responseは多すぎるので分割
-        $chunk_size = intdiv(count($event_response_data), $chunk_count);        
-        $event_response_datas = array_chunk($event_response_data, $chunk_size);
-        $event_response_table = $this->table('event_responses');
-        foreach($event_response_datas as $event_response_data){
-            // $event_response_table->insert($event_response_data)->save();
-        }
     }
 
     public function location_display_name_lists ($count){
@@ -160,39 +147,40 @@ class EventResponsesSeed extends AbstractSeed
     }
 
     public function gen_event_data($faker, $event_count, $user_count, $location_count, $event_datetime_min, $event_datetime_max){
-        $event_data = [];
-        $event_response_data = [];
         for($e_idx = 0; $e_idx < $event_count; $e_idx++){
             $event_id = $e_idx+1;
-            $val = rand($event_datetime_min, $event_datetime_max);
-            $start_time = date('Y-m-d H:i:s', $val);
+            $rand_start = rand($event_datetime_min, $event_datetime_max);
+            $start_time = date('Y-m-d H:i:s', $rand_start);
             $time_distance = ['+2hour', '+4hour'][random_int(0, 1)];
             $end_time = date("Y-m-d H:i:s",strtotime($start_time . $time_distance)); //開始時間の2時間後
-
-            /*$event_data[]*/ $data = [
+            $area_count = random_int(1, 6);
+            $area = implode(
+                ', ', 
+                $faker->randomElements([1, 2, 3, 4, 5, 6, 7, 8, 'A','B','C','D','E','F','G','H'], $area_count) //コート数だけ文字取り出し
+            );
+            $participants_limit = ($area_count < 3) ? $area_count * 4: -1; //人数制限はコート数だけ
+            
+            $event_data = [
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
                 'deleted_at' => null,
                 'start_time' => $start_time,
                 'end_time' => $end_time,
-                'area' => $faker->randomDigitNotNull(),
-                'participants_limit' => $faker->randomElement([-1, 8, 12, 16, 20, 24]), //人数制限はコート数だけ
+                'area' => $area,
+                'participants_limit' => $participants_limit, 
                 'comment' => $faker->realText(),
                 'organizer_id' => $faker->numberBetween(1, $user_count),
                 'location_id' => $faker->numberBetween(1, $location_count),
             ];
             $event_table = $this->table('events');
-            $event_table->insert($data)->save();
-            $event_response_data = array_merge(
-                $event_response_data, 
-                $this->gen_event_response_data($faker, $user_count, $event_id, $start_time)
-            );
+            $event_table->insert($event_data)->save();
+            $this->gen_event_response_data($faker, $user_count, $event_id, $start_time);
         }
-        return [$event_data, $event_response_data];
     }
 
     public function gen_event_response_data($faker, $user_count, $event_id, $start_time){
         $event_response_data = [];
+
         $rand_val = random_int(0, $user_count); //eventに反応した人数の生成
         $event_response_count = ($rand_val % 2 == 0) ? $rand_val : $rand_val+1; //event反応人数はペアができるように
         $event_response_count = ($rand_val > $user_count) ? $event_response_count - 1 : $event_response_count;
@@ -204,11 +192,16 @@ class EventResponsesSeed extends AbstractSeed
         for($er_idx=0; $er_idx < $event_response_count; $er_idx++){
             $response_time = rand(strtotime($start_time), strtotime($start_time . "-7day")); //反応時間はevent開始時間から7日前までの範囲
             $response_time = date("Y-m-d H:i:s", $response_time);
+
+            $state_prob_list = [0=>5, 1=>20, 2=>100]; //未定5%参加15%不参加80%:todoここガチ適当
+            $p = random_int(1, 100);
+            $response_state = 0; //参加状態はある程度偏らせたかった
+            foreach($state_prob_list as $state=>$prob){if($p <= $prob){$response_state = $state;break;}}
             
             $event_response_data[] = [
                 'created_at' => $response_time,
                 'updated_at' => $response_time,
-                'response_state' => $faker->numberBetween(0, 2),
+                'response_state' => $response_state,
                 'responder_id' => $responder_ids[$er_idx],
                 'event_id' => $event_id
             ];
@@ -217,5 +210,4 @@ class EventResponsesSeed extends AbstractSeed
         $event_response_table->insert($event_response_data)->save();
         return $event_response_data;
     }
-
 }
