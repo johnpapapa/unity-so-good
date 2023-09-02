@@ -418,7 +418,6 @@ class EventsController extends AppController
                 $event_responder_list[$event_response->response_state][] = $event_response->user->display_name;
             }
             $event_formated['event_responses'] = $event_responder_list;
-
             
             $events_formated[] = $event_formated;
 
