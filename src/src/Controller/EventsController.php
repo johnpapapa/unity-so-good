@@ -480,11 +480,11 @@ class EventsController extends AppController
         $event['event_responses'] = $event_responder_list;
 
         $event_prev = $this->Events->find("all", [
-            "conditions" => ["Events.id <" => $id]
-        ])->select('id')->order(['Events.id'=>'DESC'])->limit(1)->first();
+            "conditions" => ["Events.start_time <" => $event->start_time]
+        ])->select('id')->order(['Events.start_time'=>'DESC'])->limit(1)->first();
         $event_next = $this->Events->find("all", [
-            "conditions" => ["Events.id >" => $id]
-        ])->select('id')->order(['Events.id'=>'ASC'])->limit(1)->first();
+            "conditions" => ["Events.start_time >" => $event->start_time]
+        ])->select('id')->order(['Events.start_time'=>'ASC'])->limit(1)->first();
 
         $event_prev_id = (isset($event_prev->id)) ? $event_prev->id : null;
         $event_next_id = (isset($event_next->id)) ? $event_next->id : null;
