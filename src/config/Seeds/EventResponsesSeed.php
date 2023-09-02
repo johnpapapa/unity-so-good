@@ -25,15 +25,7 @@ class EventResponsesSeed extends AbstractSeed
         $user_count = 150;
         $event_count = 1000;
         $event_response_count = 100;
-
-        // $user_id_between_min = 1;
-        // $user_id_between_max = $user_count;
-        $location_id_between_min = 1;
-        $location_id_between_max = $location_count;
-        $event_id_between_min = 1;
-        $event_id_between_max = $event_count;
         
-
         $event_datetime_min = strtotime('2023-1-1 00:00:00');
         $event_datetime_max = strtotime('2023-12-31 00:00:00');
         
@@ -59,8 +51,8 @@ class EventResponsesSeed extends AbstractSeed
         $user_data = [];
         for($i = 1; $i < $user_count+1; $i++){
             $user_data[] = [
-                'display_name' => $faker->unique()->name,
-                'user_id' => $faker->unique()->userName,
+                'display_name' => $faker->randomElement([$faker->unique()->name, $faker->unique()->kanaName, $faker->unique()->userName]),
+                'user_id' => null,
                 'line_user_id' => null,
                 'password' => null,
                 'remember_token' => null,
@@ -112,26 +104,6 @@ class EventResponsesSeed extends AbstractSeed
 
         $event_response_table = $this->table('event_responses');
         $event_response_table->insert($event_response_data)->save();
-        
-
-        // $table = $this->table('events');
-        // $table->insert($data)->save();
-
-        //event_reseponses
-        // $data = [];
-        
-        // for($i = 0; $i < $event_response_count; $i++){
-        //     $data[] = [
-        //         'created_at' => date('Y-m-d H:i:s'),
-        //         'updated_at' => date('Y-m-d H:i:s'),
-        //         'response_state' => $faker->numberBetween(0, 2),
-        //         'responder_id' => $faker->numberBetween($user_id_between_min, $user_id_between_max),
-        //         'event_id' => $faker->numberBetween($event_id_between_min, $event_id_between_max),
-        //     ];
-        // }
-        // $table = $this->table('event_responses');
-        // $table->insert($data)->save();
-
     }
 
     public function display_name_lists (){
