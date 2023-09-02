@@ -418,7 +418,7 @@ class Initial extends AbstractMigration
             ])
             ->addColumn('line_user_id', 'string', [
                 'default' => null,
-                'limit' => 255,
+                'limit' => 50,
                 'null' => true,
             ])
             ->addColumn('password', 'string', [

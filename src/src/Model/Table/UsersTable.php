@@ -77,7 +77,7 @@ class UsersTable extends Table
 
         $validator
             ->scalar('line_user_id')
-            ->maxLength('line_user_id', 255)
+            ->maxLength('line_user_id', 50)
             ->allowEmptyString('line_user_id')
             ->add('line_user_id', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
 
@@ -88,7 +88,7 @@ class UsersTable extends Table
 
         $validator
             ->scalar('remember_token')
-            ->maxLength('remember_token', 100)
+            ->maxLength('remember_token', 50)
             ->allowEmptyString('remember_token');
 
         $validator
