@@ -61,7 +61,7 @@
         <div class="row mb20">
             <div class="label mb5">コート</div>
             <div class="content">
-                <?= is_null($event->area) ? '' : h($event->area) . ',1,2,B,6,C,8,9コート' ?>
+                <?= is_null($event->area) ? '' : h($event->area) . 'コート' ?>
             </div>
         </div>
         <div class="row mb20">

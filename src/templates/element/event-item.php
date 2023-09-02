@@ -54,6 +54,9 @@
                     o:<?= count($event->event_responses[1]) ?>
                     x:<?= count($event->event_responses[2]) ?>
                 </div>
+                <div class="total mb5">
+                    (合計:<?= count($event->event_responses[0]) + count($event->event_responses[1]) + count($event->event_responses[2]) ?>人)
+                </div>
             </div>
 
 
@@ -69,21 +72,34 @@
         <?php if ($current_user) : ?>
             <div class="description_toggle disp-flex just-center align-center mb10">
                 <span class="material-symbols-outlined">expand_all</span>
-                参加者
+                参加者確認
             </div>
 
             <div class="description mb10" style="display: none;">
                 <div class="states disp-flex">
-                    <?php for($state_idx=0; $state_idx<=2; $state_idx++): ?>
-                        <div class="state state-<?= $state_idx ?> pure-u-1-3 text-center p10">
-                            <div class="state-title mb10">
-                                <?= Configure::read('response_states')[$state_idx]["text"] ?>
-                            </div>
+                    <?php $state_idx = 1; ?>
+                    <div class="state state-<?= $state_idx ?> pure-u-1-2 text-center p10">
+                        <div class="state-title mb10">
+                            <?= Configure::read('response_states')[$state_idx]["text"] ?>
+                        </div>
+                        <div class="state-content">
                             <?php foreach($event->event_responses[$state_idx] as $event_response): ?>
                                 <div class="over-ellipsis"><?= h($event_response); ?></div>
                             <?php endforeach; ?>
                         </div>
-                    <?php endfor; ?>
+                    </div>
+
+                    <?php $state_idx = 0; ?>
+                    <div class="state state-<?= $state_idx ?> pure-u-1-2 text-center p10">
+                        <div class="state-title mb10">
+                            <?= Configure::read('response_states')[$state_idx]["text"] ?>
+                        </div>
+                        <div class="state-content">
+                            <?php foreach($event->event_responses[$state_idx] as $event_response): ?>
+                                <div class="over-ellipsis"><?= h($event_response); ?></div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
                 </div>
                 
             </div>
