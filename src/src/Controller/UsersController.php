@@ -118,7 +118,7 @@ class UsersController extends AppController
         $postData = array(
             'grant_type'    => 'authorization_code',
             'code'          => $this->request->getQuery('code'),
-            'redirect_uri'  => 'http://localhost:8001/users/lineLogin',
+            'redirect_uri'  => Configure::read('param_linelogin.redirect_uri')[$this->request->host()],
             'client_id'     => '2000439541',
             'client_secret' => 'b3b4212b5b7760b442883bb88b1f21f1'
           );
