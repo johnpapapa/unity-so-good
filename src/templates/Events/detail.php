@@ -112,7 +112,7 @@
         <div class="row">
             <div class="label mb5">参加者一覧</div>
             <div class="content states">
-                <?php $state_idx = 0; ?>
+                <?php $state_idx = 1; ?>
                 <div class="states-active-perhaps disp-flex">
                     <div class="state p10 pure-u-1-2">
                         <div class="state-title mb10 text-center">
@@ -120,13 +120,13 @@
                         </div>
                         <?php foreach($event->event_responses[$state_idx] as $event_response): ?>
                             <div class="state-content over-ellipsis disp-iblock pure-u-1 mb5">
-                                <div class="name disp-iblock over-ellipsis"><?= h($event_response["name"]); ?></div>
+                                <div class="name disp-m-block disp-iblock over-ellipsis"><?= h($event_response["name"]); ?></div>
                                 <div class="time disp-iblock fr"><?= $event_response["time"]->i18nFormat('MM/dd HH:mm:ss') ?></div>
                             </div>
                         <?php endforeach; ?>
                     </div>
                         
-                    <?php $state_idx = 1; ?>
+                    <?php $state_idx = 0; ?>
                     <div class="state p10 pure-u-1-2">
                         <div class="state-title mb10 text-center">
                             <?= Configure::read('response_states')[$state_idx]["text"] ?>
