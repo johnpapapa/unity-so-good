@@ -88,7 +88,7 @@ class UsersTable extends Table
 
         $validator
             ->scalar('remember_token')
-            ->maxLength('remember_token', 50)
+            ->maxLength('remember_token', 255)
             ->allowEmptyString('remember_token');
 
         $validator

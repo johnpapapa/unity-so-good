@@ -20,6 +20,11 @@
                 'unity.so-good.jp' => 'http://unity.so-good.jp/users/lineLogin',
                 'localhost:8001' => 'http://localhost:8001/users/lineLogin'
             ]
-        ]
+        ],
+        'cookie' => [
+            'key' => 'key_auto_login',
+            'expired' => '+1 day',
+        ],
+        
     ];
 ?>

@@ -2,6 +2,9 @@
 declare(strict_types=1);
 
 namespace App\Controller;
+use Cake\Core\Configure; 
+use Cake\Http\Cookie\Cookie;
+use DateTime;
 
 /**
  * Users Controller
@@ -14,29 +17,51 @@ class UsersController extends AppController
     public function beforeFilter(\Cake\Event\EventInterface $event)
     {
         parent::beforeFilter($event);
-        $this->Authentication->addUnauthenticatedActions(['login', 'add', 'lineLogin']); //認証不要のアクション
+        $this->Authentication->addUnauthenticatedActions(['login', 'add', 'lineLogin','setIdentity','removeIdentity']); //認証不要のアクション
     }
 
     public function login()
     {
         $result = $this->Authentication->getResult();
-        // debug($result);
         if ($result->isValid()) {
+            //ログインに成功した場合クッキーをセット
+            $user_data = $this->Authentication->getResult()->getData();
+            $result = $this->setIdentity($user_data);
+            $this->Flash->success('setIdentity_result:'.$result);
             // ログインしていればログイン後の画面にリダイレクト
             $target = $this->Authentication->getLoginRedirect() ?? '/events/index';
             return $this->redirect($target);
+        } else {
+            // ログインしていない場合cookieを確認
+            $cookie = $this->request->getCookie(Configure::read('cookie.key'));
+            if($cookie){
+                // cookieが存在する場合にcookieのidを持つuserを検索
+                $user_data = $this->Users->find('all', ['conditions'=>['remember_token' => $cookie]])->first();
+                if($user_data){
+                    //cookieのidを持つuserがいた場合ログイン
+                    $this->setIdentity($user_data);
+                }
+                $target = $this->Authentication->getLoginRedirect() ?? '/events/index';
+                return $this->redirect($target);
+            }
         }
+
+
         // ログイン認証に失敗した場合はエラーを表示する
-        if ($this->request->is('post') && !$result->isValid()) {
-            $this->Flash->error(__('メールアドレスまたはパスワードが誤っています。'));
-        }
+        if ($this->request->is('post')) {
+            if(!$result->isValid()){
+                $this->Flash->error(__('メールアドレスまたはパスワードが誤っています。'));
+            } 
+        } 
+        
     }
 
     public function logout()
     {
         $result = $this->Authentication->getResult();
         if ($result->isValid()) {
-            $this->Authentication->logout();
+            // $this->Authentication->logout();
+            $this->removeIdentity();
         }
         return $this->redirect(['controller' => 'Users', 'action' => 'login']);
     }
@@ -145,11 +170,64 @@ class UsersController extends AppController
             }
             $this->Flash->success(__('The user has been saved.'));
         }
-        $this->Authentication->setIdentity($user_data);
+        $this->setIdentity($user_data);
         $this->Flash->success(__('Login successful'));
         return $this->redirect(['controller'=>'Events','action'=>'index']);
     }
 
+    public function setIdentity($user_data){
+        $this->autoRender = false;
+        //手動でログインする場合にcookieを設定する
+        $this->Authentication->setIdentity($user_data);
+        $cookie = $this->request->getCookie(Configure::read('cookie.key'));
+        if($cookie){ //既にcookieが設定されている場合はログインのみ
+            return true;
+        }
+        $key_auto_login = hash('sha256', (uniqid() . mt_rand(1, 999999999) . '_auto_logins'));
+        $this->response = $this->response->withCookie(Cookie::create(
+            Configure::read('cookie.key'),
+            $key_auto_login,
+            ['expires'=>new DateTime(Configure::read('cookie.expired')), 'http'=>true]
+        ));
+        $update_data = $this->Users->patchEntity($user_data, [
+            'id' => $user_data['id'],
+            'remember_token' => $key_auto_login
+        ]);
+        $result = $this->Users->save($update_data);
+        if(!$result){
+            $this->Flash->error('cannot set user identity. retry login.');
+            return true;
+        }
+        return false;
+    }
+
+    public function removeIdentity(){
+        $this->autoRender = false;
+        if ($this->Authentication->getResult()->isValid()){
+                $uid = $this->Authentication->getResult()->getData()['id'];
+                $user_data = $this->Users->find('all', ['conditions'=>['id' => $uid]])->first();
+                
+                $update_data = $this->Users->patchEntity($user_data, [
+                    'id' => $user_data['id'],
+                    'remember_token' => null
+                ]);
+                $result = $this->Users->save($update_data);
+                if(!$result){
+                    $this->Flash->error('cannot remove remember_token. please contact server administrator');
+                    return false;
+                }
+                
+                $this->Authentication->logout();
+        }
+
+        $this->response = $this->response->withCookie(Cookie::create(
+            Configure::read('cookie.key'),
+            '',
+            ['expires'=>new DateTime('-1 day'), 'http'=>true]
+        ));
+        return true;
+    }
+    
     /**
      * View method
      *
