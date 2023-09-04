@@ -12,10 +12,10 @@
             <div class="tag disp-iblock" style="background-color: <?= $event_state['tag_color'] ?>;">
                 <?= $event_state['text'] ?>
             </div>
-            
             <?php if(!is_null($user_response_state)): ?>
                 <div class="tag disp-iblock" , style="background-color: <?= $user_response_state['tag_color'] ?>;">
                     <?= $user_response_state['text'] ?>
+                    
                 </div>
             <?php endif; ?>
             

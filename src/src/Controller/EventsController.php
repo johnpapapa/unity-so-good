@@ -7,9 +7,7 @@ use Cake\Core\Configure;
 use Cake\Event\EventInterface;
 use Cake\Utility\Hash;
 use Cake\Datasource\ConnectionManager;
-
-use Cake\Http\Cookie\Cookie;
-use DateTime;
+use Cake\I18n\FrozenTime;
 
 /**
  * Events Controller
@@ -30,58 +28,6 @@ class EventsController extends AppController
      *
      * @return \Cake\Http\Response|null|void Renders view
      */
-    public function test(){
-        // $this->autoRender = false;
-
-        $this->EventResponses = $this->fetchTable('EventResponses');
-
-        // $responsed_event_id = $this->EventResponses->find("all", [
-        //     "conditions" => [
-        //         "EventResponses.responder_id" => 1,
-        //         "Events.start_time >" => date("Y-m-d H:i:s")
-        //     ]
-        // ])
-        // ->select('EventResponses.event_id')
-        // ->contain('Events')
-        // ->all()->toArray();
-        // $responsed_event_id = Hash::extract($responsed_event_id, '{n}.event_id');
-
-        // $events = $this->Events->find("all", [
-        //     "conditions"=>[
-        //         "Events.id IN" => $responsed_event_id
-        //     ]
-        // ])->all()->toArray();
-
-
-        // SELECT event_responses.event_id, event_responses.response_state, count(event_responses.response_state)
-        // FROM events
-        // INNER JOIN event_responses ON Events.id = event_responses.event_id
-        // WHERE 1
-        // GROUP BY event_responses.event_id, event_responses.response_state
-    
-        // // $events = $this->Events->find("all")
-        // // ->contain('EventResponses')
-        // // ->group('EventResponses.event_state')
-        // // ->all()->toArray();
-        // $events = $this->Events->find("all")
-        // ->contain([
-        //     'EventResponses' => function ($q) {
-        //         return $q->select([
-        //             'EventResponses.event_id',
-        //             'EventResponses.response_state'
-        //         ]);
-        //     }
-        // ])
-        // ->select("EventResponses.event_id")
-        // // ->group('EventResponses.event_id')
-        // ->limit(10)
-        // ->all()->toArray();
-        
-
-
-        
-        
-    }
 
     public function index()
     {
@@ -92,58 +38,43 @@ class EventsController extends AppController
         
         $this->Locations = $this->fetchTable('Locations');
         $conditions = [
-            'Events.deleted_at IS' => NULL,
-            'Events.end_time >=' => date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s") . "-14days"))
+            'Events.deleted_at IS' => NULL, //削除前のイベント
+            'Events.end_time >=' => date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s") . "-14days")) //14日前までのイベント
         ]; 
         $events_query = $this->Events->find("all", ['conditions'=>$conditions]);
         $events_query = $events_query
         ->contain([
-            // 'Users', //開催者
             'Locations',
             'EventResponses' => [
                 'sort' => [
-                    'response_state' => 'DESC', 
-                    'EventResponses.updated_at' => 'ASC'
+                    'response_state' => 'DESC', //反応した種類順
+                    'EventResponses.updated_at' => 'ASC' //反応した時間順
                 ]
             ]
         ])
         ->select($this->Events)
         ->select($this->Locations)
-        ->contain('EventResponses.Users') //EventResponses以下Usersオブジェクト作成
-        ->order(['Events.start_time'=>'ASC'])
-        ->limit(50);
+        ->contain('EventResponses.Users') //EventResponsesに紐づくUsersオブジェクト作成
+        ->order(['Events.start_time'=>'ASC']) //Eventが表示される順番
+        ->limit(Configure::read('event_item_limit')); 
         $events = $events_query->all()->toArray();
         
-        $day_of_week=[1=>'月',2=>'火',3=>'水',4=>'木',5=>'金',6=>'土',7=>'日']; //日付変換用の定数
-
-        $events_formated = [];
+        $events_formated = []; //整形後のevent
+        $now_datetime = new FrozenTime('+9 hour');
         foreach($events as $event){
-            $event_formated = $event;
-            
-            //開催日の取出
-            // $event_formated['date'] = $event->start_time->i18nFormat('yyyy-MM-dd');
-            // $event_formated['day_of_week'] = "{$day_of_week[$event->start_time->dayOfWeek]}";
-
             //時刻の比較
-            $now_datetime = strtotime("now");
-            $start_datetime = strtotime($event->start_time->i18nFormat('yyyy-MM-dd HH:mm:ss'));
-            $end_datetime = strtotime($event->end_time->i18nFormat('yyyy-MM-dd HH:mm:ss'));
-            if($now_datetime < $start_datetime){
-                $event_formated['event_state'] = 0;
-            } elseif($now_datetime > $end_datetime) {
-                $event_formated['event_state'] = 2;
+            if($now_datetime < $event->start_time){
+                $event['event_state'] = 0;
+            } elseif($now_datetime > $event->end_time) {
+                $event['event_state'] = 2;
             } else {
-                $event_formated['event_state'] = 1;
+                $event['event_state'] = 1;
             }
 
             //ユーザの参加情報取出
             if ($uid){
-                $user_event_responses = Hash::extract($event, 'event_responses.{n}[responder_id='.$uid.']');
-                if(count($user_event_responses) <= 0){
-                    $event_formated['user_response_state'] = null;
-                } else {
-                    $event_formated['user_response_state'] = $user_event_responses[0]['response_state'];
-                }
+                $resp = array_search($uid, array_column($event->event_responses, 'responder_id'));
+                $event['user_response_state'] = ($resp !== false) ? $event->event_responses[$resp]->response_state: null;
             }
 
             //参加情報取出
@@ -151,10 +82,9 @@ class EventsController extends AppController
             foreach($event->event_responses as $event_response){
                 $event_responder_list[$event_response->response_state][] = $event_response->user->display_name;
             }
-            $event_formated['event_responses'] = $event_responder_list;
+            $event['event_responses'] = $event_responder_list;
 
-            
-            $events_formated[] = $event_formated;
+            $events_formated[] = $event;
         }
         $events = $events_formated;
         
@@ -162,43 +92,47 @@ class EventsController extends AppController
     }
 
     public function unresponded(){ //未表明
-        if ($this->Authentication->getResult()->isValid()){
-            $uid = $this->Authentication->getResult()->getData()['id'];
-        } else {
+        if (!$this->Authentication->getResult()->isValid()){
             $this->Flash->error(__('Failed to get member information. Please login.'));
             return $this->redirect(['action' => 'index']);
         }
+        $uid = $this->Authentication->getResult()->getData()['id'];
 
-        $this->EventResponses = $this->fetchTable('EventResponses');
-        $conditions = [
-            
-        ];
-        $event_responses = $this->EventResponses->find("all", ["conditions"=>$conditions])
-        ->contain(['Events'])
-        ->where([
-            "EventResponses.responder_id NOT IN" => $uid, //自分
-        ])
-        ->select([
-            'EventResponses.event_id',
-        ])
-        ->group('EventResponses.event_id')
-        ->all()
-        ->toArray();
-        
-        $event_ids = Hash::extract($event_responses, '{n}.event_id');
+        //未削除かつ開催時間が未来のEventに対して,userのEventResponseをLEFTJOINした結果NULLのものを返す
+        //1.未削除かつ開催時間が未来のEventを取得 => e
+        //2.responder_idが自分のEventResponseを取得 => er
+        //3.Event.idとEventResponse.event_idをキーにしてLEFTJOIN
+        //4.responder_idがNULLとなるEvent.idを取得
+        $sql = <<<EOF
+        SELECT e.id, e.start_time
+        FROM ( 
+            SELECT events.id, events.start_time, events.deleted_at
+            FROM events 
+            WHERE ISNULL(events.deleted_at) AND events.start_time between cast(NOW()  + interval 9 hour as datetime) and cast( NOW()+ interval 1 year as datetime) 
+        ) AS e 
+        LEFT JOIN ( 
+            SELECT event_responses.responder_id, event_responses.event_id 
+            FROM event_responses 
+            WHERE event_responses.responder_id = {$uid} 
+        ) AS er 
+        ON (er.event_id = e.id ) 
+        WHERE ISNULL(er.responder_id)
+        ORDER BY e.start_time ASC
+        EOF;
+        $connection = ConnectionManager::get('default');
+        $event_responses = $connection->execute($sql)->fetchAll('assoc');
+        $event_ids = Hash::extract($event_responses, '{n}.id');
+
         $events = [];
-
         if(count($event_ids) > 0){  
+
             $this->Locations = $this->fetchTable('Locations');
             $conditions = [
                 'Events.id IN' => $event_ids,
-                'Events.end_time >=' => date("Y-m-d H:i:s"), //現在日時より後
-                'Events.deleted_at IS' => NULL, //未削除
             ]; 
             $events_query = $this->Events->find("all", ['conditions'=>$conditions]);
             $events_query = $events_query
             ->contain([
-                // 'Users', //開催者
                 'Locations',
                 'EventResponses' => [
                     'sort' => [
@@ -210,35 +144,26 @@ class EventsController extends AppController
             ->select($this->Events)
             ->select($this->Locations)
             ->contain('EventResponses.Users') //EventResponses以下Usersオブジェクト作成
-            ->order(['Events.start_time'=>'DESC'])
-            ->limit(50);
-
+            ->order(['Events.start_time'=>'ASC'])
+            ->limit(Configure::read('event_item_limit'));
             $events = $events_query->all()->toArray();
 
-            $events_formated = [];
+            $events_formated = []; //整形前のevent
+            $now_datetime = new FrozenTime('+9 hour');
             foreach($events as $event){
-                $event_formated = $event;
-
                 //時刻の比較
-                $now_datetime = strtotime("now");
-                $start_datetime = strtotime($event->start_time->i18nFormat('yyyy-MM-dd HH:mm:ss'));
-                $end_datetime = strtotime($event->end_time->i18nFormat('yyyy-MM-dd HH:mm:ss'));
-                if($now_datetime < $start_datetime){
+                if($now_datetime < $event->start_time){
                     $event['event_state'] = 0;
-                } elseif($now_datetime > $end_datetime) {
+                } elseif($now_datetime > $event->end_time) {
                     $event['event_state'] = 2;
                 } else {
                     $event['event_state'] = 1;
                 }
-
+                
                 //ユーザの参加情報取出
                 if ($uid){
-                    $user_event_responses = Hash::extract($event, 'event_responses.{n}[responder_id='.$uid.']');
-                    if(count($user_event_responses) <= 0){
-                        $event['user_response_state'] = null;
-                    } else {
-                        $event['user_response_state'] = $user_event_responses[0]['response_state'];
-                    }
+                    $resp = array_search($uid, array_column($event->event_responses, 'responder_id'));
+                    $event['user_response_state'] = ($resp !== false) ? $event->event_responses[$resp]->response_state: null;
                 }
 
                 //参加情報取出
@@ -246,12 +171,9 @@ class EventsController extends AppController
                 foreach($event->event_responses as $event_response){
                     $event_responder_list[$event_response->response_state][] = $event_response->user->display_name;
                 }
-                $event_formated['event_responses'] = $event_responder_list;
-
+                $event['event_responses'] = $event_responder_list;
                 
-                $events_formated[] = $event_formated;
-
-                
+                $events_formated[] = $event;
             };
             $events = $events_formated;
         }
@@ -267,29 +189,27 @@ class EventsController extends AppController
             return $this->redirect(['action' => 'index']);
         }
 
-        $this->EventResponses = $this->fetchTable('EventResponses');
-        $conditions = [
-            
-        ];
-        $event_responses = $this->EventResponses->find("all", ["conditions"=>$conditions])
-        ->contain(['Events'])
-        ->where([
-            "EventResponses.responder_id" => $uid, //自分
-            'EventResponses.response_state IN' => [0, 1], //未定or参加
-            'Events.deleted_at IS' => NULL, //未削除
-            'Events.end_time >=' => date("Y-m-d H:i:s"), //現在日時より後
-        ])
-        ->select([
-            'Events.id',
-            'Events.end_time',
-            'EventResponses.event_id',
-            'EventResponses.responder_id',
-            'EventResponses.response_state'
-        ])
-        ->all()
-        ->toArray();
 
-        $event_ids = Hash::extract($event_responses, '{n}.event_id');
+        $sql = <<<EOF
+        SELECT e.id 
+        FROM ( 
+            SELECT events.id, events.start_time, events.deleted_at 
+            FROM events 
+            WHERE ISNULL(events.deleted_at) AND events.start_time between cast(NOW() + interval 9 hour as datetime) and cast( NOW() + interval 1 year as datetime) 
+        ) AS e 
+        LEFT JOIN ( 
+            SELECT event_responses.responder_id, event_responses.event_id 
+            FROM event_responses
+            WHERE event_responses.responder_id = {$uid}
+        ) AS er 
+        ON (er.event_id = e.id ) 
+        WHERE ISNULL(er.responder_id) = 0 
+        ORDER BY e.start_time ASC;
+        EOF;
+        $connection = ConnectionManager::get('default');
+        $event_responses = $connection->execute($sql)->fetchAll('assoc');
+        $event_ids = Hash::extract($event_responses, '{n}.id');
+
         $events = [];
 
         if(count($event_ids) > 0){   
@@ -300,7 +220,6 @@ class EventsController extends AppController
             $events_query = $this->Events->find("all", ['conditions'=>$conditions]);
             $events_query = $events_query
             ->contain([
-                // 'Users', //開催者
                 'Locations',
                 'EventResponses' => [
                     'sort' => [
@@ -312,35 +231,27 @@ class EventsController extends AppController
             ->select($this->Events)
             ->select($this->Locations)
             ->contain('EventResponses.Users') //EventResponses以下Usersオブジェクト作成
-            ->order(['Events.start_time'=>'DESC']);
-            // ->limit(10);
+            ->order(['Events.start_time'=>'ASC'])
+            ->limit(Configure::read('event_item_limit')); 
             $events = $events_query->all()->toArray();
-            
-            $events_formated = [];
-            foreach($events as $event){
-                $event_formated = $event;
 
+            $events_formated = [];
+            $now_datetime = new FrozenTime('+9 hour');
+            foreach($events as $event){
                 //時刻の比較
-                $now_datetime = strtotime("now");
-                $start_datetime = strtotime($event->start_time->i18nFormat('yyyy-MM-dd HH:mm:ss'));
-                $end_datetime = strtotime($event->end_time->i18nFormat('yyyy-MM-dd HH:mm:ss'));
-                if($now_datetime < $start_datetime){
+                if($now_datetime < $event->start_time){
                     $event['event_state'] = 0;
-                } elseif($now_datetime > $end_datetime) {
+                } elseif($now_datetime > $event->end_time) {
                     $event['event_state'] = 2;
                 } else {
                     $event['event_state'] = 1;
                 }
-                $event['event_state'] = 0;
 
                 //ユーザの参加情報取出
                 if ($uid){
-                    $user_event_responses = Hash::extract($event, 'event_responses.{n}[responder_id='.$uid.']');
-                    if(count($user_event_responses) <= 0){
-                        $event['user_response_state'] = null;
-                    } else {
-                        $event['user_response_state'] = $user_event_responses[0]['response_state'];
-                    }
+                    $resp = array_search($uid, array_column($event->event_responses, 'responder_id'));
+                    $event['user_response_state'] = ($resp !== false) ? $event->event_responses[$resp]->response_state: null;
+                    
                 }
 
                 //参加情報取出
@@ -348,11 +259,9 @@ class EventsController extends AppController
                 foreach($event->event_responses as $event_response){
                     $event_responder_list[$event_response->response_state][] = $event_response->user->display_name;
                 }
-                $event_formated['event_responses'] = $event_responder_list;
+                $event['event_responses'] = $event_responder_list;
 
-                
-
-                $events_formated[] = $event_formated;
+                $events_formated[] = $event;
             };
             $events = $events_formated;
         }
@@ -361,25 +270,22 @@ class EventsController extends AppController
     }
 
     public function created(){
+        $uid = null;
         if ($this->Authentication->getResult()->isValid()){
             $uid = $this->Authentication->getResult()->getData()['id'];
-        } else {
-            $this->Flash->error(__('Failed to get member information. Please login.'));
-            return $this->redirect(['action' => 'index']);
         }
 
         $this->Locations = $this->fetchTable('Locations');
-        $conditions = [
+        $conditions = [ //削除済みのイベントも含ませる
             'Events.organizer_id IN' => $uid
         ]; 
         $events_query = $this->Events->find("all", ['conditions'=>$conditions]);
         $events_query = $events_query
         ->contain([
-            // 'Users', //開催者
             'Locations',
             'EventResponses' => [
                 'sort' => [
-                    'response_state' => 'DESC', 
+                    'response_state' => 'DESC',
                     'EventResponses.updated_at' => 'ASC'
                 ]
             ]
@@ -387,21 +293,17 @@ class EventsController extends AppController
         ->select($this->Events)
         ->select($this->Locations)
         ->contain('EventResponses.Users') //EventResponses以下Usersオブジェクト作成
-        ->order(['Events.start_time'=>'DESC']);
-        // ->limit(10);
+        ->order(['Events.start_time'=>'DESC'])
+        ->limit(Configure::read('event_item_limit')); 
         $events = $events_query->all()->toArray();
         
-        $events_formated = [];
+        $events_formated = []; //整形後のevent
+        $now_datetime = new FrozenTime('+9 hour');
         foreach($events as $event){
-            $event_formated = $event;
-
             //時刻の比較
-            $now_datetime = strtotime("now");
-            $start_datetime = strtotime($event->start_time->i18nFormat('yyyy-MM-dd HH:mm:ss'));
-            $end_datetime = strtotime($event->end_time->i18nFormat('yyyy-MM-dd HH:mm:ss'));
-            if($now_datetime < $start_datetime){
+            if($now_datetime < $event->start_time){
                 $event['event_state'] = 0;
-            } elseif($now_datetime > $end_datetime) {
+            } elseif($now_datetime > $event->end_time) {
                 $event['event_state'] = 2;
             } else {
                 $event['event_state'] = 1;
@@ -409,12 +311,8 @@ class EventsController extends AppController
 
             //ユーザの参加情報取出
             if ($uid){
-                $user_event_responses = Hash::extract($event, 'event_responses.{n}[responder_id='.$uid.']');
-                if(count($user_event_responses) <= 0){
-                    $event['user_response_state'] = null;
-                } else {
-                    $event['user_response_state'] = $user_event_responses[0]['response_state'];
-                }
+                $resp = array_search($uid, array_column($event->event_responses, 'responder_id'));
+                $event['user_response_state'] = ($resp !== false) ? $event->event_responses[$resp]->response_state: null;
             }
 
             //参加情報取出
@@ -422,11 +320,10 @@ class EventsController extends AppController
             foreach($event->event_responses as $event_response){
                 $event_responder_list[$event_response->response_state][] = $event_response->user->display_name;
             }
-            $event_formated['event_responses'] = $event_responder_list;
-            
-            $events_formated[] = $event_formated;
+            $event['event_responses'] = $event_responder_list;
 
-        };
+            $events_formated[] = $event;
+        }
         $events = $events_formated;
 
         $this->set(compact('events'));
@@ -474,6 +371,11 @@ class EventsController extends AppController
             } else {
                 $event['user_response_state'] = $user_event_responses[0]['response_state'];
             }
+        }
+
+        if ($uid){
+            $resp = array_search($uid, array_column($event->event_responses, 'responder_id'));
+            $event['user_response_state'] = ($resp !== false) ? $event->event_responses[$resp]->response_state: null;
         }
 
         //参加情報取出
@@ -554,8 +456,8 @@ class EventsController extends AppController
 
         if ($this->request->is('post')) {
             $data = $this->request->getData();
-            $save_data = [];
 
+            //新規コートのチェックがついている場合のLocation追加処理
             if(isset($data['location_new_check'])){
                 $location_data = $this->Locations->newEntity([
                     "display_name"=>h($data['display_name']),
