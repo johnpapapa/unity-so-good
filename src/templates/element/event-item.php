@@ -13,6 +13,21 @@
 ?>
 
 <div class="event-item event-outer mb20">
+    <?php if(isset($displayCreatedBtn)): ?>
+        <div class="disp-flex align-center ">
+            <a class="buttons pure-u-2-3" href="<?= $this->Url->build(['controller' => 'events','action' => 'delete', $event->id]); ?>">
+                <button class="pure-button w100" type="button" style="background-color:#dfb31d7d;">
+                    編集
+                </button>
+            </a>
+
+            <a class="buttons pure-u-1-3" href="<?= $this->Url->build(['controller' => 'events','action' => 'delete', $event->id]); ?>">
+                <button class="pure-button w100" type="button">
+                    削除
+                </button>
+            </a>
+        </div>
+    <?php endif; ?>
     <div class="event-inner">
         <div class="tags mb5">
             <div class="tag disp-iblock" style="background-color: <?= $event_state['tag_color'] ?>;">

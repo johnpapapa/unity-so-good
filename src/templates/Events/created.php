@@ -7,5 +7,5 @@
     </div>
 </a>
 <?php foreach($events as $event): ?>
-    <?php echo $this->element('event-item', array('event' => $event, 'displayResponseBtn' => false)); ?>
+    <?php echo $this->element('event-item', array('event' => $event, 'displayCreatedBtn' => true)); ?>
 <?php endforeach; ?>

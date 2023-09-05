@@ -457,8 +457,6 @@ class EventsController extends AppController
         if ($this->request->is('post')) {
             $data = $this->request->getData();
             
-            return;
-            
             //候補から選択しなかった場合のLocation追加処理
             if($data['location_id'] == ''){
                 $location_data = $this->Locations->newEntity([
@@ -472,12 +470,9 @@ class EventsController extends AppController
                     $this->Flash->error(__('The location could not be saved. Please, try again.'));
                     return;
                 }
+                $this->Flash->success(__('The location has been saved.'));
                 $data["location_id"] = $result_location->id;
             }
-
-            // $data['event_date'] = str_replace('/','-',$data['event_date']); //日付のフォーマット
-            // $data['start_time'] = wordwrap($data['start_time'], 2, ':', true); //時刻のフォーマット
-            // $data['end_time'] = wordwrap($data['end_time'], 2, ':', true); //時刻のフォーマット
 
             $event_data = $this->Events->newEntity([
                 "organizer_id" => $uid,
