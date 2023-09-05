@@ -451,7 +451,7 @@ class EventsController extends AppController
         $this->Locations = $this->fetchTable('Locations');
         $event = $this->Events->newEmptyEntity();
         $locations = $this->Locations->find('all', ["conditions"=>[]])->all()->toArray();
-        $locations = Hash::combine($locations, '{n}.display_name', '{n}');
+        // $locations = Hash::combine($locations, '{n}.display_name', '{n}');
         $this->set(compact('event', 'locations'));
 
         if ($this->request->is('post')) {

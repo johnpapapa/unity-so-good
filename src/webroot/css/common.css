@@ -31,6 +31,10 @@
 
 .bold {font-weight: bold;}
 
+.fs-small {font-size: 14px;}
+.fs-medium {font-size: 16px;}
+.fs-large {font-size: 18px;}
+
 .nostyle-a {text-decoration: none;}
 .note-p {
     font-size: 12px; 
@@ -44,4 +48,8 @@
 
 @media screen and (max-width: 768px) {
     .disp-m-block { display: block; }
+
+    .fs-m-small { font-size: 12px !important; }
+    .fs-m-medium { font-size: 14px !important;; }
+    .fs-m-large { font-size: 16px !important;; }
 }

@@ -26,13 +26,17 @@
         font-size: 1.2rem;
     }
 
-    .detail .detail-content .undecided {background-color: #d3d3d37F;}
-    .detail .detail-content .present {background-color: #90ee907F;}
+    .detail .detail-content .undecided, .detail .detail-content .state-0 {background-color: #d3d3d37F;}
+    .detail .detail-content .present, .detail .detail-content .state-1 {background-color: #90ee907F;}
     .detail .detail-content .absent {background-color: #f080807F;}
 
+    .detail .state-title {
+        color: #00000055;
+    }
+
     .detail .state {border: 1px solid #ccc;}
-    .detail .state-content .name {font-size: 1.2rem;}
-    .detail .state-content .time {font-size: .7rem;}
+    /* .detail .state-content .name {font-size: 1.2rem;}
+    .detail .state-content .time {font-size: .7rem;} */
 </style>
 
 
@@ -114,27 +118,27 @@
             <div class="content states">
                 <?php $state_idx = 1; ?>
                 <div class="states-active-perhaps disp-flex">
-                    <div class="state p10 pure-u-1-2">
+                    <div class="state state-<?= $state_idx ?> p10 pure-u-1-2">
                         <div class="state-title mb10 text-center">
                             <?= Configure::read('response_states')[$state_idx]["text"] ?>
                         </div>
                         <?php foreach($event->event_responses[$state_idx] as $event_response): ?>
                             <div class="state-content over-ellipsis disp-iblock pure-u-1 mb5">
-                                <div class="name disp-m-block disp-iblock over-ellipsis"><?= h($event_response["name"]); ?></div>
-                                <div class="time disp-iblock fr"><?= $event_response["time"]->i18nFormat('MM/dd HH:mm:ss') ?></div>
+                                <div class="name disp-m-block disp-iblock over-ellipsis fs-large fs-m-large"><?= h($event_response["name"]); ?></div>
+                                <div class="time disp-iblock fr fs-small fs-m-small"><?= $event_response["time"]->i18nFormat('MM/dd HH:mm:ss') ?></div>
                             </div>
                         <?php endforeach; ?>
                     </div>
                         
                     <?php $state_idx = 0; ?>
-                    <div class="state p10 pure-u-1-2">
+                    <div class="state state-<?= $state_idx ?> p10 pure-u-1-2">
                         <div class="state-title mb10 text-center">
                             <?= Configure::read('response_states')[$state_idx]["text"] ?>
                         </div>
                         <?php foreach($event->event_responses[$state_idx] as $event_response): ?>
                             <div class="state-content over-ellipsis disp-iblock pure-u-1 mb5">
-                                <div class="name disp-iblock over-ellipsis"><?= h($event_response["name"]); ?></div>
-                                <div class="time disp-iblock fr"><?= $event_response["time"]->i18nFormat('MM/dd HH:mm:ss') ?></div>
+                                <div class="name disp-m-block disp-iblock over-ellipsis fs-large fs-m-large"><?= h($event_response["name"]); ?></div>
+                                <div class="time disp-iblock fr fs-small fs-m-small"><?= $event_response["time"]->i18nFormat('MM/dd HH:mm:ss') ?></div>
                             </div>
                         <?php endforeach; ?>
                     </div>
@@ -147,8 +151,7 @@
                     </div>
                     <?php foreach($event->event_responses[$state_idx] as $event_response): ?>
                         <div class="state-content over-ellipsis">
-                            <?= h($event_response["name"]); ?> 
-                        </div>
+                            <div class="fs-medium  fs-m-midium"><?= h($event_response["name"]); ?></div>
                     <?php endforeach; ?>
                 </div>
             </div>

@@ -4,6 +4,12 @@
     $user_response_state = (!is_null($event->user_response_state)) ? Configure::read('response_states')[$event->user_response_state] : null;
     $event_state = Configure::read('event_states')[$event->event_state];
     $day_of_weeks = Configure::read('day_of_weeks');
+
+    $response_count = [
+        0 => count($event->event_responses[0]),
+        1 => count($event->event_responses[1]),
+        2 => count($event->event_responses[2]),
+    ];
 ?>
 
 <div class="event-item event-outer mb20">
@@ -50,9 +56,9 @@
                 </div>
 
                 <div class="count mb5">
-                    ?:<?= count($event->event_responses[0]) ?>
-                    o:<?= count($event->event_responses[1]) ?>
-                    x:<?= count($event->event_responses[2]) ?>
+                    o:<?= $response_count[1] ?>
+                    ?:<?= $response_count[0] ?>
+                    x:<?= $response_count[2] ?>
                 </div>
                 <div class="total mb5">
                     (合計:<?= count($event->event_responses[0]) + count($event->event_responses[1]) + count($event->event_responses[2]) ?>人)
@@ -81,9 +87,10 @@
                     <div class="state state-<?= $state_idx ?> pure-u-1-2 text-center p10">
                         <div class="state-title mb10">
                             <?= Configure::read('response_states')[$state_idx]["text"] ?>
+                            (<?= $response_count[$state_idx] ?>)
                         </div>
                         <div class="state-content">
-                            <?php foreach($event->event_responses[$state_idx] as $event_response): ?>
+                            <?php foreach($event->event_responses[$state_idx] as $idx=>$event_response): ?>
                                 <div class="over-ellipsis"><?= h($event_response); ?></div>
                             <?php endforeach; ?>
                         </div>
@@ -93,6 +100,7 @@
                     <div class="state state-<?= $state_idx ?> pure-u-1-2 text-center p10">
                         <div class="state-title mb10">
                             <?= Configure::read('response_states')[$state_idx]["text"] ?>
+                            (<?= $response_count[$state_idx] ?>)
                         </div>
                         <div class="state-content">
                             <?php foreach($event->event_responses[$state_idx] as $event_response): ?>
