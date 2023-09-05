@@ -16,7 +16,7 @@ use Cake\ORM\Entity;
  * @property string|null $remember_token
  * @property \Cake\I18n\FrozenTime|null $created_at
  * @property \Cake\I18n\FrozenTime|null $updated_at
- * @property \Cake\I18n\FrozenTime|null $deleted_at
+ * @property int $deleted_at
  */
 class User extends Entity
 {

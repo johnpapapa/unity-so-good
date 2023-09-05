@@ -24,6 +24,7 @@ class UsersController extends AppController
     {
         $result = $this->Authentication->getResult();
         if ($result->isValid()) {
+            $this->log("isvalid");
             //ログインに成功した場合クッキーをセット
             $user_data = $this->Authentication->getResult()->getData();
             $result = $this->setIdentity($user_data);
@@ -31,12 +32,21 @@ class UsersController extends AppController
             $target = $this->Authentication->getLoginRedirect() ?? '/events/index';
             return $this->redirect($target);
         } else {
+            $this->log("isnotvalid");
             // ログインしていない場合cookieを確認
             $cookie = $this->request->getCookie(Configure::read('cookie.key'));
             if($cookie){
+                $this->log(print_r($cookie));
+            } else {
+                $this->log('null=');
+            }
+
+            if($cookie){
+                $this->log('is-cookie');
                 // cookieが存在する場合にcookieのidを持つuserを検索
                 $user_data = $this->Users->find('all', ['conditions'=>['remember_token' => $cookie]])->first();
                 if($user_data){
+                    $this->log('find');
                     //cookieのidを持つuserがいた場合ログイン
                     $this->setIdentity($user_data);
                 }
@@ -44,7 +54,6 @@ class UsersController extends AppController
                 return $this->redirect($target);
             }
         }
-
 
         // ログイン認証に失敗した場合はエラーを表示する
         if ($this->request->is('post')) {
@@ -178,7 +187,14 @@ class UsersController extends AppController
         $this->autoRender = false;
         //手動でログインする場合にcookieを設定する
         $this->Authentication->setIdentity($user_data);
+        $this->log('setIdentity');
         $cookie = $this->request->getCookie(Configure::read('cookie.key'));
+        if($cookie){
+            $this->log(print_r($cookie));
+        } else {
+            $this->log('null~~');
+        }
+        
         if($cookie){ //既にcookieが設定されている場合はログインのみ
             return true;
         }
@@ -186,7 +202,7 @@ class UsersController extends AppController
         $this->response = $this->response->withCookie(Cookie::create(
             Configure::read('cookie.key'),
             $key_auto_login,
-            ['expires'=>new DateTime(Configure::read('cookie.expired')), 'http'=>true]
+            ['expires'=>new DateTime('+ 1 min'), 'http'=>true]
         ));
         $update_data = $this->Users->patchEntity($user_data, [
             'id' => $user_data['id'],

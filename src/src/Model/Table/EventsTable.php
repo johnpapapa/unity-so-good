@@ -85,8 +85,8 @@ class EventsTable extends Table
             ->allowEmptyDateTime('updated_at');
 
         $validator
-            ->dateTime('deleted_at')
-            ->allowEmptyDateTime('deleted_at');
+            ->integer('deleted_at')
+            ->notEmptyString('deleted_at');
 
         $validator
             ->datetime('start_time')

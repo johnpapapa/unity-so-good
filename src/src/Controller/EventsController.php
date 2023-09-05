@@ -38,7 +38,7 @@ class EventsController extends AppController
         
         $this->Locations = $this->fetchTable('Locations');
         $conditions = [
-            'Events.deleted_at IS' => NULL, //削除前のイベント
+            'Events.deleted_at IS' => 0, //削除前のイベント
             'Events.end_time >=' => date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s") . "-14days")) //14日前までのイベント
         ]; 
         $events_query = $this->Events->find("all", ['conditions'=>$conditions]);
@@ -108,7 +108,7 @@ class EventsController extends AppController
         FROM ( 
             SELECT events.id, events.start_time, events.deleted_at
             FROM events 
-            WHERE ISNULL(events.deleted_at) AND events.start_time between cast(NOW()  + interval 9 hour as datetime) and cast( NOW()+ interval 1 year as datetime) 
+            WHERE events.deleted_at=0 AND events.start_time between cast(NOW()  + interval 9 hour as datetime) and cast( NOW()+ interval 1 year as datetime) 
         ) AS e 
         LEFT JOIN ( 
             SELECT event_responses.responder_id, event_responses.event_id 
@@ -195,7 +195,7 @@ class EventsController extends AppController
         FROM ( 
             SELECT events.id, events.start_time, events.deleted_at 
             FROM events 
-            WHERE ISNULL(events.deleted_at) AND events.start_time between cast(NOW() + interval 9 hour as datetime) and cast( NOW() + interval 1 year as datetime) 
+            WHERE events.deleted_at=0 AND events.start_time between cast(NOW() + interval 9 hour as datetime) and cast( NOW() + interval 1 year as datetime) 
         ) AS e 
         LEFT JOIN ( 
             SELECT event_responses.responder_id, event_responses.event_id 

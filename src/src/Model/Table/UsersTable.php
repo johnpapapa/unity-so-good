@@ -100,8 +100,8 @@ class UsersTable extends Table
             ->allowEmptyDateTime('updated_at');
 
         $validator
-            ->dateTime('deleted_at')
-            ->allowEmptyDateTime('deleted_at');
+            ->integer('deleted_at')
+            ->notEmptyString('deleted_at');
 
         return $validator;
     }

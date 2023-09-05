@@ -11,7 +11,7 @@ use Cake\ORM\Entity;
  * @property int $id
  * @property \Cake\I18n\FrozenTime|null $created_at
  * @property \Cake\I18n\FrozenTime|null $updated_at
- * @property \Cake\I18n\FrozenTime|null $deleted_at
+ * @property int $deleted_at
  * @property \Cake\I18n\FrozenTime $start_time
  * @property \Cake\I18n\FrozenTime $end_time
  * @property string|null $area

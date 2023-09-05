@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 use Migrations\AbstractMigration;
+use Phinx\Db\Adapter\MysqlAdapter;
 
 class Initial extends AbstractMigration
 {
@@ -139,10 +140,10 @@ class Initial extends AbstractMigration
                 'limit' => null,
                 'null' => true,
             ])
-            ->addColumn('deleted_at', 'timestamp', [
-                'default' => null,
+            ->addColumn('deleted_at', 'integer', [
+                'default' => 0,
                 'limit' => null,
-                'null' => true,
+                'null' => false,
             ])
             ->addColumn('start_time', 'datetime', [
                 'default' => null,
@@ -428,7 +429,7 @@ class Initial extends AbstractMigration
             ])
             ->addColumn('remember_token', 'string', [
                 'default' => null,
-                'limit' => 50,
+                'limit' => 255,
                 'null' => true,
             ])
             ->addColumn('created_at', 'timestamp', [
@@ -441,10 +442,10 @@ class Initial extends AbstractMigration
                 'limit' => null,
                 'null' => true,
             ])
-            ->addColumn('deleted_at', 'timestamp', [
-                'default' => null,
-                'limit' => null,
-                'null' => true,
+            ->addColumn('deleted_at', 'integer', [
+                'default' => 0,
+                'limit'=>null,
+                'null' => false,
             ])
             ->addIndex(
                 [

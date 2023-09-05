@@ -131,7 +131,7 @@ class EventResponsesSeed extends AbstractSeed
             $idx = $u_i % 3;
             if ($idx == 0) { $display_name = $faker->unique()->name; }
             elseif ($idx == 1) { $display_name = $faker->unique()->kanaName; }
-            elseif ($idx == 2) { $display_name = $faker->unique()->userName; }
+            else { $display_name = $faker->unique()->userName; }
             
             $user_data[] = [
                 'display_name' => $display_name,
@@ -140,7 +140,8 @@ class EventResponsesSeed extends AbstractSeed
                 'password' => null,
                 'remember_token' => null,
                 'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s')
+                'updated_at' => date('Y-m-d H:i:s'),
+                'deleted_at' => 0
             ];
         }
         return $user_data;
@@ -163,7 +164,7 @@ class EventResponsesSeed extends AbstractSeed
             $event_data = [
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
-                'deleted_at' => null,
+                'deleted_at' => 0,
                 'start_time' => $start_time,
                 'end_time' => $end_time,
                 'area' => $area,
