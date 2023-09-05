@@ -1,5 +1,6 @@
 <?php $this->assign('title', 'event add'); ?>
 <?php $this->assign('content-title', 'イベントの追加'); ?>
+<?= $this->Html->script('jquery.ui.autocomplete.scroll.min.js', array('inline' => false)); ?>
 <script>
     let locations = <?= json_encode($locations) ?>;
 </script>
@@ -30,23 +31,50 @@
         user-select: none;
         box-sizing: border-box;
     }
+
+    /* コート名入力の際の候補の文字サイズ */
+    .ui-menu-item-wrapper { 
+        font-size: 20px;
+    }
+
+    .events .location-data-exist-status .is-exist{ color: green;  }
+    .events .location-data-exist-status .is-notexist{ color: red;  }
+
+    /* カレンダーのサイズ */
+    .ui-datepicker{
+        font-size: 20px;
+    }
+
+    /* 時刻入力時のアイコン非表示かつ選択範囲全体化 */
+    .events input [type="time"] {
+        position: relative;
+    }
+    .events input[type="time"]::-webkit-calendar-picker-indicator {
+        position: absolute;
+        opacity: 0;
+        width: 100%;
+    }
 </style>
 
 <div class="events form pure-form pure-form-stacked">
+<a class="nostyle-a" href="<?= $this->Url->build(['controller' => 'events','action' => 'created']); ?>">
+    <div class="pure-button pure-u-1-2 mb30">
+        作成したイベント一覧
+    </div>
+</a>
 <?= $this->Form->create() ?>
     <fieldset>
         <div class="location_name_input mb20">
             <div class="mb20">
                 <label for="display_name">コート名</label>
+                <p class="note-p">
+                入力フォームの候補に該当するコートが存在する場合、<br>
+                候補のタップを優先してください<br>
+                </p>
                 <input type="text" class="pure-u-1" name="display_name" id="display_name" placeholder="コート名">
-
-                <select name="display_name_select" id="display_name_select" size="5" style="height: 200px;">
-                    <!-- <option value="new">新規</option>
-                    <?php foreach($locations as $location): ?>
-                        <option value="<?= $location->display_name ?>"><?= $location->display_name ?></option>
-                    <?php endforeach; ?> -->
-                
-                </select>
+                <div class="location-data-exist-status">
+                    コート情報<span id="status-text" class="is-notexist">未入力</span>
+                </div>
             </div>
 
             <div class="location_data_input_collapse_btn mb20">
@@ -62,17 +90,21 @@
                     </span>
                     コート情報の入力画面収納
                 </div>
-                
             </div>
             <div class="location_data_input" style="display: none;">
+                <p class="note-p mb20">
+                    ・既存のコート名を指定した場合、<br>
+                    コート情報の入力画面は自動で収納します<br>
+                    ・既存のコート情報の編集も可能です<br>
+                </p>
                 <label for="address">住所</label>
-                <input type="text" name="address" id="address" placeholder="住所">
+                <input type="text" class="pure-u-1" style="margin-bottom: 20px;" name="address" id="address" placeholder="住所" required>
     
                 <label for="usage_price">コート使用料</label>
-                <input type="number" name="usage_price" id="usage_price" placeholder="コート使用料">
+                <input type="number" class="pure-u-1" style="margin-bottom: 20px;" name="usage_price" id="usage_price" placeholder="コート使用料">
                 
                 <label for="night_price">コート使用料(ナイター)</label>
-                <input type="number" name="night_price" id="night_price" placeholder="コート使用料(ナイター)">
+                <input type="number" class="pure-u-1" style="margin-bottom: 20px;" name="night_price" id="night_price" placeholder="コート使用料(ナイター)">
 
                 <input type="hidden" id="location_id" name="location_id" value="">
             </div>
@@ -82,46 +114,49 @@
         <div class="input text mb20">
             <label for="area">コート番号</label>
             <p style="font-size: 12px; color:gray;">無入力可</p>
-            <input type="text" name="area" id="area" value="" maxlength="255"  placeholder="コート番号">
+            <input type="text" class="pure-u-1" name="area" id="area" value="" maxlength="255"  placeholder="コート番号">
         </div>        
-        <div class="input number required">
+        <div class="input number required mb20">
             <label for="participants_limit">参加人数上限</label>
-            <input type="number" id="participants_limit" name="participants_limit" required="required" 
+            <input type="number" class="pure-u-1" id="participants_limit" name="participants_limit" required="required" 
                 data-validity-message="This field cannot be left empty" aria-required="true" value="8"  placeholder="参加人数上限" read>
             <div class="participants_limit_none">
                 <input type="checkbox" id="participants_limit_none_check">
                 参加人数無制限
             </div>
         </div>       
-        <div class="input text">
+        <div class="input text mb20">
             <label for="comment">コメント・注意事項</label>
             <p style="font-size: 12px; color:gray;">無入力可</p>
             <!-- <input type="textarea" name="comment" id="comment" maxlength="255" placeholder="コメント・注意事項" rows="5"> -->
-            <textarea name="comment" id="comment" maxlength="255" placeholder="コメント・注意事項" rows="5"></textarea>
+            <textarea name="comment" class="pure-u-1" id="comment" maxlength="255" placeholder="コメント・注意事項" rows="5"></textarea>
         </div>
 
-        <div class="input date">
+        <div class="input date mb20">
             <label for="event_date">日付</label>
-            <input type="text" name="event_date" id="event_date" required="required" placeholder="日付">
+            <p class="note-p">
+                カレンダーで日付を指定してください    
+            </p>
+            <input type="text" class="pure-u-1" name="event_date" id="event_date" required="required" placeholder="日付" readonly tabindex="-1">
         </div>
-        <div class="input datetime required">
+        <div class="input datetime required mb20">
             <label for="start_time">開始時刻</label>
-            <p style="font-size: 12px; color:gray;">
-                時刻を表現する半角英数字4文字を入力してください<br>
-                (例)9時45分=>0945, 23時05分=>2305 (24時間形式)
-            </p>
-            <input type="text" name="start_time" id="start_time" required="required" maxlength="4" pattern="^([01][0-9]|2[0-3])[0-5][0-9]$" title="Please enter 4 characters that can represent the time." placeholder="開始時刻">
+            <input type="time" class="pure-u-1" name="start_time" id="start_time"  placeholder="開始時刻" required>
         </div>        
-        <div class="input datetime required">
+        <div class="input datetime required mb20">
             <label for="end_time">終了時刻</label>
-            <p style="font-size: 12px; color:gray;">
-                時刻を表現する半角英数字4文字を入力してください<br>
-                (例)9時45分=>0945, 23時05分=>2305 (24時間形式)
-            </p>
-            <input type="text" name="end_time" id="end_time" required="required" maxlength="4" pattern="^([01][0-9]|2[0-3])[0-5][0-9]$" title="Please enter 4 characters that can represent the time." placeholder="終了時刻">
+            <input type="time" class="pure-u-1" name="end_time" id="end_time"  placeholder="終了時刻" required>
         </div>
+
+        <datalist id="data1">
+            <option value="サンプル1"></option>
+            <option value="サンプル2"></option>
+            <option value="サンプル3"></option>
+        </datalist>
    </fieldset>
-<?= $this->Form->button(__('新規登録')); ?>
+   <div class="mb10">
+        <button type="submit" name="login" class="pure-button pure-button-primary">イベント新規登録</button>
+    </div>
 <?= $this->Form->end() ?>
 </div>
 
@@ -133,6 +168,7 @@
         let obj_usage_price = $('#usage_price');
         let obj_night_price = $('#night_price');
         let obj_location_id = $('#location_id');
+        let obj_location_data_exist_status = $('#status-text');
 
         let obj_participants_limit = $('#participants_limit');
         let obj_participants_limit_none_check = $('#participants_limit_none_check');
@@ -142,20 +178,6 @@
         let obj_location_data_input = $('.location_data_input');
 
         let obj_event_date = $('#event_date');
-        // let obj_event_date = $('.date-btn');
-        
-
-        obj_location_data_input_expand.on('click', function(){
-            obj_location_data_input.show();
-            obj_location_data_input_collapse.show()
-            $(this).hide()
-        });
-
-        obj_location_data_input_collapse.on('click', function(){
-            obj_location_data_input.hide();
-            obj_location_data_input_expand.show()
-            $(this).hide()
-        });
 
         $(obj_participants_limit_none_check).on('click', function(){
             if ($(this).prop("checked")){
@@ -169,106 +191,73 @@
             }
         });
 
-        //コート名の候補に関するoption初期状態
-        setOptions("");
-
-        //候補を出力する処理のためにコート名入力時に発火するイベント
-        let before_input = ''; //コート名入力される直前の値
-        obj_display_name.on("input", function(){
-            let input_location_name = $(this).val();
-            let is_delete = before_input > input_location_name;
-            setOptions(input_location_name, is_delete);
-            before_input = input_location_name;
+        location_data_input_toggle_view(true);
+        obj_location_data_input_expand.on('click', function(){
+            location_data_input_toggle_view(true)
+        });
+        obj_location_data_input_collapse.on('click', function(){
+            location_data_input_toggle_view(false)
         });
 
-        //入力されたコート名が既存のコート名と一致する場合候補として出力する処理
-        function setOptions(input_location_name, is_delete=false){
-            let option_arr = ["<option value='new'>新規</option>"]; //候補
-            let last_idx = -1; //候補が新規の他に一個しかない時のidx
-            for (var location_idx = 0; location_idx < locations.length; location_idx++) { //何も入力してない場合は全部表示
-                if (locations[location_idx]["display_name"].indexOf(input_location_name) != -1 || input_location_name == "") {
-                    option_arr.push("<option value="+ location_idx +">" + locations[location_idx]["display_name"] + "</option>");
-                    last_idx = location_idx;
-                }
+        function location_data_input_toggle_view(is_show=false){
+            if(is_show){
+                obj_location_data_input.show();
+                obj_location_data_input_collapse.show();
+                obj_location_data_input_expand.hide();
+            } else {
+                obj_location_data_input.hide();
+                obj_location_data_input_expand.show();
+                obj_location_data_input_collapse.hide();
             }
             
-            if(is_delete){ //何も入力してない場合はコート情報全消し
-                onSelected(is_delete);
-            }
-            
-            //候補が特定の個数しかない時選択済みにする処理
-            if (option_arr.length == 1){
-                option_arr[0] = "<option value='new' selected>新規</option>";
-                onSelected(is_delete);
-            }
-            if (option_arr.length == 2 && is_delete === false){
-                option_arr[1] = "<option value="+ last_idx +" selected>" + locations[last_idx]["display_name"] + "</option>";
-                onSelected(is_delete);
-            }
-            obj_display_name_select[0].innerHTML = option_arr.join("");
         }
 
-        obj_display_name_select.change(function(){
-            onSelected();
+        obj_display_name.autocomplete({
+            source: Object.keys(locations),
+            maxShowItems: 5,
+            width: '100%',
+            select: function (event, ui) { //autocompleteで候補を選択した時に発火
+                onSelected(locations[ui.item.value]);
+            }
         });
-        
+
         //selectされた時にコート情報を入力するかリセットするかの処理
-        function onSelected(is_delete=false){
-            let location_idx = obj_display_name_select.children('option:selected').val();
-            let location = locations[location_idx];
-            if(location && !is_delete){
-                obj_display_name.val(location['display_name']);
+        function onSelected(location = ""){
+            if (location != ""){
                 obj_address.val(location['address']);
                 obj_usage_price.val(location['usage_price']);
                 obj_night_price.val(location['night_price']);
                 obj_location_id.val(location['id']);
-                before_input = location['display_name'];
+                obj_location_data_exist_status[0].innerHTML='入力済';
+                obj_location_data_exist_status.removeClass('is-notexist')
+                obj_location_data_exist_status.addClass('is-exist')
+                location_data_input_toggle_view(false);
             } else {
                 obj_address.val("");
                 obj_usage_price.val("");
                 obj_night_price.val("");
                 obj_location_id.val("");
-                before_input = "";
+                obj_location_data_exist_status[0].innerHTML='未入力';
+                obj_location_data_exist_status.removeClass('is-exist')
+                obj_location_data_exist_status.addClass('is-notexist')
+                location_data_input_toggle_view(true);
             }
-
-
         }
 
-
-        // $("#display_name").keyup(function(){
-        //     let textbox_val = $(this).val();
-
-        //     if(textbox_val in locations){
-        //         let location = locations[textbox_val];
-
-        //         obj_address.val(location['address']);
-        //         obj_usage_price.val(location['usage_price']);
-        //         obj_night_price.val(location['night_price']);
-        //         obj_location_id.val(location['id']);
-
-        //         obj_location_new_check.prop("checked", false);
-        //     } else {
-        //         if(obj_location_id.val() !== ""){
-        //             obj_address.val("");
-        //             obj_usage_price.val("");
-        //             obj_night_price.val("");
-        //             obj_location_id.val("");
-        //         }
-
-        //         obj_location_new_check.prop("checked", true);
-        //     }
-        // });
+        obj_display_name.on("input", function(){
+            onSelected();
+        });
 
         $.datepicker.setDefaults($.datepicker.regional["ja"]);
         obj_event_date.datepicker({
             showOtherMonths: true, //他の月を表示
             selectOtherMonths: true, //他の月を選択可能
             showOn: "button",
-            // buttonImage:"https://icons8.jp/icon/h2TDxANl6COB/%E5%88%86%E6%95%A3%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF",
+            dateFormat: 'yy-mm-dd',
             buttonText:"カレンダーで日付を指定"
-            // buttonImage: "ui/datepicker/jquery-ui-datepicker-buttonimage.png",
-            // buttonImageOnly: true
+
         });
+        
         
     });
 </script>

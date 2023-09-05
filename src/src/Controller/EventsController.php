@@ -451,14 +451,16 @@ class EventsController extends AppController
         $this->Locations = $this->fetchTable('Locations');
         $event = $this->Events->newEmptyEntity();
         $locations = $this->Locations->find('all', ["conditions"=>[]])->all()->toArray();
-        // $locations = Hash::combine($locations, '{n}.display_name', '{n}');
+        $locations = Hash::combine($locations, '{n}.display_name', '{n}');
         $this->set(compact('event', 'locations'));
 
         if ($this->request->is('post')) {
             $data = $this->request->getData();
-
-            //新規コートのチェックがついている場合のLocation追加処理
-            if(isset($data['location_new_check'])){
+            
+            return;
+            
+            //候補から選択しなかった場合のLocation追加処理
+            if($data['location_id'] == ''){
                 $location_data = $this->Locations->newEntity([
                     "display_name"=>h($data['display_name']),
                     "address"=>h($data['address']),
@@ -473,9 +475,9 @@ class EventsController extends AppController
                 $data["location_id"] = $result_location->id;
             }
 
-            $data['event_date'] = str_replace('/','-',$data['event_date']); //日付のフォーマット
-            $data['start_time'] = wordwrap($data['start_time'], 2, ':', true); //時刻のフォーマット
-            $data['end_time'] = wordwrap($data['end_time'], 2, ':', true); //時刻のフォーマット
+            // $data['event_date'] = str_replace('/','-',$data['event_date']); //日付のフォーマット
+            // $data['start_time'] = wordwrap($data['start_time'], 2, ':', true); //時刻のフォーマット
+            // $data['end_time'] = wordwrap($data['end_time'], 2, ':', true); //時刻のフォーマット
 
             $event_data = $this->Events->newEntity([
                 "organizer_id" => $uid,

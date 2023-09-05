@@ -43,7 +43,7 @@
             </div>
         
             <div class="mb10">
-                <button type="submit" name="login" class="pure-button pure-button-primary">login</button>
+                <button type="submit" name="login" class="pure-button pure-button-primary">ログイン</button>
             </div>
 
             <a href="<?= $this->Url->build(["controller"=>"Users","action"=>"add"]); ?>">

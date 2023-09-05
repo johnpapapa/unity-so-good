@@ -27,7 +27,6 @@ class UsersController extends AppController
             //ログインに成功した場合クッキーをセット
             $user_data = $this->Authentication->getResult()->getData();
             $result = $this->setIdentity($user_data);
-            $this->Flash->success('setIdentity_result:'.$result);
             // ログインしていればログイン後の画面にリダイレクト
             $target = $this->Authentication->getLoginRedirect() ?? '/events/index';
             return $this->redirect($target);
