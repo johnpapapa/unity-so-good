@@ -1,5 +1,5 @@
-<?php $this->assign('title', 'event add'); ?>
-<?php $this->assign('content-title', 'イベントの追加'); ?>
+<?php $this->assign('title', 'event edit'); ?>
+<?php $this->assign('content-title', 'イベントの編集'); ?>
 <?= $this->Html->script('jquery.ui.autocomplete.scroll.min.js', array('inline' => false)); ?>
 <script>
     let locations = <?= json_encode($locations) ?>;
@@ -57,11 +57,6 @@
 </style>
 
 <div class="events form pure-form pure-form-stacked">
-<a class="nostyle-a" href="<?= $this->Url->build(['controller' => 'events','action' => 'created']); ?>">
-    <div class="pure-button pure-u-1-2 mb30">
-        作成したイベント一覧
-    </div>
-</a>
 <?= $this->Form->create() ?>
     <fieldset>
         <div class="location_name_input mb20">
@@ -71,9 +66,9 @@
                 入力フォームの候補に該当するコートが存在する場合、<br>
                 候補のタップを優先してください<br>
                 </p>
-                <input type="text" class="pure-u-1" name="display_name" id="display_name" placeholder="コート名">
+                <input type="text" class="pure-u-1" name="display_name" id="display_name" placeholder="コート名" value="<?= $event_data->location->display_name ?>">
                 <div class="location-data-exist-status">
-                    コート情報<span id="status-text" class="is-notexist">未入力</span>
+                    コート情報<span id="status-text" class="is-exist">入力済</span>
                 </div>
             </div>
 
@@ -98,38 +93,36 @@
                     ・既存のコート情報の編集も可能です<br>
                 </p>
                 <label for="address">住所</label>
-                <input type="text" class="pure-u-1" style="margin-bottom: 20px;" name="address" id="address" placeholder="住所" required>
+                <input type="text" class="pure-u-1" style="margin-bottom: 20px;" name="address" id="address" placeholder="住所"  value="<?= $event_data->location->address ?>" required>
     
                 <label for="usage_price">コート使用料</label>
-                <input type="number" class="pure-u-1" style="margin-bottom: 20px;" name="usage_price" id="usage_price" placeholder="コート使用料">
+                <input type="number" class="pure-u-1" style="margin-bottom: 20px;" name="usage_price" id="usage_price" placeholder="コート使用料"  value="<?= $event_data->location->usage_price ?>">
                 
                 <label for="night_price">コート使用料(ナイター)</label>
-                <input type="number" class="pure-u-1" style="margin-bottom: 20px;" name="night_price" id="night_price" placeholder="コート使用料(ナイター)">
+                <input type="number" class="pure-u-1" style="margin-bottom: 20px;" name="night_price" id="night_price" placeholder="コート使用料(ナイター)"  value="<?= $event_data->location->night_price ?>">
 
-                <input type="hidden" id="location_id" name="location_id" value="">
+                <input type="hidden" id="location_id" name="location_id" value="<?= $event_data->location->id ?>">
             </div>
-
         </div>
 
         <div class="input text mb20">
             <label for="area">コート番号</label>
             <p style="font-size: 12px; color:gray;">無入力可</p>
-            <input type="text" class="pure-u-1" name="area" id="area" value="" maxlength="255"  placeholder="コート番号">
+            <input type="text" class="pure-u-1" name="area" id="area" value="<?= $event_data->area ?>" maxlength="255"  placeholder="コート番号">
         </div>        
         <div class="input number required mb20">
             <label for="participants_limit">参加人数上限</label>
-            <input type="number" class="pure-u-1" id="participants_limit" name="participants_limit" required="required" 
-                data-validity-message="This field cannot be left empty" aria-required="true" value="8"  placeholder="参加人数上限" read>
+            <input type="number" class="pure-u-1 <?=  ($event_data->participants_limit <= 0)? 'disabled' : '' ?>" id="participants_limit" name="participants_limit" required="required" 
+                data-validity-message="This field cannot be left empty" aria-required="true" value="<?= $event_data->participants_limit ?>" placeholder="参加人数上限" <?=  ($event_data->participants_limit <= 0)? 'readonly' : 'read' ?>>
             <div class="participants_limit_none">
-                <input type="checkbox" id="participants_limit_none_check">
+                <input type="checkbox" id="participants_limit_none_check" <?= ($event_data->participants_limit <= 0)? 'checked' : '' ?>>
                 参加人数無制限
             </div>
         </div>       
         <div class="input text mb20">
             <label for="comment">コメント・注意事項</label>
             <p style="font-size: 12px; color:gray;">無入力可</p>
-            <!-- <input type="textarea" name="comment" id="comment" maxlength="255" placeholder="コメント・注意事項" rows="5"> -->
-            <textarea name="comment" class="pure-u-1" id="comment" maxlength="255" placeholder="コメント・注意事項" rows="5"></textarea>
+            <textarea name="comment" class="pure-u-1" id="comment" maxlength="255" placeholder="コメント・注意事項" rows="5"><?= $event_data->comment ?></textarea>
         </div>
 
         <div class="input date mb20">
@@ -137,19 +130,20 @@
             <p class="note-p">
                 カレンダーで日付を指定してください    
             </p>
-            <input type="text" class="pure-u-1" name="event_date" id="event_date" required="required" placeholder="日付" readonly tabindex="-1">
+            
+            <input type="text" class="pure-u-1" name="event_date" id="event_date" required="required" placeholder="日付" readonly tabindex="-1" value="<?= $event_data->start_time->i18nFormat('yyyy-MM-dd'); ?>">
         </div>
         <div class="input datetime required mb20">
             <label for="start_time">開始時刻</label>
-            <input type="time" class="pure-u-1" name="start_time" id="start_time"  placeholder="開始時刻" required>
+            <input type="time" class="pure-u-1" name="start_time" id="start_time" value="<?= $event_data->start_time->i18nFormat('HH:MM') ?>" placeholder="開始時刻" required>
         </div>        
         <div class="input datetime required mb20">
             <label for="end_time">終了時刻</label>
-            <input type="time" class="pure-u-1" name="end_time" id="end_time"  placeholder="終了時刻" required>
+            <input type="time" class="pure-u-1" name="end_time" id="end_time" value="<?= $event_data->end_time->i18nFormat('HH:MM') ?>" placeholder="終了時刻" required>
         </div>
    </fieldset>
    <div class="mb10">
-        <button type="submit" name="submit" class="pure-button pure-button-primary">イベント新規登録</button>
+        <button type="submit" name="submit" class="pure-button pure-button-primary">変更を保存</button>
     </div>
 <?= $this->Form->end() ?>
 </div>
@@ -185,7 +179,7 @@
             }
         });
 
-        location_data_input_toggle_view(true);
+        location_data_input_toggle_view(false);
         obj_location_data_input_expand.on('click', function(){
             location_data_input_toggle_view(true)
         });
@@ -251,7 +245,5 @@
             buttonText:"カレンダーで日付を指定"
 
         });
-        
-        
     });
 </script>

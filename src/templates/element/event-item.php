@@ -12,20 +12,28 @@
     ];
 ?>
 
-<div class="event-item event-outer mb20">
+<div class="event-item event-outer mb20 <?= ($event->deleted_at)?'delete-item':'' ?>">
     <?php if(isset($displayCreatedBtn)): ?>
         <div class="disp-flex align-center ">
-            <a class="buttons pure-u-2-3" href="<?= $this->Url->build(['controller' => 'events','action' => 'delete', $event->id]); ?>">
+            <a class="buttons pure-u-2-3" href="<?= $this->Url->build(['controller' => 'events','action' => 'edit', $event->id]); ?>">
                 <button class="pure-button w100" type="button" style="background-color:#dfb31d7d;">
                     編集
                 </button>
             </a>
 
-            <a class="buttons pure-u-1-3" href="<?= $this->Url->build(['controller' => 'events','action' => 'delete', $event->id]); ?>">
-                <button class="pure-button w100" type="button">
-                    削除
-                </button>
-            </a>
+            <?php if($event->deleted_at): ?>
+                <a class="buttons pure-u-1-3" href="<?= $this->Url->build(['controller' => 'events','action' => 'restore', $event->id]); ?>">
+                    <button class="pure-button w100" type="button">
+                        削除済
+                    </button>
+                </a>
+            <?php else: ?>
+                <a class="buttons pure-u-1-3 delete-lnk" href="<?= $this->Url->build(['controller' => 'events','action' => 'delete', $event->id]); ?>">
+                    <button class="pure-button w100" type="button">
+                        削除
+                    </button>
+                </a>
+            <?php endif; ?>
         </div>
     <?php endif; ?>
     <div class="event-inner">
@@ -106,7 +114,7 @@
                         </div>
                         <div class="state-content">
                             <?php foreach($event->event_responses[$state_idx] as $idx=>$event_response): ?>
-                                <div class="over-ellipsis"><?= h($event_response); ?></div>
+                                <div class="over-ellipsis"><?= h($event_response['name']); ?></div>
                             <?php endforeach; ?>
                         </div>
                     </div>
@@ -119,7 +127,7 @@
                         </div>
                         <div class="state-content">
                             <?php foreach($event->event_responses[$state_idx] as $event_response): ?>
-                                <div class="over-ellipsis"><?= h($event_response); ?></div>
+                                <div class="over-ellipsis"><?= h($event_response['name']); ?></div>
                             <?php endforeach; ?>
                         </div>
                     </div>

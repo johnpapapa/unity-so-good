@@ -7,4 +7,11 @@ $(function(){
             description.style.display = "none";
         }
     }); 
+
+    $('.delete-lnk').on('click', function(event){
+        var res = confirm('このイベントを削除しますか?');
+        if(!res){
+           event.preventDefault();
+        }
+    });
 });

@@ -24,7 +24,7 @@
         ],
         'cookie' => [
             'key' => 'key_auto_login',
-            'expired' => '+1 hour',
+            'expired' => '+1 month',
         ],
         
     ];
