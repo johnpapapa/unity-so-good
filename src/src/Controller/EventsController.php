@@ -137,20 +137,35 @@ class EventsController extends AppController
         }
 
 
+        // $sql = <<<EOF
+        // SELECT e.id 
+        // FROM ( 
+        //     SELECT events.id, events.start_time, events.deleted_at 
+        //     FROM events 
+        //     WHERE events.deleted_at=0 AND events.start_time between cast(NOW() + interval 9 hour as datetime) and cast( NOW() + interval 1 year as datetime) 
+        // ) AS e 
+        // LEFT JOIN ( 
+        //     SELECT event_responses.responder_id, event_responses.event_id 
+        //     FROM event_responses
+        //     WHERE event_responses.responder_id = {$uid}
+        // ) AS er 
+        // ON (er.event_id = e.id ) 
+        // WHERE ISNULL(er.responder_id)
+        // ORDER BY e.start_time ASC;
+        // EOF;
         $sql = <<<EOF
-        SELECT e.id 
+        SELECT e.id
         FROM ( 
             SELECT events.id, events.start_time, events.deleted_at 
             FROM events 
             WHERE events.deleted_at=0 AND events.start_time between cast(NOW() + interval 9 hour as datetime) and cast( NOW() + interval 1 year as datetime) 
         ) AS e 
-        LEFT JOIN ( 
+         JOIN ( 
             SELECT event_responses.responder_id, event_responses.event_id 
             FROM event_responses
             WHERE event_responses.responder_id = {$uid}
         ) AS er 
         ON (er.event_id = e.id ) 
-        WHERE ISNULL(er.responder_id) = 0 
         ORDER BY e.start_time ASC;
         EOF;
         $connection = ConnectionManager::get('default');
