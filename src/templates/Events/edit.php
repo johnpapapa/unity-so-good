@@ -135,11 +135,11 @@
         </div>
         <div class="input datetime required mb20">
             <label for="start_time">開始時刻</label>
-            <input type="time" class="pure-u-1" name="start_time" id="start_time" value="<?= $event_data->start_time->i18nFormat('HH:MM') ?>" placeholder="開始時刻" required>
+            <input type="time" class="pure-u-1" name="start_time" id="start_time" value="<?= $event_data->start_time->i18nFormat('HH:mm') ?>" placeholder="開始時刻" required>
         </div>        
         <div class="input datetime required mb20">
             <label for="end_time">終了時刻</label>
-            <input type="time" class="pure-u-1" name="end_time" id="end_time" value="<?= $event_data->end_time->i18nFormat('HH:MM') ?>" placeholder="終了時刻" required>
+            <input type="time" class="pure-u-1" name="end_time" id="end_time" value="<?= $event_data->end_time->i18nFormat('HH:mm') ?>" placeholder="終了時刻" required>
         </div>
    </fieldset>
    <div class="mb10">

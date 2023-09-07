@@ -242,6 +242,10 @@ class EventsController extends AppController
         ])
         ->contain('EventResponses.Users')
         ->first();
+        if($event->deleted_at && $event->organizer_id != $uid){ //削除されていた時
+            $this->Flash->error(__('このイベントはすでに削除されています'));
+            return $this->redirect(['controller'=>'Events', 'action'=>'index']);
+        }
                     
         $event = $this->Event->getFormatEventData($event, $uid);
 

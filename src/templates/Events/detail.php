@@ -88,7 +88,14 @@
             </div>
         </div>
         <div class="row mb20">
-            <div class="label mb5">参加情報</div>
+            <div class="label mb5">コート代</div>
+            <div class="content">
+                <?= ($event->location->usage_price) ? $event->location->usage_price : '---' ?>円
+                (ナイター:<?= ($event->location->night_price) ? $event->location->night_price : '---' ?>円)
+            </div>
+        </div>
+        <div class="row mb20">
+            <div class="label mb5">イベントの参加人数</div>
             <div class="content">
                 ?:<?= count($event->event_responses[0]) ?>
                 o:<?= count($event->event_responses[1]) ?>
@@ -96,7 +103,7 @@
             </div>
         </div>
         <div class="row mb20">
-            <div class="label mb5">ユーザー参加情報</div>
+            <div class="label mb5">あなたの参加情報</div>
             <div class="content">
                 <?php if ($event->user_response_state) : ?>
                     <?= $user_response_state['text']; ?>
@@ -123,7 +130,7 @@
                             <?= Configure::read('response_states')[$state_idx]["text"] ?>
                         </div>
                         <?php foreach($event->event_responses[$state_idx] as $event_response): ?>
-                            <div class="state-content over-ellipsis disp-iblock pure-u-1 mb5 mt10">
+                            <div class="state-content over-ellipsis disp-iblock pure-u-1 mb5">
                                 <div class="name disp-m-block disp-iblock over-ellipsis fs-large fs-m-large"><?= h($event_response["name"]); ?></div>
                                 <div class="time disp-iblock fr fs-small fs-m-small"><?= $event_response["time"]->i18nFormat('MM/dd HH:mm:ss') ?></div>
                             </div>
@@ -136,7 +143,7 @@
                             <?= Configure::read('response_states')[$state_idx]["text"] ?>
                         </div>
                         <?php foreach($event->event_responses[$state_idx] as $event_response): ?>
-                            <div class="state-content over-ellipsis disp-iblock pure-u-1 mb5 mt10">
+                            <div class="state-content over-ellipsis disp-iblock pure-u-1 mb5">
                                 <div class="name disp-m-block disp-iblock over-ellipsis fs-large fs-m-large"><?= h($event_response["name"]); ?></div>
                                 <div class="time disp-iblock fr fs-small fs-m-small"><?= $event_response["time"]->i18nFormat('MM/dd HH:mm:ss') ?></div>
                             </div>
