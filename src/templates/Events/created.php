@@ -13,11 +13,8 @@
         イベントの新規作成
     </div>
 </a>
-<?php foreach($events as $event): ?>
-    <?php echo $this->element('event-item', array('event' => $event, 'displayCreatedBtn' => true)); ?>
-<?php endforeach; ?>
 
-<div class="sticky-hover-selected-menu" style="display: none;">
+<div class="sticky-hover-selected-menu">
     <div class="disp-iblock">
         選択済:<span id="selected-cnt">0</span>個
     </div>
@@ -41,21 +38,20 @@
     </div>
 </div>
 
+<?php foreach($events as $event): ?>
+    <?php echo $this->element('event-item', array('event' => $event, 'displayCreatedBtn' => true)); ?>
+<?php endforeach; ?>
+
 <style>
     .sticky-hover-selected-menu{
-        position: fixed;
-        top: 100px;
-        left: 50%;
-        right: 0px;
-        width: 70%;
-        
+        margin-bottom: 20px;
         text-align: center;
         padding: 5px 15px;
         background-color: white;
-        transform: translateX(-50%);
+
         box-sizing: content-box;
         border: black 1px solid;
-        border-radius: 10px;
+        border-radius: 5px;
     }
 </style>
 

@@ -96,7 +96,9 @@
                     </button>
                 </a>
 
-                <input type="checkbox" class="pure-u-1-2 select-chk" style="height:25%;" value="<?= $event->id ?>">
+                <?php if(isset($displayCreatedBtn)): ?>
+                    <input type="checkbox" class="pure-u-1-2 select-chk" style="height:25%;" value="<?= $event->id ?>">
+                <?php endif; ?>
             </div>
         </div>
         
@@ -110,28 +112,32 @@
                 <div class="states disp-flex">
                     <?php $state_idx = 1; ?>
                     <div class="state state-<?= $state_idx ?> pure-u-1-2 text-center p10">
-                        <div class="state-title mb10">
+                        <div class="state-title">
                             <?= Configure::read('response_states')[$state_idx]["text"] ?>
                             (<?= $response_count[$state_idx] ?>)
                         </div>
-                        <div class="state-content">
+                        <?php if($response_count[$state_idx] > 0): ?>
+                        <div class="state-content mt10">
                             <?php foreach($event->event_responses[$state_idx] as $idx=>$event_response): ?>
                                 <div class="over-ellipsis"><?= h($event_response['name']); ?></div>
                             <?php endforeach; ?>
                         </div>
+                        <?php endif; ?>
                     </div>
 
                     <?php $state_idx = 0; ?>
                     <div class="state state-<?= $state_idx ?> pure-u-1-2 text-center p10">
-                        <div class="state-title mb10">
+                        <div class="state-title">
                             <?= Configure::read('response_states')[$state_idx]["text"] ?>
                             (<?= $response_count[$state_idx] ?>)
                         </div>
-                        <div class="state-content">
+                        <?php if($response_count[$state_idx] > 0): ?>
+                        <div class="state-content mt10">
                             <?php foreach($event->event_responses[$state_idx] as $event_response): ?>
                                 <div class="over-ellipsis"><?= h($event_response['name']); ?></div>
                             <?php endforeach; ?>
                         </div>
+                        <?php endif; ?>
                     </div>
                 </div>
                 
