@@ -8,6 +8,9 @@
 .just-center {justify-content: center;}
 .just-space {justify-content: space-around;}
 .text-center {text-align: center;}
+.just-end {justify-content: flex-end;}
+.dir-row {flex-direction: row;}
+.dir-column {flex-direction: column;}
 
 .g10 {gap: 10px;}
 
@@ -48,6 +51,8 @@
 
 @media screen and (max-width: 768px) {
     .disp-m-block { display: block; }
+    .dir-m-row { flex-direction: row; }
+    .dir-m-column { flex-direction: column; }
 
     .fs-m-small { font-size: 12px !important; }
     .fs-m-medium { font-size: 14px !important;; }

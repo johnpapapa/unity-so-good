@@ -89,12 +89,14 @@
             </div>
 
 
-            <div class="content-right w50 disp-flex just-center align-center">
+            <div class="content-right w50 disp-flex dir-row dir-m-column just-space align-center">
                 <a class="buttons" href="<?= $this->Url->build(['controller' => 'events','action' => 'detail', $event->id]); ?>">
                     <button class="pure-button" type="button">
                     参加表明/詳細
                     </button>
                 </a>
+
+                <input type="checkbox" class="pure-u-1-2 select-chk" style="height:25%;" value="<?= $event->id ?>">
             </div>
         </div>
         

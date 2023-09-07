@@ -31,6 +31,8 @@
                         LINEでログイン
                     </button>
                 </a>
+
+                <p class="p-note">アカウント未作成の方がLINEログインを行うと<br>自動でアカウントが作成されます。</p>
             </div>
             <div class="mb10">
                 <label for="user_id">ユーザーID</label>
