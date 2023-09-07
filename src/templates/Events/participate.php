@@ -1,6 +1,6 @@
 <?php $this->assign('title', 'event participate'); ?>
 <?php $this->assign('content-title', '参加予定イベント'); ?>
-<p class="p-note">
+<p class="p-note mb20">
     未開催イベントのうち参加/参加未定のイベントが表示されます。
 </p>
 <?php foreach($events as $event): ?>
