@@ -91,7 +91,7 @@ input[type=text],input[type=textarea], textarea,input[type=number],input[type=pa
 /* font-family: 'Orbitron', sans-serif; */
 /* @import url('https://fonts.googleapis.com/css2?family=Tilt+Prism&display=swap');  */
 /* font-family: 'Tilt Prism', cursive; */
-@import url('https://fonts.googleapis.com/css2?family=Gluten&display=swap');
+/* @import url('https://fonts.googleapis.com/css2?family=Gluten&display=swap'); */
 /* font-family: 'Gluten', cursive; */
 
 .top-nav {
@@ -149,7 +149,6 @@ input[type=text],input[type=textarea], textarea,input[type=number],input[type=pa
   font-size: 22px;
   font-weight: 500;
   padding: 0 40px;
-  font-family: 'Gluten', cursive;
 }
 
 .top-nav .nav-links li{

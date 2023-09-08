@@ -1,10 +1,21 @@
 <head>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+  <link href="https://fonts.googleapis.com/earlyaccess/nicomoji.css" rel="stylesheet">
 </head>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Gluten&display=swap');
+  .top-nav .logo {
+    /* font-family: 'Gluten', cursive; */
+    font-family: "Nico Moji";
+    padding: 0px;
+  }
+</style>
 
 <nav class="top-nav">
   <span class="material-symbols-outlined navOpenBtn">double_arrow</span>
-  <a href="#" class="logo">Unity</a>
+  <a href="#" class="logo">ゆにてぇ
+  </a>
   <ul class="nav-links">
     <span class="material-symbols-outlined navCloseBtn">close</span>
     <li><a href="<?= $this->Url->build(['controller' => 'informations','action' => 'about']); ?>">About</a></li>
