@@ -93,7 +93,7 @@
                     ・既存のコート情報の編集も可能です<br>
                 </p>
                 <label for="address">住所</label>
-                <input type="text" class="pure-u-1" style="margin-bottom: 20px;" name="address" id="address" placeholder="住所"  value="<?= $event_data->location->address ?>" required>
+                <input type="text" class="pure-u-1" style="margin-bottom: 20px;" name="address" id="address" placeholder="住所"  value="<?= $event_data->location->address ?>">
     
                 <label for="usage_price">コート使用料</label>
                 <input type="number" class="pure-u-1" style="margin-bottom: 20px;" name="usage_price" id="usage_price" placeholder="コート使用料"  value="<?= $event_data->location->usage_price ?>">
