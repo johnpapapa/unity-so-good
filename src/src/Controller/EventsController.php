@@ -334,65 +334,6 @@ class EventsController extends AppController
         return $this->response->withStringBody(json_encode($response));
     }
 
-    public function ajaxShareEvent(){
-
-        $this->autoRender = false;
-        $response = ['status'=>''];
-        // $uid = $this->getLoginUserData(true);
-        // if(!$uid){
-        //     $this->Flash->error(__('ユーザー情報の取得に失敗しました'));
-        // }
-
-        $data = $this->request->getData();
-
-        $event_ids = $data['event_ids'];
-        $share_sentence = "お疲れ様です！\nテニス日程を記載させて頂きます！\n\n"; //共有する文言
-        $this->Locations = $this->fetchTable('Locations');
-        foreach($event_ids as $id){
-            $event_data = $this->Events->find("all", [
-                'conditions'=>['Events.id'=>$id]
-            ])->contain(['Locations'])->select($this->Locations)->select($this->Events)->first();
-            if(!$event_data){
-                $response['error'][] = ['id'=>$id, 'status'=>'存在しないイベントID'];
-                continue;
-            } 
-            $event_date = $event_data->start_time->i18nFormat('MM月dd日');
-            $day_of_weeks = Configure::read('day_of_weeks');
-            $event_date_dow = $day_of_weeks[$event_data->start_time->dayOfWeek];//曜日
-            $location = $event_data->location->display_name;
-            $start_time = $event_data->start_time->i18nFormat('HH:mm');
-            $end_time = $event_data->end_time->i18nFormat('HH:mm');
-            $area = ($event_data->area != '')? $event_data->area.'コート' : '';
-            $participants_limit = ($event_data->participants_limit > 0)? '定員'.$event_data->participants_limit.'名' : '';
-
-            $share_sentence = $share_sentence . "{$event_date}（{$event_date_dow}）\n";
-            $share_sentence = $share_sentence . "{$location}\n";
-            $share_sentence = $share_sentence . "{$start_time}〜{$end_time}\n";
-            $share_sentence = $share_sentence . "{$area}\n";
-            $share_sentence = $share_sentence . "🍅{$participants_limit}\n\n";
-            
-            // $share_sentence = $share_sentence . <<<EOF
-            //     {$event_date}({$event_date_dow})
-            //     {$location}
-            //     {$start_time}〜{$end_time}
-            //     {$area}
-            //     {$participants_limit}
-            // EOF;
-
-            // if(1){
-            //     $response['content'][] = ['id'=>$id, 'status'=>'イベント情報更新失敗'];
-            // } else {
-            //     $response['content'][] = ['id'=>$id, 'status'=>'イベント情報更新成功'];
-            // }            
-        }
-
-        $response['content'] = $share_sentence;
-
-        $this->RequestHandler->respondAs('application/json; charset=UTF-8');
-        return $this->response->withStringBody(json_encode($response));
-    }
-
-
     /**
      * View method
      *

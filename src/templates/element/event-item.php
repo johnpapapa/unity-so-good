@@ -95,10 +95,6 @@
                     参加表明/詳細
                     </button>
                 </a>
-
-                <?php if(isset($displayCreatedBtn)): ?>
-                    <input type="checkbox" class="pure-u-1-2 select-chk" style="height:25%;" value="<?= $event->id ?>">
-                <?php endif; ?>
             </div>
         </div>
         
