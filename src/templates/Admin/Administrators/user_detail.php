@@ -84,7 +84,7 @@ $day_of_weeks = Configure::read('day_of_weeks');
                         <div class="disp-flex just-center align-center">
                             <?php if(is_null($event_response["response_state"])): ?>
                                 <div class="state tc" style="width:120px; background-color: white;">
-                                    未反応
+                                    未反応 
                                 </div>
                             <?php else: ?>
                                 <div class="state tc" style="width:120px; background-color: <?= Configure::read('response_states')[$event_response["response_state"]]["tag_color"] ?>;">
