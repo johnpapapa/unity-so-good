@@ -79,6 +79,15 @@ class AppController extends Controller
         $this->set("current_user", $login_user_data);
     }
 
+    public function isAdministrator(){ //管理者権限を持つ場合true
+        $uid = $this->getLoginUserData($id_only=false);
+        $admin = $this->Administrators->find("all", ["conditions"=>["administrators.user_id"=>$uid]]);
+        if($admin){
+            return true; 
+        }
+        return false;
+    }
+
     public function isActiveCookieData(){ //有効なcookieが存在する場合true
         $cookie = $this->getCookieAutoLogin();
         $result = false;

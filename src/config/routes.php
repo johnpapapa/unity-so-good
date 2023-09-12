@@ -23,6 +23,11 @@
 
 use Cake\Routing\Route\DashedRoute;
 use Cake\Routing\RouteBuilder;
+use Authentication\AuthenticationService;
+// use Authentication\AuthenticationServiceInterface;
+// use Authentication\AuthenticationServiceProviderInterface;
+use Authentication\Middleware\AuthenticationMiddleware;
+// use Psr\Http\Message\ServerRequestInterface;
 
 return static function (RouteBuilder $routes) {
     /*
@@ -44,6 +49,16 @@ return static function (RouteBuilder $routes) {
      */
     $routes->setRouteClass(DashedRoute::class);
 
+    $routes->prefix('Admin', ['_namePrefix' => 'admin:'], function (RouteBuilder $routes) {
+    
+        // ダッシュボード
+        $routes->connect('/', ['controller' => 'Administrators', 'action' => 'index']);
+        $routes->connect('/event-list',['controller'=>'Administrators', 'action'=>'event_list']);
+        $routes->connect('/user-list',['controller'=>'Administrators', 'action'=>'user_list']);
+        $routes->connect('/ranking',['controller'=>'Administrators', 'action'=>'ranking']);
+        $routes->fallbacks();
+    });
+
     $routes->scope('/', function (RouteBuilder $builder) {
         /*
          * Here, we are connecting '/' (base path) to a controller called 'Pages',
@@ -58,7 +73,7 @@ return static function (RouteBuilder $routes) {
         /*
          * ...and connect the rest of 'Pages' controller's URLs.
          */
-        $builder->connect('/pages/*', 'Pages::display');
+        // $builder->connect('/pages/*', 'Pages::display');
 
         /*
          * Connect catchall routes for all controllers.

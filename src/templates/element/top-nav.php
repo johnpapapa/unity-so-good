@@ -20,6 +20,7 @@
     <span class="material-symbols-outlined navCloseBtn">close</span>
     <li><a href="<?= $this->Url->build(['controller' => 'informations','action' => 'about']); ?>">About</a></li>
     <li><a href="<?= $this->Url->build(['controller' => 'informations','action' => 'about']); ?>#contact">Contact</a></li>
+    <li><a href="<?= $this->Url->build(['prefix'=>'Admin', 'controller' => 'administrators','action' => 'index']); ?>">Admin</a></li>
   </ul>
   <div class="user-links">
     <span class="material-symbols-outlined">person</span>

@@ -467,6 +467,16 @@ class Initial extends AbstractMigration
             )
             ->create();
 
+        $this->table('administrators')
+            ->addColumn('user_id', 'biginteger', [
+                'autoIncrement' => false,
+                'default' => null,
+                'limit' => null,
+                'null' => false,
+                'signed' => false,
+            ])
+            ->create();
+
         $this->table('announces')
             ->addForeignKey(
                 'announcer_id',
@@ -526,6 +536,8 @@ class Initial extends AbstractMigration
             )
             ->update();
     }
+
+
 
     /**
      * Down Method.

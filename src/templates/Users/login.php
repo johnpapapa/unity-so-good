@@ -40,19 +40,6 @@
                     自動でアカウントが作成されます。
                 </p>
             </div>
-
-            <div class="mb30">
-                <a href="<?= $url_linelogin ?>">
-                    <button class="pure-button admin-login-btn pure-u-1" type="button">
-                        管理画面にログイン
-                    </button>
-                </a>
-                <p class="p-note mb20">
-                    管理画面へのアクセスは代表者のみ
-                </p>
-            </div>
-
-            </div>
         <?= $this->Form->end() ?>
     </div>
 
