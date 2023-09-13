@@ -126,7 +126,7 @@
                 <?php $state_idx = 1; ?>
                 <div class="states-active-perhaps disp-flex">
                     <div class="state state-<?= $state_idx ?> p10 pure-u-1-2">
-                        <div class="state-title text-center">
+                        <div class="state-title text-center mb10">
                             <?= Configure::read('response_states')[$state_idx]["text"] ?>
                         </div>
                         <?php foreach($event->event_responses[$state_idx] as $event_response): ?>
@@ -139,7 +139,7 @@
                         
                     <?php $state_idx = 0; ?>
                     <div class="state state-<?= $state_idx ?> p10 pure-u-1-2">
-                        <div class="state-title text-center">
+                        <div class="state-title text-center mb10">
                             <?= Configure::read('response_states')[$state_idx]["text"] ?>
                         </div>
                         <?php foreach($event->event_responses[$state_idx] as $event_response): ?>
