@@ -65,6 +65,5 @@
             <i class="fa-solid fa-face-smile" style="font-size: 1.5em;"></i>
             <div>スポーツやろうよ</div>
         </div>
-        
     </a>
 </div>
