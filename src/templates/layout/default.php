@@ -2,8 +2,7 @@
 <html>
 <head>
     <?= $this->Html->charset() ?>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
     <title>
         <?= $this->fetch('title') ?>
     </title>
@@ -27,27 +26,30 @@
 </head>
 
 <style>
+    /* 背景色->背景画像の周りの色に合わせてる */
     #default-body {
-        /* 背景色->背景画像の周りの色に合わせてる */
-        background-image: linear-gradient(to right, rgb(0 230 255), rgb(0 80 185));
+        background-image: linear-gradient(to right, rgb(92, 224, 229), rgb(0, 74, 173));
     }
-    #default-main {
-        /* 背景画像->alpha0.8 */
+    /* 背景画像->alpha0.8 */
+    #default-body::before {
+        content: "";
+        display: block;
+        position: fixed;
         background-image:url("<?= $this->Url->image('unity-background.jpg'); ?>"); 
         background-color: rgba(255, 255, 255, 0.8);
         background-blend-mode: overlay;
-        background-attachment: fixed;
+        /* background-attachment: fixed; */
         background-size: contain;
         background-repeat: no-repeat;
         background-position-x: center;
         background-position-y: center;
-
-        min-height: 100vh; /* 最低表示領域 */
-        padding-bottom: 100px; /* bottom-nav分の余剰領域 */
+        min-height: 100vh;
+        width: 100%;
+        z-index:-1;
     }
 </style>
-<body class="" id="default-body">
-    <div id="default-main">
+<body id="default-body">
+    <div class="mb100" id="default-main">
         <header>
             <?= $this->element('top-nav'); ?>  
         </header>
