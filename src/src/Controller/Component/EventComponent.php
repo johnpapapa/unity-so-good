@@ -23,7 +23,7 @@ class eventComponent extends Component
     }
 
     public function getNow(){
-        return new FrozenTime('+9 hour');
+        return new FrozenTime('now');
     }
 
     public function getFormatEventDataList($events, $uid=null){
