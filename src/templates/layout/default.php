@@ -41,7 +41,8 @@
         background-repeat: no-repeat;
         background-position-x: center;
         background-position-y: center;
-        
+
+        min-height: 100vh; /* 最低表示領域 */
         padding-bottom: 100px; /* bottom-nav分の余剰領域 */
     }
 </style>
@@ -64,6 +65,5 @@
             <?= $this->element('bottom-nav'); ?>
         </footer>
     </div>
-
 </body>
 </html>
