@@ -12,7 +12,7 @@
 
 <nav class="top-nav">
   <span class="material-symbols-outlined navOpenBtn">double_arrow</span>
-  <a href="#" class="logo">UNITY
+  <a href="<?= $this->Url->build(['prefix'=>false, 'controller' => 'informations','action' => 'about']); ?>" class="logo">UNITY
   </a>
   <ul class="nav-links">
     <span class="material-symbols-outlined navCloseBtn">close</span>
