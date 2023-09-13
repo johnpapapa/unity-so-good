@@ -4,9 +4,7 @@
 </head>
 
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Gluten&display=swap');
   .top-nav .logo {
-    /* font-family: 'Gluten', cursive; */
     font-family: "Nico Moji";
     padding: 0px;
   }
@@ -14,7 +12,7 @@
 
 <nav class="top-nav">
   <span class="material-symbols-outlined navOpenBtn">double_arrow</span>
-  <a href="#" class="logo">ゆにてぇ
+  <a href="#" class="logo">UNITY
   </a>
   <ul class="nav-links">
     <span class="material-symbols-outlined navCloseBtn">close</span>

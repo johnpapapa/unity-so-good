@@ -85,15 +85,6 @@ input[type=text],input[type=textarea], textarea,input[type=number],input[type=pa
 /* =========== */
 /* top-nav.php */
 /* =========== */
-
-/* Google Fonts */
-/* @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap'); */ 
-/* font-family: 'Orbitron', sans-serif; */
-/* @import url('https://fonts.googleapis.com/css2?family=Tilt+Prism&display=swap');  */
-/* font-family: 'Tilt Prism', cursive; */
-/* @import url('https://fonts.googleapis.com/css2?family=Gluten&display=swap'); */
-/* font-family: 'Gluten', cursive; */
-
 .top-nav {
   top: 0;
   left: 0;
@@ -132,7 +123,6 @@ input[type=text],input[type=textarea], textarea,input[type=number],input[type=pa
 
 .top-nav a:hover {
   color: yellow;
-  transition: all 0.2s linear;
 }
 
 .top-nav .navOpenBtn, 
@@ -163,7 +153,6 @@ input[type=text],input[type=textarea], textarea,input[type=number],input[type=pa
   display: block;
   width: 100%;
   height: 100%;
-  transition: all 0.2s linear;
   padding: 30px 0;
   font-size: 16px;
 }

@@ -25,22 +25,45 @@
     <?= $this->fetch('css') ?>
     <?= $this->fetch('script') ?>
 </head>
-<body class="mb100">
-    <header>
-        <?= $this->element('top-nav'); ?>  
-    </header>
-    <?php echo $this->Flash->render(); ?>
-    <main class="main disp-flex just-center">
-        <div class="container w100">
-            <h1 class="content-title">
-                <?= $this->fetch('content-title') ?>
-            </h1>
-            <?= $this->Flash->render() ?>
-            <?= $this->fetch('content') ?>
-        </div>
-    </main>
-    <footer>
-        <?= $this->element('bottom-nav'); ?>
-    </footer>
+
+<style>
+    #default-body {
+        /* 背景色->背景画像の周りの色に合わせてる */
+        background-image: linear-gradient(to right, rgb(0 230 255), rgb(0 80 185));
+    }
+    #default-main {
+        /* 背景画像->alpha0.8 */
+        background-image:url("<?= $this->Url->image('unity-background.jpg'); ?>"); 
+        background-color: rgba(255, 255, 255, 0.8);
+        background-blend-mode: overlay;
+        background-attachment: fixed;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position-x: center;
+        background-position-y: center;
+        
+        padding-bottom: 100px; /* bottom-nav分の余剰領域 */
+    }
+</style>
+<body class="" id="default-body">
+    <div id="default-main">
+        <header>
+            <?= $this->element('top-nav'); ?>  
+        </header>
+        <?php echo $this->Flash->render(); ?>
+        <main class="main disp-flex just-center">
+            <div class="container w100">
+                <h1 class="content-title">
+                    <?= $this->fetch('content-title') ?>
+                </h1>
+                <?= $this->Flash->render() ?>
+                <?= $this->fetch('content') ?>
+            </div>
+        </main>
+        <footer>
+            <?= $this->element('bottom-nav'); ?>
+        </footer>
+    </div>
+
 </body>
 </html>
