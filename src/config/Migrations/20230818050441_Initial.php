@@ -469,7 +469,7 @@ class Initial extends AbstractMigration
 
         $this->table('administrators')
             ->addColumn('user_id', 'biginteger', [
-                'autoIncrement' => false,
+                // 'autoIncrement' => false,
                 'default' => null,
                 'limit' => null,
                 'null' => false,
@@ -578,5 +578,6 @@ class Initial extends AbstractMigration
         $this->table('password_resets')->drop()->save();
         $this->table('personal_access_tokens')->drop()->save();
         $this->table('users')->drop()->save();
+        $this->table('administrators')->drop()->save();
     }
 }

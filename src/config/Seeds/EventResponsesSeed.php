@@ -23,10 +23,10 @@ class EventResponsesSeed extends AbstractSeed
     {
         $location_count = 30;
         $user_count = 150;
-        $event_count = 1000;
+        $event_count = 10;
         
-        $event_datetime_min = strtotime('2023-1-1 00:00:00');
-        $event_datetime_max = strtotime('2023-12-31 00:00:00');
+        $event_datetime_min = strtotime('2023-9-1 00:00:00');
+        $event_datetime_max = strtotime('2023-10-1 00:00:00');
         
         $faker = Faker\Factory::create('ja_JP');
 
