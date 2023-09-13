@@ -26,6 +26,5 @@
             'key' => 'key_auto_login',
             'expired' => '+1 month',
         ],
-        
     ];
 ?>
