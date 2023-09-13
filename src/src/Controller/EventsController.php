@@ -84,7 +84,7 @@ class EventsController extends AppController
         FROM ( 
             SELECT events.id, events.start_time, events.deleted_at
             FROM events 
-            WHERE events.deleted_at=0 AND events.start_time between cast(NOW()  + interval 9 hour as datetime) and cast( NOW()+ interval 1 year as datetime) 
+            WHERE events.deleted_at=0 AND events.start_time between cast(NOW() + interval 9 hour as datetime) and cast( NOW()+ interval 1 year as datetime) 
         ) AS e 
         LEFT JOIN ( 
             SELECT event_responses.responder_id, event_responses.event_id 
@@ -158,7 +158,7 @@ class EventsController extends AppController
         FROM ( 
             SELECT events.id, events.start_time, events.deleted_at 
             FROM events 
-            WHERE events.deleted_at=0 AND events.start_time between cast(NOW() + interval 9 hour as datetime) and cast( NOW() + interval 1 year as datetime) 
+            WHERE events.deleted_at=0 AND events.start_time between cast(CURRENT_DATE + interval 9 hour as datetime) and cast( NOW() + interval 1 year as datetime) 
         ) AS e 
          JOIN ( 
             SELECT event_responses.responder_id, event_responses.event_id 

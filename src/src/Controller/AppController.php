@@ -51,6 +51,18 @@ class AppController extends Controller
         $this->loadComponent('Flash');
         $this->loadComponent('Authentication.Authentication'); //認証ロジック
 
+                // Configure::read('param_linelogin.redirect_uri')[];
+        // $host = $this->request->host();
+        // $host = $_SERVER[ 'REQUEST_URI' ];
+        // debug($host);
+
+        // if($host == 'unity.so-good.jp'){
+        //     $this->setConnection(ConnectionManager::get('default'));
+        // }
+        // if($host == 'localhost:8001'){
+        //     $this->setConnection(ConnectionManager::get('test'));
+        // }
+
         /*
          * Enable the following component for recommended CakePHP form protection settings.
          * see https://book.cakephp.org/4/en/controllers/components/form-protection.html
