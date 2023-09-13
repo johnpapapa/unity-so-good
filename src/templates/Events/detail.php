@@ -95,6 +95,12 @@
             </div>
         </div>
         <div class="row mb20">
+            <div class="label mb5">コメント・注意事項</div>
+            <div class="content">
+            <?= $event->comment ?>
+            </div>
+        </div>
+        <div class="row mb20">
             <div class="label mb5">イベントの参加人数</div>
             <div class="content">
                 ?:<?= count($event->event_responses[0]) ?>
