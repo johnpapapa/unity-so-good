@@ -4,7 +4,7 @@
 <div class="user-detail-content disp-flex just-center">
     <div class="detail form pure-g pure-form pure-form-stacked">
         <?= $this->Form->create() ?>
-        <a class="nostyle-a" href="<?= $this->Url->build(['controller' => 'users','action' => 'logout']); ?>">
+        <a href="<?= $this->Url->build(['controller' => 'users','action' => 'logout']); ?>">
             <button class="pure-button mb10" type="button">
                 ログアウトする
             </button>

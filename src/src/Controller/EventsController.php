@@ -163,7 +163,7 @@ class EventsController extends AppController
          JOIN ( 
             SELECT event_responses.responder_id, event_responses.event_id 
             FROM event_responses
-            WHERE event_responses.responder_id = {$uid}
+            WHERE event_responses.responder_id = {$uid} AND (event_responses.response_state = 0 OR event_responses.response_state = 1)
         ) AS er 
         ON (er.event_id = e.id ) 
         ORDER BY e.start_time ASC;
