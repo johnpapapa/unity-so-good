@@ -34,8 +34,8 @@ input[type=text],input[type=textarea], textarea,input[type=number],input[type=pa
 }
 
 #default-main {
-  /* margin-top: 100px; */
   padding-top: 50px;
+  padding-bottom: 100px;
 }
 
 /* ============== */

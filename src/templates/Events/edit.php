@@ -66,7 +66,7 @@
                 入力フォームの候補に該当するコートが存在する場合、<br>
                 候補のタップを優先してください<br>
                 </p>
-                <input type="text" class="pure-u-1" name="display_name" id="display_name" placeholder="コート名" value="<?= $event_data->location->display_name ?>">
+                <input type="text" class="pure-u-1" name="display_name" id="display_name" placeholder="コート名" value="<?= $event_data->location->display_name ?>" required="required">
                 <div class="location-data-exist-status">
                     コート情報<span id="status-text" class="is-exist">入力済</span>
                 </div>
