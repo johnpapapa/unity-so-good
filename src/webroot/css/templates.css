@@ -33,6 +33,11 @@ input[type=text],input[type=textarea], textarea,input[type=number],input[type=pa
     padding: 10px;
 }
 
+#default-main {
+  /* margin-top: 100px; */
+  padding-top: 50px;
+}
+
 /* ============== */
 /* bottom-nav.php */
 /* ============== */
@@ -94,6 +99,7 @@ input[type=text],input[type=textarea], textarea,input[type=number],input[type=pa
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   justify-content: space-between;
   max-height: 50px;
+  position: fixed;
 }
 
 .top-nav,

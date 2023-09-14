@@ -49,7 +49,7 @@
     }
 </style>
 <body id="default-body">
-    <div class="mb100" id="default-main">
+    <div id="default-main">
         <header>
             <?= $this->element('top-nav'); ?>  
         </header>
