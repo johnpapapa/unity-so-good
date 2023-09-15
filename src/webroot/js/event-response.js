@@ -39,7 +39,6 @@ $(function(){
 			allSprites = [],
 			radius = 50,
 			sprite_size = 5,
-			// image = opts.image,
 			lifespan = 1000,
 			fadetoOpacity = 100,
 			rotateDeg=200;
@@ -56,8 +55,6 @@ $(function(){
             }
             clickEvent(centerX, centerY);
 
-            
-            
             let button_current = $(this);
             button_current.prop('disabled', true);
             let button_siblings = $(this).siblings();
@@ -67,8 +64,8 @@ $(function(){
             
             clearInterval(interval);
             interval = setInterval(function(){createStar(button_current)}, 200);
-            // createStar(button_current);
             
+            /* todo:関数として別にまとめる */
             let send_data = {
                 "response_state": button_current.prop('value'),
                 "user_id": current_user.id,
@@ -98,7 +95,6 @@ $(function(){
             starEl.style.top = (Math.random() * el.height()) + el.offset().top + "px";
             document.body.appendChild(starEl);
             
-            // 一定時間経つとキラキラを消す
             setTimeout(() => {
                 starEl.remove();
             }, 1000);
