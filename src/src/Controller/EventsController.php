@@ -97,6 +97,8 @@ class EventsController extends AppController
         EOF;
         $connection = ConnectionManager::get('default');
         $event_responses = $connection->execute($sql)->fetchAll('assoc');
+        debug($event_responses);
+        
         $event_ids = Hash::extract($event_responses, '{n}.id');
 
         $events = [];
@@ -136,29 +138,12 @@ class EventsController extends AppController
             return $this->redirect(['controller' => 'Users', 'action' => 'login']);
         }
 
-
-        // $sql = <<<EOF
-        // SELECT e.id 
-        // FROM ( 
-        //     SELECT events.id, events.start_time, events.deleted_at 
-        //     FROM events 
-        //     WHERE events.deleted_at=0 AND events.start_time between cast(NOW() + interval 9 hour as datetime) and cast( NOW() + interval 1 year as datetime) 
-        // ) AS e 
-        // LEFT JOIN ( 
-        //     SELECT event_responses.responder_id, event_responses.event_id 
-        //     FROM event_responses
-        //     WHERE event_responses.responder_id = {$uid}
-        // ) AS er 
-        // ON (er.event_id = e.id ) 
-        // WHERE ISNULL(er.responder_id)
-        // ORDER BY e.start_time ASC;
-        // EOF;
         $sql = <<<EOF
         SELECT e.id
         FROM ( 
             SELECT events.id, events.start_time, events.deleted_at 
             FROM events 
-            WHERE events.deleted_at=0 AND events.start_time between cast(CURRENT_DATE + interval 9 hour as datetime) and cast( NOW() + interval 1 year as datetime) 
+            WHERE events.deleted_at=0 AND events.start_time between cast(CURRENT_DATE as datetime) and cast( NOW() + interval 1 year as datetime) 
         ) AS e 
          JOIN ( 
             SELECT event_responses.responder_id, event_responses.event_id 
