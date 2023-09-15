@@ -1,6 +1,7 @@
 <?php $this->assign('title', 'event detail'); ?>
 <?php $this->assign('content-title', 'イベント詳細'); ?>
 <?= $this->Html->script('event-response', array('inline' => false));  ?>
+<?php //$this->Html->script('sparkle', array('inline' => false));  ?>
 
 <?php 
     use Cake\Core\Configure;
@@ -35,8 +36,36 @@
     }
 
     .detail .state {border: 1px solid #ccc;}
-    /* .detail .state-content .name {font-size: 1.2rem;}
-    .detail .state-content .time {font-size: .7rem;} */
+
+    .star {
+    position: absolute;
+    display: block;
+    width: 10px; /* キラキラの横幅を指定 */
+    height: 10px; /* キラキラの縦幅を指定 */
+    background-image: url("<?= $this->Url->image('star-on.png'); ?>"); /* キラキラの画像のパスを記入 */
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center center;
+    animation: glitter 1s;
+    pointer-events: none;
+    }
+
+    @keyframes glitter {
+        0% {
+            transform: scale(0);
+            opacity: 0;
+        }
+
+        50% {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        100% {
+            transform: scale(0);
+            opacity: 0;
+        }
+    }
 </style>
 
 
@@ -123,7 +152,7 @@
             <div class="content disp-flex just-center g10">
                 <button class="pure-button response-btn pure-u-1 undecided" value="0" <?= ($event->user_response_state === 0)? 'disabled':'' ?>>参加未定</button>
                 <button class="pure-button response-btn pure-u-1 present" value="1" <?= ($event->user_response_state === 1)? 'disabled':'' ?>>参加</button>
-                <button class="pure-button response-btn pure-u-1 absent" value="2" <?= ($event->user_response_state === 2)? 'disabled':'' ?>>不参加</button>
+                <button class="pure-button response-btn pure-u-1 absent " value="2" <?= ($event->user_response_state === 2)? 'disabled':'' ?>>不参加</button>
             </div>
         </div>
         <div class="row">
