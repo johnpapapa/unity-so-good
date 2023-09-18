@@ -74,30 +74,6 @@ class EventsController extends AppController
             return $this->redirect(['controller' => 'Users', 'action' => 'login']);
         }
 
-        //未削除かつ開催時間が未来のEventに対して,userのEventResponseをLEFTJOINした結果NULLのものを返す
-        //1.未削除かつ開催時間が未来のEventを取得 => e
-        //2.responder_idが自分のEventResponseを取得 => er
-        //3.Event.idとEventResponse.event_idをキーにしてLEFTJOIN
-        //4.responder_idがNULLとなるEvent.idを取得
-        // $sql = <<<EOF
-        // SELECT e.id
-        // FROM ( 
-        //     SELECT events.id, events.start_time, events.deleted_at
-        //     FROM events 
-        //     WHERE events.deleted_at=0 AND events.start_time between cast(NOW() + interval 9 hour as datetime) and cast( NOW()+ interval 1 year as datetime) 
-        // ) AS e 
-        // LEFT JOIN ( 
-        //     SELECT event_responses.responder_id, event_responses.event_id 
-        //     FROM event_responses 
-        //     WHERE event_responses.responder_id = {$uid} 
-        // ) AS er 
-        // ON (er.event_id = e.id ) 
-        // WHERE ISNULL(er.responder_id)
-        // ORDER BY e.start_time ASC
-        // EOF;
-        // $connection = ConnectionManager::get('default');
-        // $event_responses = $connection->execute($sql)->fetchAll('assoc');        
-        
         $event_responses = $this->Event->getEventIds($uid, true);
         $event_ids = Hash::extract($event_responses, '{n}.id');
 
@@ -234,12 +210,8 @@ class EventsController extends AppController
                     
         $event = $this->Event->getFormatEventData($event, $uid);
 
-        $event_prev = $this->Events->find("all", [
-            "conditions" => ["Events.start_time <" => $event->start_time]
-        ])->select('id')->order(['Events.start_time'=>'DESC'])->limit(1)->first();
-        $event_next = $this->Events->find("all", [
-            "conditions" => ["Events.start_time >" => $event->start_time]
-        ])->select('id')->order(['Events.start_time'=>'ASC'])->limit(1)->first();
+        $event_prev = $this->Event->getNeighberEvent($event->start_time, 'previous');
+        $event_next = $this->Event->getNeighberEvent($event->start_time, 'next');
 
         $event_prev_id = (isset($event_prev->id)) ? $event_prev->id : null;
         $event_next_id = (isset($event_next->id)) ? $event_next->id : null;

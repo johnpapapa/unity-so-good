@@ -36,6 +36,23 @@ class eventComponent extends Component
         $this->EventResponses->getEventResponseListByUserId($user_id, $limit);
     }
 
+    public function getNeighberEvent($start_time, $type){
+        $conditions = ["Events.deleted_at"=>0];
+        $order = [];
+        if($type == 'previous'){
+            $conditions["Events.start_time <"] = $start_time;
+            $order['Events.start_time'] = 'DESC';
+        }
+        if($type == 'next'){
+            $conditions["Events.start_time >"] = $start_time;
+            $order['Events.start_time'] = 'ASC';
+        }
+
+        return $this->Events->find("all", [
+            "conditions" => $conditions
+        ])->select('id')->order($order)->limit(1)->first();
+    }
+
     /**
      * 現在時間
      *
