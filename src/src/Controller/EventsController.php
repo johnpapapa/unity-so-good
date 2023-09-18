@@ -105,29 +105,7 @@ class EventsController extends AppController
             return $this->redirect(['controller' => 'Users', 'action' => 'login']);
         }
 
-        //未削除かつ開催時間が未来のEventに対して,userのEventResponseをLEFTJOINした結果NULLのものを返す
-        //1.未削除かつ開催時間が未来のEventを取得 => e
-        //2.responder_idが自分のEventResponseを取得 => er
-        //3.Event.idとEventResponse.event_idをキーにしてLEFTJOIN
-        //4.responder_idがNULLとなるEvent.idを取得
-        $sql = <<<EOF
-        SELECT e.id, e.start_time
-        FROM ( 
-            SELECT events.id, events.start_time, events.deleted_at
-            FROM events 
-            WHERE events.deleted_at=0 AND events.start_time between cast(NOW() + interval 9 hour as datetime) and cast( NOW()+ interval 1 year as datetime) 
-        ) AS e 
-        LEFT JOIN ( 
-            SELECT event_responses.responder_id, event_responses.event_id 
-            FROM event_responses 
-            WHERE event_responses.responder_id = {$uid} 
-        ) AS er 
-        ON (er.event_id = e.id ) 
-        WHERE ISNULL(er.responder_id)
-        ORDER BY e.start_time ASC
-        EOF;
-        $connection = ConnectionManager::get('default');
-        $event_responses = $connection->execute($sql)->fetchAll('assoc');
+        $event_responses = $this->Event->getEventIds($uid, true);
         $event_ids = Hash::extract($event_responses, '{n}.id');
 
         $events = [];
@@ -167,40 +145,7 @@ class EventsController extends AppController
             return $this->redirect(['controller' => 'Users', 'action' => 'login']);
         }
 
-
-        // $sql = <<<EOF
-        // SELECT e.id 
-        // FROM ( 
-        //     SELECT events.id, events.start_time, events.deleted_at 
-        //     FROM events 
-        //     WHERE events.deleted_at=0 AND events.start_time between cast(NOW() + interval 9 hour as datetime) and cast( NOW() + interval 1 year as datetime) 
-        // ) AS e 
-        // LEFT JOIN ( 
-        //     SELECT event_responses.responder_id, event_responses.event_id 
-        //     FROM event_responses
-        //     WHERE event_responses.responder_id = {$uid}
-        // ) AS er 
-        // ON (er.event_id = e.id ) 
-        // WHERE ISNULL(er.responder_id)
-        // ORDER BY e.start_time ASC;
-        // EOF;
-        $sql = <<<EOF
-        SELECT e.id
-        FROM ( 
-            SELECT events.id, events.start_time, events.deleted_at 
-            FROM events 
-            WHERE events.deleted_at=0 AND events.start_time between cast(CURRENT_DATE + interval 9 hour as datetime) and cast( NOW() + interval 1 year as datetime) 
-        ) AS e 
-         JOIN ( 
-            SELECT event_responses.responder_id, event_responses.event_id 
-            FROM event_responses
-            WHERE event_responses.responder_id = {$uid} AND (event_responses.response_state = 0 OR event_responses.response_state = 1)
-        ) AS er 
-        ON (er.event_id = e.id ) 
-        ORDER BY e.start_time ASC;
-        EOF;
-        $connection = ConnectionManager::get('default');
-        $event_responses = $connection->execute($sql)->fetchAll('assoc');
+        $event_responses = $this->Event->getEventIds($uid, false);
         $event_ids = Hash::extract($event_responses, '{n}.id');
 
         $events = [];
@@ -226,6 +171,7 @@ class EventsController extends AppController
             ->contain('EventResponses.Users') //EventResponses以下Usersオブジェクト作成
             ->order(['Events.start_time'=>'ASC'])
             ->limit(Configure::read('event_item_limit')); 
+            
             $events = $events_query->all()->toArray();
             $events = $this->Event->getFormatEventDataList($events, $uid);
         }
@@ -295,12 +241,8 @@ class EventsController extends AppController
                     
         $event = $this->Event->getFormatEventData($event, $uid);
 
-        $event_prev = $this->Events->find("all", [
-            "conditions" => ["Events.start_time <" => $event->start_time]
-        ])->select('id')->order(['Events.start_time'=>'DESC'])->limit(1)->first();
-        $event_next = $this->Events->find("all", [
-            "conditions" => ["Events.start_time >" => $event->start_time]
-        ])->select('id')->order(['Events.start_time'=>'ASC'])->limit(1)->first();
+        $event_prev = $this->Event->getNeighberEvent($event->start_time, 'previous');
+        $event_next = $this->Event->getNeighberEvent($event->start_time, 'next');
 
         $event_prev_id = (isset($event_prev->id)) ? $event_prev->id : null;
         $event_next_id = (isset($event_next->id)) ? $event_next->id : null;
@@ -363,22 +305,6 @@ class EventsController extends AppController
 
         $this->RequestHandler->respondAs('application/json; charset=UTF-8');
         return $this->response->withStringBody(json_encode($response));
-    }
-
-    /**
-     * View method
-     *
-     * @param string|null $id Event id.
-     * @return \Cake\Http\Response|null|void Renders view
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function view($id = null)
-    {
-        $event = $this->Events->get($id, [
-            'contain' => ['Users', 'Locations', 'EventResponses'],
-        ]);
-
-        $this->set(compact('event'));
     }
 
     /**

@@ -7,6 +7,7 @@ use Cake\ORM\Query;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
+use Cake\Datasource\ConnectionManager;
 
 /**
  * EventResponses Model
@@ -106,5 +107,108 @@ class EventResponsesTable extends Table
         $rules->add($rules->existsIn('event_id', 'Events'), ['errorField' => 'event_id']);
 
         return $rules;
+    }
+
+    /**
+     * 指定したeventに紐づくevent_responsesの取得
+     *
+     * @param int $event_id events.id
+     * @return array|false eventResponses.*
+     */
+    public function getEventResponseListByEventId($event_id){
+        $sql = <<<EOF
+        SELECT users.id, users.display_name, er.response_state 
+        FROM users 
+        LEFT JOIN ( 
+            SELECT event_responses.responder_id, event_responses.response_state 
+            FROM event_responses 
+            WHERE event_responses.event_id={$event_id} 
+        ) as er 
+        ON users.id = er.responder_id
+        ORDER BY er.response_state DESC;
+        EOF;
+    }
+
+    /**
+     * 指定したuserに紐づく全てのevent_responsesの取得
+     *
+     * @param int $user_id users.id
+     * @return array|false eventResponses.*
+     */
+    public function getEventResponseListByUserId($user_id, $limit=null){
+        $limit_sql = '';
+        if($limit){ $limit_sql = "LIMIT {$limit}";}
+        $sql = <<<EOF
+        SELECT 
+            e.id,
+            e.start_time,
+            e.end_time,
+            e.display_name,
+            event_responses.created_at,
+            event_responses.response_state
+        FROM event_responses
+        INNER JOIN (
+            SELECT 
+                events.id,
+                events.start_time,
+                events.end_time,
+                locations.display_name
+            FROM events
+            INNER JOIN locations ON locations.id = events.location_id
+            ORDER BY events.start_time DESC
+            {$limit_sql}
+        ) as e
+        ON event_responses.event_id = e.id
+        WHERE event_responses.responder_id = {$user_id}
+        EOF;
+
+        return $this->executeSql($sql);
+    }
+
+    /**
+     * 指定したuserに紐づくevent_responsesの取得
+     *
+     * @param int $event_id events.id
+     * @param int $event_id events.id
+     * @return array|false eventResponses.*
+     */
+    public function getAllEventResponseListByUserId($user_id, $limit=null){ //未反応のイベントも含めたevent_response
+        $limit_sql = '';
+        if($limit){ $limit_sql = "LIMIT {$limit}";}
+        $sql = <<<EOF
+        SELECT 
+            e.id,
+            e.start_time,
+            e.end_time,
+            e.display_name,
+            er.created_at,
+            er.response_state
+        FROM (
+            SELECT 
+                events.id,
+                events.start_time,
+                events.end_time,
+                locations.display_name
+            FROM events
+            INNER JOIN locations ON locations.id=events.location_id
+            ORDER BY events.start_time DESC
+            {$limit_sql}
+        ) as e
+        LEFT JOIN (
+            SELECT 
+                event_responses.created_at,
+                event_responses.response_state,
+                event_responses.event_id
+            FROM event_responses
+            WHERE event_responses.responder_id={$user_id}
+        ) as er
+        ON e.id=er.event_id
+        EOF;
+
+        return $this->executeSql($sql);
+    }
+
+    public function executeSql($sql){
+        return ConnectionManager::get('default')->execute($sql)->fetchAll('assoc');
     }
 }
