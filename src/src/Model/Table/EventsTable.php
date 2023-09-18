@@ -7,6 +7,7 @@ use Cake\ORM\Query;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
+use Cake\Datasource\ConnectionManager;
 
 /**
  * Events Model
@@ -134,5 +135,49 @@ class EventsTable extends Table
         $rules->add($rules->existsIn('location_id', 'Locations'), ['errorField' => 'location_id']);
 
         return $rules;
+    }
+
+    /**
+     * 指定したuserによるevent_responses.stateに応じたeventの取得
+     *
+     * @param int $uid users.id
+     * @param bool $is_unrespond 未表明イベントを取得するか
+     * @param string $start_order events.start_timeをキーとした並び順
+     * @return array|false eventResponses.*
+     */
+    public function getEventIds($uid, $is_unrespond=false, $start_order='ASC'){
+        $event_where = ($is_unrespond) ? ' WHERE ISNULL(er.responder_id)':'';
+        $event_join_type = ($is_unrespond) ? 'LEFT JOIN':'JOIN';
+        $sql = <<<EOF
+            SELECT e.id
+            FROM ( 
+                SELECT e.id, er.responder_id, e.start_time
+                FROM (
+                    SELECT events.id, events.start_time
+                    FROM events
+                    WHERE events.deleted_at=0 AND events.start_time between cast(CURRENT_DATE as datetime) and cast(CURRENT_DATE + interval 1 year as datetime) 
+                ) as e
+                {$event_join_type} ( 
+                    SELECT event_responses.responder_id, event_responses.event_id 
+                    FROM event_responses
+                    WHERE event_responses.responder_id={$uid}
+                ) as er
+                ON (e.id = er.event_id)
+                {$event_where}
+            ) as e
+            ORDER BY e.start_time {$start_order};
+        EOF;
+
+        return $this->executeSql($sql);
+    }
+
+    /**
+     * 指定したsql_statementを実行
+     *
+     * @param string $sql_statement SQL文章
+     * @return array|false eventResponses.*
+     */
+    public function executeSql($sql_statement){
+        return ConnectionManager::get('default')->execute($sql_statement)->fetchAll('assoc');
     }
 }

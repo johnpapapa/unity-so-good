@@ -79,26 +79,26 @@ class EventsController extends AppController
         //2.responder_idが自分のEventResponseを取得 => er
         //3.Event.idとEventResponse.event_idをキーにしてLEFTJOIN
         //4.responder_idがNULLとなるEvent.idを取得
-        $sql = <<<EOF
-        SELECT e.id, e.start_time
-        FROM ( 
-            SELECT events.id, events.start_time, events.deleted_at
-            FROM events 
-            WHERE events.deleted_at=0 AND events.start_time between cast(NOW() + interval 9 hour as datetime) and cast( NOW()+ interval 1 year as datetime) 
-        ) AS e 
-        LEFT JOIN ( 
-            SELECT event_responses.responder_id, event_responses.event_id 
-            FROM event_responses 
-            WHERE event_responses.responder_id = {$uid} 
-        ) AS er 
-        ON (er.event_id = e.id ) 
-        WHERE ISNULL(er.responder_id)
-        ORDER BY e.start_time ASC
-        EOF;
-        $connection = ConnectionManager::get('default');
-        $event_responses = $connection->execute($sql)->fetchAll('assoc');
-        debug($event_responses);
+        // $sql = <<<EOF
+        // SELECT e.id
+        // FROM ( 
+        //     SELECT events.id, events.start_time, events.deleted_at
+        //     FROM events 
+        //     WHERE events.deleted_at=0 AND events.start_time between cast(NOW() + interval 9 hour as datetime) and cast( NOW()+ interval 1 year as datetime) 
+        // ) AS e 
+        // LEFT JOIN ( 
+        //     SELECT event_responses.responder_id, event_responses.event_id 
+        //     FROM event_responses 
+        //     WHERE event_responses.responder_id = {$uid} 
+        // ) AS er 
+        // ON (er.event_id = e.id ) 
+        // WHERE ISNULL(er.responder_id)
+        // ORDER BY e.start_time ASC
+        // EOF;
+        // $connection = ConnectionManager::get('default');
+        // $event_responses = $connection->execute($sql)->fetchAll('assoc');        
         
+        $event_responses = $this->Event->getEventIds($uid, true);
         $event_ids = Hash::extract($event_responses, '{n}.id');
 
         $events = [];
@@ -138,23 +138,7 @@ class EventsController extends AppController
             return $this->redirect(['controller' => 'Users', 'action' => 'login']);
         }
 
-        $sql = <<<EOF
-        SELECT e.id
-        FROM ( 
-            SELECT events.id, events.start_time, events.deleted_at 
-            FROM events 
-            WHERE events.deleted_at=0 AND events.start_time between cast(CURRENT_DATE as datetime) and cast( NOW() + interval 1 year as datetime) 
-        ) AS e 
-         JOIN ( 
-            SELECT event_responses.responder_id, event_responses.event_id 
-            FROM event_responses
-            WHERE event_responses.responder_id = {$uid} AND (event_responses.response_state = 0 OR event_responses.response_state = 1)
-        ) AS er 
-        ON (er.event_id = e.id ) 
-        ORDER BY e.start_time ASC;
-        EOF;
-        $connection = ConnectionManager::get('default');
-        $event_responses = $connection->execute($sql)->fetchAll('assoc');
+        $event_responses = $this->Event->getEventIds($uid, false);
         $event_ids = Hash::extract($event_responses, '{n}.id');
 
         $events = [];
@@ -180,6 +164,7 @@ class EventsController extends AppController
             ->contain('EventResponses.Users') //EventResponses以下Usersオブジェクト作成
             ->order(['Events.start_time'=>'ASC'])
             ->limit(Configure::read('event_item_limit')); 
+            
             $events = $events_query->all()->toArray();
             $events = $this->Event->getFormatEventDataList($events, $uid);
         }
