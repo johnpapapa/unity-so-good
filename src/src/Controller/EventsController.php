@@ -73,7 +73,7 @@ class EventsController extends AppController
         $this->Locations = $this->fetchTable('Locations');
         $conditions = [
             'Events.deleted_at IS' => 0, //削除前のイベント
-            'Events.end_time >' => date("Y-m-d", strtotime(date("Y-m-d H:i:s") . "-1days"))
+            'Events.end_time <=' => date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s") . "now"))
         ]; 
         $events_query = $this->Events->find("all", ['conditions'=>$conditions]);
         $events_query = $events_query
@@ -89,7 +89,7 @@ class EventsController extends AppController
         ->select($this->Events)
         ->select($this->Locations)
         ->contain('EventResponses.Users') //EventResponsesに紐づくUsersオブジェクト作成
-        ->order(['Events.start_time'=>'ASC']) //Eventが表示される順番
+        ->order(['Events.start_time'=>'DESC']) //Eventが表示される順番
         ->limit(Configure::read('event_item_limit')); 
         $events = $events_query->all()->toArray();
         
