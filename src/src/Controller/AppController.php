@@ -88,6 +88,7 @@ class AppController extends Controller
                 }
             }
         }
+
         $this->set("current_user", $login_user_data);
     }
 

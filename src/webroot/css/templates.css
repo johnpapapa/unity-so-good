@@ -73,6 +73,9 @@ input[type=text],input[type=textarea], textarea,input[type=number],input[type=pa
     color: white;
     text-decoration: none;
 }
+.bottom-nav .nav-links a.enable {
+  background-color: orange;
+}
 
 .bottom-nav .nav-links a:hover {
     background-color: white;
