@@ -13,6 +13,7 @@ use Cake\I18n\FrozenTime;
  * Events Controller
  *
  * @property \App\Model\Table\EventsTable $Events
+ * @property \App\Controller\Component\EventComponent $Event
  * @method \App\Model\Entity\Event[]|\Cake\Datasource\ResultSetInterface paginate($object = null, array $settings = [])
  */
 class EventsController extends AppController
@@ -39,29 +40,29 @@ class EventsController extends AppController
     {
         $uid = $this->getLoginUserData(true);   
         
-        $this->Locations = $this->fetchTable('Locations');
-        $conditions = [
-            'Events.deleted_at IS' => 0, //削除前のイベント
-            'Events.end_time >=' => date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s") . "-14days")) //14日前までのイベント
-        ]; 
-        $events_query = $this->Events->find("all", ['conditions'=>$conditions]);
-        $events_query = $events_query
-        ->contain([
-            'Locations',
-            'EventResponses' => [
-                'sort' => [
-                    'response_state' => 'DESC', //反応した種類順
-                    'EventResponses.updated_at' => 'ASC' //反応した時間順
-                ]
-            ]
-        ])
-        ->select($this->Events)
-        ->select($this->Locations)
-        ->contain('EventResponses.Users') //EventResponsesに紐づくUsersオブジェクト作成
-        ->order(['Events.start_time'=>'ASC']) //Eventが表示される順番
-        ->limit(Configure::read('event_item_limit')); 
-        $events = $events_query->all()->toArray();
-        
+        // $this->Locations = $this->fetchTable('Locations');
+        // $conditions = [
+        //     'Events.deleted_at IS' => 0, //削除前のイベント
+        //     'Events.end_time >=' => date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s") . "-14days")) //14日前までのイベント
+        // ]; 
+        // $events_query = $this->Events->find("all", ['conditions'=>$conditions]);
+        // $events_query = $events_query
+        // ->contain([
+        //     'Locations',
+        //     'EventResponses' => [
+        //         'sort' => [
+        //             'response_state' => 'DESC', //反応した種類順
+        //             'EventResponses.updated_at' => 'ASC' //反応した時間順
+        //         ]
+        //     ]
+        // ])
+        // ->select($this->Events)
+        // ->select($this->Locations)
+        // ->contain('EventResponses.Users') //EventResponsesに紐づくUsersオブジェクト作成
+        // ->order(['Events.start_time'=>'ASC']) //Eventが表示される順番
+        // ->limit(Configure::read('event_item_limit')); 
+        // $events = $events_query->all()->toArray();
+        $events = $this->Event->getEventList(false, false, false, true);
         $events = $this->Event->getFormatEventDataList($events, $uid);
         
         $this->set(compact('events'));
@@ -70,30 +71,8 @@ class EventsController extends AppController
     public function archived(){ //開催済み
         $uid = $this->getLoginUserData(true);   
         
-        $this->Locations = $this->fetchTable('Locations');
-        $conditions = [
-            'Events.deleted_at IS' => 0, //削除前のイベント
-            'Events.end_time <=' => date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s") . "now"))
-        ]; 
-        $events_query = $this->Events->find("all", ['conditions'=>$conditions]);
-        $events_query = $events_query
-        ->contain([
-            'Locations',
-            'EventResponses' => [
-                'sort' => [
-                    'response_state' => 'DESC', //反応した種類順
-                    'EventResponses.updated_at' => 'ASC' //反応した時間順
-                ]
-            ]
-        ])
-        ->select($this->Events)
-        ->select($this->Locations)
-        ->contain('EventResponses.Users') //EventResponsesに紐づくUsersオブジェクト作成
-        ->order(['Events.start_time'=>'DESC']) //Eventが表示される順番
-        ->limit(Configure::read('event_item_limit')); 
-        $events = $events_query->all()->toArray();
-        
-        $events = $this->Event->getFormatEventDataList($events, $uid);
+        $events = $this->Event->getEventList(false, false, true, false);
+        $events = $this->Event->getFormatEventDataList($events);
         
         $this->set(compact('events'));
     }
@@ -104,36 +83,12 @@ class EventsController extends AppController
             $this->Flash->error(__('ユーザー情報の取得に失敗しました。'));
             return $this->redirect(['controller' => 'Users', 'action' => 'login']);
         }
-
-        $event_responses = $this->Event->getEventIds($uid, true);
-        $event_ids = Hash::extract($event_responses, '{n}.id');
-
-        $events = [];
-        if(count($event_ids) > 0){  
-
-            $this->Locations = $this->fetchTable('Locations');
-            $conditions = [
-                'Events.id IN' => $event_ids,
-            ]; 
-            $events_query = $this->Events->find("all", ['conditions'=>$conditions]);
-            $events_query = $events_query
-            ->contain([
-                'Locations',
-                'EventResponses' => [
-                    'sort' => [
-                        'response_state' => 'DESC',
-                        'EventResponses.updated_at' => 'ASC'
-                    ]
-                ]
-            ])
-            ->select($this->Events)
-            ->select($this->Locations)
-            ->contain('EventResponses.Users') //EventResponses以下Usersオブジェクト作成
-            ->order(['Events.start_time'=>'ASC'])
-            ->limit(Configure::read('event_item_limit'));
-            $events = $events_query->all()->toArray();
-            $events = $this->Event->getFormatEventDataList($events, $uid);
-        }
+        
+        $event_responses = $this->Event->getEventIdList($uid, true);
+        $event_id_list = Hash::extract($event_responses, '{n}.id');
+        
+        $events = $this->Event->getEventListByEventId($event_id_list);
+        $events = $this->Event->getFormatEventDataList($events, $uid);
 
         $this->set(compact('events'));
     }
@@ -145,36 +100,11 @@ class EventsController extends AppController
             return $this->redirect(['controller' => 'Users', 'action' => 'login']);
         }
 
-        $event_responses = $this->Event->getEventIds($uid, false);
-        $event_ids = Hash::extract($event_responses, '{n}.id');
+        $event_responses = $this->Event->getEventIdList($uid, false);
+        $event_id_list = Hash::extract($event_responses, '{n}.id');
 
-        $events = [];
-
-        if(count($event_ids) > 0){   
-            $this->Locations = $this->fetchTable('Locations');
-            $conditions = [
-                'Events.id IN' => $event_ids
-            ]; 
-            $events_query = $this->Events->find("all", ['conditions'=>$conditions]);
-            $events_query = $events_query
-            ->contain([
-                'Locations',
-                'EventResponses' => [
-                    'sort' => [
-                        'response_state' => 'DESC', 
-                        'EventResponses.updated_at' => 'ASC'
-                    ]
-                ]
-            ])
-            ->select($this->Events)
-            ->select($this->Locations)
-            ->contain('EventResponses.Users') //EventResponses以下Usersオブジェクト作成
-            ->order(['Events.start_time'=>'ASC'])
-            ->limit(Configure::read('event_item_limit')); 
-            
-            $events = $events_query->all()->toArray();
-            $events = $this->Event->getFormatEventDataList($events, $uid);
-        }
+        $events = $this->Event->getEventListByEventId($event_id_list);
+        $events = $this->Event->getFormatEventDataList($events, $uid);
         
         $this->set(compact('events'));
     }
@@ -185,30 +115,10 @@ class EventsController extends AppController
             $this->Flash->error(__('ユーザー情報の取得に失敗しました。'));
             return $this->redirect(['controller' => 'Users', 'action' => 'login']);
         }
-
-        $this->Locations = $this->fetchTable('Locations');
-        $conditions = [ //削除済みのイベントも含ませる
-            'Events.organizer_id IN' => $uid
-        ]; 
-        $events_query = $this->Events->find("all", ['conditions'=>$conditions]);
-        $events_query = $events_query
-        ->contain([
-            'Locations',
-            'EventResponses' => [
-                'sort' => [
-                    'response_state' => 'DESC',
-                    'EventResponses.updated_at' => 'ASC'
-                ]
-            ]
-        ])
-        ->select($this->Events)
-        ->select($this->Locations)
-        ->contain('EventResponses.Users') //EventResponses以下Usersオブジェクト作成
-        ->order(['Events.start_time'=>'DESC'])
-        ->limit(Configure::read('event_item_limit')); 
-        $events = $events_query->all()->toArray();
         
+        $events = $this->Event->getEventList($uid, true, true, true);
         $events = $this->Event->getFormatEventDataList($events, $uid);
+        
         $this->set(compact('events'));
     }
 
@@ -241,8 +151,8 @@ class EventsController extends AppController
                     
         $event = $this->Event->getFormatEventData($event, $uid);
 
-        $event_prev = $this->Event->getNeighberEvent($event->start_time, 'previous');
-        $event_next = $this->Event->getNeighberEvent($event->start_time, 'next');
+        $event_prev = $this->Event->getNeighberEvent($event["start_time"], 'previous');
+        $event_next = $this->Event->getNeighberEvent($event["start_time"], 'next');
 
         $event_prev_id = (isset($event_prev->id)) ? $event_prev->id : null;
         $event_next_id = (isset($event_next->id)) ? $event_next->id : null;

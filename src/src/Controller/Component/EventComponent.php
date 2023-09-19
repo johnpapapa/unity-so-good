@@ -9,7 +9,12 @@ use Cake\I18n\FrozenTime;
 use Cake\Utility\Hash;
 // use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\Datasource\ModelAwareTrait;
- 
+
+/**
+ * @property \App\Model\Table\EventsTable $Events
+ * @property \App\Model\Table\EventResponsesTable $EventResponses
+ * 
+ */
 class eventComponent extends Component
 {
     public function initialize(array $config): void
@@ -20,8 +25,12 @@ class eventComponent extends Component
         $this->EventResponses = FactoryLocator::get('Table')->get('EventResponses');
     }
 
-    public function getEventIds($uid, $is_unrespond=false, $start_order='ASC'){
-        return $this->Events->getEventIds($uid, $is_unrespond, $start_order);
+    public function getEventIdList($uid, $is_unrespond=false, $start_order='ASC'){
+        return $this->Events->getEventIdList($uid, $is_unrespond, $start_order);
+    }
+
+    public function getEventList($organizer_user_id=false,$contain_deleted_event=false, $contain_held_event=false, $contain_not_held_event=false){
+        return $this->Events->getEventList($organizer_user_id, $contain_deleted_event, $contain_held_event, $contain_not_held_event);
     }
 
     public function getEventResponseListByEventId($event_id){
@@ -33,7 +42,14 @@ class eventComponent extends Component
     }
 
     public function getAllEventResponseListByUserId($user_id, $limit=null){ //未反応のイベントも含めたevent_response
-        $this->EventResponses->getEventResponseListByUserId($user_id, $limit);
+        return $this->EventResponses->getEventResponseListByUserId($user_id, $limit);
+    }
+
+    public function getEventListByEventId($event_id_list, $event_display_order='ASC', $response_display_order='ASC'){
+        if(count($event_id_list) <= 0){ //id listが空の場合は空配列を返す
+            return [];
+        }
+        return $this->Events->getEventListByEventId($event_id_list, $event_display_order, $response_display_order);
     }
 
     public function getNeighberEvent($start_time, $type){
@@ -68,7 +84,10 @@ class eventComponent extends Component
      * @param int $uid
      * @return array 
      */
-    public function getFormatEventDataList($event_list, $uid=null){
+    public function getFormatEventDataList($event_list=[], $uid=null){
+        if(count($event_list) <= 0){
+            return [];
+        }
         $formated_event_list = []; //整形後のevent
         $now_datetime = $this->getNow();
         foreach($event_list as $event_data){

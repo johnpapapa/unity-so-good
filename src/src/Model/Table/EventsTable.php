@@ -4,10 +4,12 @@ declare(strict_types=1);
 namespace App\Model\Table;
 
 use Cake\ORM\Query;
+use Cake\Core\Configure;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
 use Cake\Datasource\ConnectionManager;
+use Cake\ORM\TableRegistry;
 
 /**
  * Events Model
@@ -145,7 +147,7 @@ class EventsTable extends Table
      * @param string $start_order events.start_timeをキーとした並び順
      * @return array|false eventResponses.*
      */
-    public function getEventIds($uid, $is_unrespond=false, $start_order='ASC'){
+    public function getEventIdList($uid, $is_unrespond=false, $start_order='ASC'){
         $event_where = ($is_unrespond) ? ' WHERE ISNULL(er.responder_id)':'';
         $event_join_type = ($is_unrespond) ? 'LEFT JOIN':'JOIN';
         $sql = <<<EOF
@@ -167,8 +169,85 @@ class EventsTable extends Table
             ) as e
             ORDER BY e.start_time {$start_order};
         EOF;
-
         return $this->executeSql($sql);
+    }
+
+    /**
+     * 指定したorganizer_idのeventを取得
+     * 
+     * @param int $organizer_user_id users.id
+     * @param bool $contain_deleted_event 削除済のイベントを含める
+     * @param bool $contain_held_event 開催済みのイベントを含める
+     * @param bool $contain_not_held_event 未開催のイベントを含める
+     * @return array|false eventResponses.*
+     */
+    public function getEventList(
+        $organizer_user_id=false,
+        $contain_deleted_event=false, 
+        $contain_held_event=false, 
+        $contain_not_held_event=false
+    ){
+        $Locations = TableRegistry::getTableLocator()->get('Locations');
+        $Events = TableRegistry::getTableLocator()->get('Events');
+
+        $conditions = [];
+        if(!$contain_deleted_event){ $conditions['AND']['Events.deleted_at'] = 0; }
+        if($contain_held_event){ $conditions['OR']['Events.end_time <='] = date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s") . "now")); }
+        if($contain_not_held_event){ $conditions['OR']['Events.start_time >='] = date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s") . "now")); }
+        if($organizer_user_id){ $conditions['Events.organizer_id IN'] = $organizer_user_id; }
+
+        $events_query = $Events->find("all", ['conditions'=>$conditions]);
+        $events_query = $events_query
+        ->contain([
+            'Locations',
+            'EventResponses' => [
+                'sort' => [
+                    'response_state' => 'DESC',
+                    'EventResponses.updated_at' => 'ASC'
+                ]
+            ]
+        ])
+        ->select($Events)
+        ->select($Locations)
+        ->contain('EventResponses.Users') //EventResponses以下Usersオブジェクト作成
+        ->order(['Events.start_time'=>'DESC'])
+        ->limit(Configure::read('event_item_limit')); 
+        $events = $events_query->all()->toArray();
+        return $events;
+    }
+
+    /**
+     * 指定したevent_idのリストでeventの取得
+     * 
+     * @param array $event_id_list 取得するeventのidの配列
+     * @param string $event_display_order 開始時刻によるイベント表示順
+     * @param string $response_display_order 反応時刻による反応表示順
+     * @return array eventの配列
+     */
+    public function getEventListByEventId($event_id_list = [], $event_display_order='ASC', $response_display_order='ASC'){
+        $Locations = TableRegistry::getTableLocator()->get('Locations');
+        $Events = TableRegistry::getTableLocator()->get('Events');
+        $conditions = [
+            'Events.id IN' => $event_id_list
+        ]; 
+
+        $events_query = $Events->find("all", ['conditions'=>$conditions]);
+        $events_query = $events_query
+        ->contain([
+            'Locations',
+            'EventResponses' => [
+                'sort' => [
+                    'EventResponses.updated_at' => $response_display_order //反応した時間順
+                ]
+            ]
+        ])
+        ->select($Events)
+        ->select($Locations)
+        ->contain('EventResponses.Users') //EventResponsesに紐づくUsersオブジェクト作成
+        ->order(['Events.start_time'=>$event_display_order]) //Eventが表示される順番
+        ->limit(Configure::read('event_item_limit')); 
+        $events = $events_query->all()->toArray();
+        return $events;
     }
 
     /**

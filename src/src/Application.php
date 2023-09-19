@@ -167,6 +167,7 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
         $this->addOptionalPlugin('Bake');
 
         $this->addPlugin('Migrations');
+        $this->addPlugin('IdeHelper');
 
         // Load more plugins here
     }
