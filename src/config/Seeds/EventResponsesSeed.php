@@ -180,6 +180,7 @@ class EventResponsesSeed extends AbstractSeed
     }
 
     public function gen_event_response_data($faker, $user_count, $event_id, $start_time){
+        $comment_data = [];
         $event_response_data = [];
 
         $rand_val = random_int(0, $user_count); //eventに反応した人数の生成
@@ -206,9 +207,24 @@ class EventResponsesSeed extends AbstractSeed
                 'responder_id' => $responder_ids[$er_idx],
                 'event_id' => $event_id
             ];
+
+            $p = random_int(1, 100);
+            if($p < 10){ //15%の確率でこめんと
+                $comment_data[] = [
+                    "created_at" => $response_time,
+                    "updated_at" => $response_time,
+                    "body" => $faker->realText(),
+                    "user_id" => $responder_ids[$er_idx],
+                    "event_id" => $event_id
+                ];
+                
+            }
         }
         $event_response_table = $this->table('event_responses');
         $event_response_table->insert($event_response_data)->save();
+
+        $comment_table = $this->table('comments');
+        $comment_table->insert($comment_data)->save();
         return $event_response_data;
     }
 }

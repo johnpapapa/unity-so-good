@@ -248,7 +248,22 @@ input[type=text],input[type=textarea], textarea,input[type=number],input[type=pa
     font-size: 1.2rem;
 }
 
+.event-item .comments .comments-title {
+    font-size: 1.2rem;
+}
+
+.event-item .comments .comment {
+  border: black 1px solid;
+  border-radius: 5px;
+}
+
+.event-item .comment-header .time {
+  font-size: .7rem;
+}
+
 .event-item .state-0 {background-color: #d3d3d37F;}
 .event-item .state-1 {background-color: #90ee907F;}
 .event-item .state-2 {background-color: #f080807F;}
+
+
 

@@ -136,6 +136,27 @@
                         <?php endif; ?>
                     </div>
                 </div>
+
+                <?php if(count($event->comments)): ?>
+                    <div class="comments_toggle disp-flex just-center align-center m10">
+                        <span class="material-symbols-outlined">expand_all</span>
+                        コメント確認
+                    </div>
+                    
+                    <div class="comments">
+                        <?php foreach($event->comments as $comment): ?>
+                            <div class="comment w100 mb5 p10 disp-flex align-center dir-column">
+                                <div class="comment-header mb5 w100 disp-flex just-center align-center dir-row">
+                                    <div class="name w100"><?= $comment->user->display_name ?></div>
+                                    <div class="time w100 tr"><?= $comment->updated_at->i18nFormat('yyyy-MM-dd HH:mm') ?></div>
+                                </div>
+                                <div class="comment-body w100">
+                                    <div class="body w100"><?= h($comment->body) ?></div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
                 
             </div>
         <?php endif; ?>

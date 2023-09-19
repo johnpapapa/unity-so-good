@@ -138,11 +138,13 @@ class EventsController extends AppController
             "conditions" => ["Events.id" => $id]
         ])
         ->contain([
-            'Users', 
+            // 'Users', 
             'Locations',
+            // 'Comments',
             'EventResponses' => ['sort' => ['response_state' => 'DESC', 'EventResponses.updated_at' => 'ASC']]
         ])
         ->contain('EventResponses.Users')
+        ->contain('Comments.Users')
         ->first();
         if($event->deleted_at && $event->organizer_id != $uid){ //削除されていた時
             $this->Flash->error(__('このイベントはすでに削除されています'));
@@ -180,8 +182,47 @@ class EventsController extends AppController
         return $this->response->withStringBody(json_encode($response));
     }
 
-    public function ajaxDeleteEvent(){
+    public function ajaxSubmitComment(){
+        $this->autoRender = false;
+        $response = ['status'=>''];
+        $uid = $this->getLoginUserData(true);
+        if(!$uid){
+            $this->Flash->error(__('ユーザー情報の取得に失敗しました'));
+        }
 
+        $data = $this->request->getData();
+        $event_id = $data['event_id'];
+        $body = $data['body'];
+        $this->Comments = $this->fetchTable('Comments');
+        $comment_data = $this->Comments->newEmptyEntity();
+        $comment_data = $this->Comments->patchEntity($comment_data,['event_id'=>$event_id,'user_id'=>$uid, 'body'=>$body]);
+        $response['body'] = $comment_data;
+
+        try {
+            $result = $this->Comments->saveOrFail($comment_data);
+        } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
+            // $response['error'] = print_r($e);
+            $response['entity'] = $e->getEntity();
+            // $repsonse['model'] = print_r($this->Comments);
+            debug($e);
+        }
+        
+        
+        
+        if ($result){
+            $response['status']='ok';
+        } else {
+            $response['status']='bad';
+        }
+
+        $this->RequestHandler->respondAs('application/json; charset=UTF-8');
+        return $this->response->withStringBody(json_encode($response));
+    }
+    public function ajaxDeleteComment(){
+
+    }
+
+    public function ajaxDeleteEvent(){
         $this->autoRender = false;
         $response = ['status'=>''];
         $uid = $this->getLoginUserData(true);

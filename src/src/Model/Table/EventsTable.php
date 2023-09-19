@@ -59,6 +59,9 @@ class EventsTable extends Table
         $this->hasMany('EventResponses', [
             'foreignKey' => 'event_id',
         ]);
+        $this->hasMany('Comments', [
+            'foreignKey' => 'event_id',
+        ]);
 
         $this->addBehavior('Timestamp', [
             'events' => [
@@ -187,7 +190,6 @@ class EventsTable extends Table
         $contain_held_event=false, 
         $contain_not_held_event=false
     ){
-        $Locations = TableRegistry::getTableLocator()->get('Locations');
         $Events = TableRegistry::getTableLocator()->get('Events');
 
         $conditions = [];
@@ -200,6 +202,7 @@ class EventsTable extends Table
         $events_query = $events_query
         ->contain([
             'Locations',
+            'Comments',
             'EventResponses' => [
                 'sort' => [
                     'response_state' => 'DESC',
@@ -207,9 +210,8 @@ class EventsTable extends Table
                 ]
             ]
         ])
-        ->select($Events)
-        ->select($Locations)
         ->contain('EventResponses.Users') //EventResponses以下Usersオブジェクト作成
+        ->contain('Comments.Users')
         ->order(['Events.start_time'=>'DESC'])
         ->limit(Configure::read('event_item_limit')); 
         $events = $events_query->all()->toArray();
@@ -235,6 +237,7 @@ class EventsTable extends Table
         $events_query = $events_query
         ->contain([
             'Locations',
+            'Comments',
             'EventResponses' => [
                 'sort' => [
                     'EventResponses.updated_at' => $response_display_order //反応した時間順
@@ -244,6 +247,7 @@ class EventsTable extends Table
         ->select($Events)
         ->select($Locations)
         ->contain('EventResponses.Users') //EventResponsesに紐づくUsersオブジェクト作成
+        ->contain('Comments.Users')
         ->order(['Events.start_time'=>$event_display_order]) //Eventが表示される順番
         ->limit(Configure::read('event_item_limit')); 
         $events = $events_query->all()->toArray();

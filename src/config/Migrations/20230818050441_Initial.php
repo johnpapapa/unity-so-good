@@ -199,6 +199,66 @@ class Initial extends AbstractMigration
                 ]
             )
             ->create();
+        
+        
+        $this->table('comments')
+            ->addColumn('id', 'biginteger', [
+                'autoIncrement' => true,
+                'default' => null,
+                'limit' => null,
+                'null' => false,
+                'signed' => false,
+            ])
+            ->addPrimaryKey(['id'])
+            ->addColumn('created_at', 'timestamp', [
+                'default' => null,
+                'limit' => null,
+                'null' => true,
+            ])
+            ->addColumn('updated_at', 'timestamp', [
+                'default' => null,
+                'limit' => null,
+                'null' => true,
+            ])
+            ->addColumn('deleted_at', 'integer', [
+                'default' => 0,
+                'limit' => null,
+                'null' => false,
+            ])
+            ->addColumn('body', 'string', [
+                'default' => '',
+                'limit' => 255,
+                'null' => true,
+            ])
+            ->addColumn('user_id', 'biginteger', [
+                'default' => null,
+                'limit' => null,
+                'null' => false,
+                'signed' => false,
+            ])
+            ->addColumn('event_id', 'biginteger', [
+                'default' => null,
+                'limit' => null,
+                'null' => false,
+                'signed' => false,
+            ])
+            ->addIndex(
+                [
+                    'user_id',
+                ],
+                [
+                    'name' => 'comments_user_id_foreign',
+                ]
+            )
+            ->addIndex(
+                [
+                    'event_id',
+                ],
+                [
+                    'name' => 'comments_event_id_foreign',
+                ]
+            )
+            ->create();
 
         $this->table('failed_jobs')
             ->addColumn('id', 'biginteger', [
@@ -535,6 +595,29 @@ class Initial extends AbstractMigration
                 ]
             )
             ->update();
+
+        $this->table('comments')
+            ->addForeignKey(
+                'user_id',
+                'users',
+                'id',
+                [
+                    'update' => 'RESTRICT',
+                    'delete' => 'RESTRICT',
+                    'constraint' => 'comments_user_id_foreign'
+                ]
+            )
+            ->addForeignKey(
+                'event_id',
+                'events',
+                'id',
+                [
+                    'update' => 'RESTRICT',
+                    'delete' => 'RESTRICT',
+                    'constraint' => 'comments_event_id_foreign'
+                ]
+            )
+            ->update();
     }
 
 
@@ -560,6 +643,14 @@ class Initial extends AbstractMigration
             ->dropForeignKey(
                 'event_id'
             )->save();
+        
+        $this->table('comments')
+            ->dropForeignKey(
+                'event_id'
+            )
+            ->dropForeignKey(
+                'user_id'
+            )->save();
 
         $this->table('events')
             ->dropForeignKey(
@@ -579,5 +670,6 @@ class Initial extends AbstractMigration
         $this->table('personal_access_tokens')->drop()->save();
         $this->table('users')->drop()->save();
         $this->table('administrators')->drop()->save();
+        $this->table('comments')->drop()->save();
     }
 }
