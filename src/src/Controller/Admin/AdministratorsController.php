@@ -7,6 +7,7 @@ use App\Controller\AppController;
 use Cake\Event\EventInterface;
 use Cake\I18n\FrozenTime;
 use Cake\Utility\Hash;
+use Cake\Datasource\ConnectionManager;
 
 /**
  * Administrators Controller
@@ -115,6 +116,58 @@ class AdministratorsController extends AppController
             'event_response_history_limit_list' 
         ));
 
+    }
+
+    
+    public function participantsCount(){ //イベント参加率の統計を表示
+        $this->loadComponent('Event');
+        $this->Events = $this->fetchTable('Events');
+        $this->Locations = $this->fetchTable('Locations');
+        $this->Users = $this->fetchTable('Users');
+
+        //userの数だけleftjoinしている状態なのでかなり非効率;countの個数で並び替えが煩雑になる;
+        //削除済みのuserは集計しない
+        $user_data_list = $this->Users->find("all", ['conditions'=>['deleted_at'=>0]])->select(['id', 'display_name'])->all()->toArray();
+
+        $participants_count_list = [];
+        $border_unresponded = 0; //集計した結果を表示させる無反応イベントの数
+        $cnt_event = $this->Events->find("all", ['conditions'=>['deleted_at'=>0]])->count();
+
+        foreach($user_data_list as $user_data){
+            $sql_statement = <<<EOF
+            SELECT 
+                count(e.id) AS cnt
+            FROM (
+                SELECT events.id
+                FROM events
+            ) as e
+            LEFT JOIN (
+                SELECT event_responses.event_id, event_responses.responder_id
+                FROM event_responses
+                WHERE event_responses.responder_id={$user_data["id"]}
+            ) as er
+            ON e.id=er.event_id
+            LEFT JOIN (
+                SELECT users.id, users.display_name
+                FROM users
+            ) as u
+            ON er.responder_id = u.id
+            GROUP BY u.id
+            EOF;
+            $participants_count_data = ConnectionManager::get('default')->execute($sql_statement)->fetchAll('assoc');
+            if(count($participants_count_data) > 0){
+                $cnt_unresponded = $cnt_event - $participants_count_data[0]["cnt"];
+                if($cnt_unresponded >= $border_unresponded){
+                    $participants_count_list[] = [
+                        "id"=>$user_data["id"],
+                        "display_name"=>$user_data["display_name"],
+                        "cnt"=>$cnt_unresponded,
+                    ];
+                }
+            }
+        }
+        $this->set(compact('participants_count_list'));
+        
     }
 
     public function eventDetail($id=null){

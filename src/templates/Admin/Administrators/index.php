@@ -11,10 +11,18 @@
         </a>
     </div>
 
-    <div>
+    <div class="mb30">
         <a href="<?= $this->Url->build(['prefix'=>'Admin', 'controller' => 'administrators','action' => 'event-list']); ?>">
             <button class="pure-button">
                 イベントの一覧
+            </button>
+        </a>
+    </div>
+
+    <div class="mb30">
+        <a href="<?= $this->Url->build(['prefix'=>'Admin', 'controller' => 'administrators','action' => 'participants-count']); ?>">
+            <button class="pure-button">
+                未反応の一覧
             </button>
         </a>
     </div>
