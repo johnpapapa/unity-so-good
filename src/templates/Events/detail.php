@@ -161,11 +161,11 @@
                 <?php $state_idx = 1; ?>
                 <div class="states-active-perhaps disp-flex">
                     <div class="state state-<?= $state_idx ?> p10 pure-u-1-2">
-                        <div class="state-title text-center mb10">
+                        <div class="state-title text-center p5">
                             <?= Configure::read('response_states')[$state_idx]["text"] ?>
                         </div>
                         <?php foreach($event->event_responses[$state_idx] as $event_response): ?>
-                            <div class="state-content over-ellipsis disp-iblock pure-u-1 mb5">
+                            <div class="state-content over-ellipsis disp-iblock pure-u-1 mt10">
                                 <div class="name disp-m-block disp-iblock over-ellipsis fs-large fs-m-large"><?= h($event_response["name"]); ?></div>
                                 <div class="time disp-iblock fr fs-small fs-m-small"><?= $event_response["time"]->i18nFormat('MM/dd HH:mm:ss') ?></div>
                             </div>
@@ -174,11 +174,11 @@
                         
                     <?php $state_idx = 0; ?>
                     <div class="state state-<?= $state_idx ?> p10 pure-u-1-2">
-                        <div class="state-title text-center mb10">
+                        <div class="state-title text-center p5">
                             <?= Configure::read('response_states')[$state_idx]["text"] ?>
                         </div>
                         <?php foreach($event->event_responses[$state_idx] as $event_response): ?>
-                            <div class="state-content over-ellipsis disp-iblock pure-u-1 mb5">
+                            <div class="state-content over-ellipsis disp-iblock pure-u-1 mt10">
                                 <div class="name disp-m-block disp-iblock over-ellipsis fs-large fs-m-large"><?= h($event_response["name"]); ?></div>
                                 <div class="time disp-iblock fr fs-small fs-m-small"><?= $event_response["time"]->i18nFormat('MM/dd HH:mm:ss') ?></div>
                             </div>
