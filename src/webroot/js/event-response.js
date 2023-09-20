@@ -31,6 +31,31 @@ $(function(){
         });
     });
 
+    $('.delete-comment-btn').on('click', function(){
+        let button_current = $(this);
+        let comment_id = $(this).children('input').val();
+
+        let send_data = {
+            "comment_id": comment_id
+        };
+
+        $.ajax({
+            type: "post",
+            url: comment_delete_ajax_send_url,
+            data: send_data,
+            headers: { 'X-CSRF-Token' : ajax_send_token },
+        }).done(function(response){
+            console.log(response);
+            if(response['status'] == 'ok'){
+                window.location.reload();
+            }
+
+        }).fail(function(jqXHR){
+            console.error('Error : ', jqXHR.status, jqXHR.statusText);
+            button_current.prop('disabled', false);
+        });
+    });
+
 
     let interval;
     $.fn.sparkle_btn = function (opts) {

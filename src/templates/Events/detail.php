@@ -18,6 +18,7 @@ $day_of_weeks = Configure::read('day_of_weeks');
     let event_data = <?= json_encode($event) ?>;
     let response_ajax_send_url = "<?= $this->Url->build(['controller' => 'Events', 'action' => 'ajaxChangeResponseState']) ?>";
     let comment_submit_ajax_send_url = "<?= $this->Url->build(['controller' => 'Events', 'action' => 'ajaxSubmitComment']) ?>";
+    let comment_delete_ajax_send_url = "<?= $this->Url->build(['controller' => 'Events', 'action' => 'ajaxDeleteComment']) ?>";
     let ajax_send_token = "<?= $this->request->getAttribute('csrfToken') ?>";
 </script>
 
@@ -64,6 +65,10 @@ $day_of_weeks = Configure::read('day_of_weeks');
     }
 
     .detail .comment-header .time {
+        font-size: .7rem;
+    }
+
+    .detail .comment-header .delete-comment-btn {
         font-size: .7rem;
     }
 
@@ -257,7 +262,12 @@ $day_of_weeks = Configure::read('day_of_weeks');
                     <div class="comment w100 mb5 p10 disp-flex align-center dir-column">
                         <div class="comment-header mb5 w100 disp-flex just-center align-center dir-row">
                             <div class="name w100"><?= $comment->user->display_name ?></div>
-                            <div class="time w100 tr"><?= $comment->updated_at->i18nFormat('yyyy-MM-dd HH:mm') ?></div>
+                            <div class="w100 disp-flex align-center just-end">
+                                <?php if($comment->user_id == $current_user->id): ?>
+                                <div class="delete-comment-btn w100 tr">コメントを削除<input type="hidden" value="<?= $comment->id ?>"></div>
+                                <?php endif; ?>
+                                <div class="time w100 tr"><?= $comment->updated_at->i18nFormat('yyyy-MM-dd HH:mm') ?></div>
+                            </div>
                         </div>
                         <div class="comment-body w100">
                             <div class="body w100"><?= h($comment->body) ?></div>

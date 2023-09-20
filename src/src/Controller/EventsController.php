@@ -8,6 +8,7 @@ use Cake\Event\EventInterface;
 use Cake\Utility\Hash;
 use Cake\Datasource\ConnectionManager;
 use Cake\I18n\FrozenTime;
+use Cake\ORM\Query;
 
 /**
  * Events Controller
@@ -134,18 +135,29 @@ class EventsController extends AppController
             $this->Flash->success(__('The event has not exist.'));
             return $this->redirect(['action' => 'index']);
         }
+        
         $event = $this->Events->find("all", [
             "conditions" => ["Events.id" => $id]
         ])
         ->contain([
-            // 'Users', 
             'Locations',
-            // 'Comments',
-            'EventResponses' => ['sort' => ['response_state' => 'DESC', 'EventResponses.updated_at' => 'ASC']]
+            'Comments' => function (Query $query){
+                return $query
+                    ->contain('Users')
+                    ->where(['Comments.deleted_at' => 0])
+                    ->order(['Comments.updated_at'=>'ASC']);
+            },
+            'EventResponses' => function (Query $query){
+                return $query
+                    ->contain('Users')
+                    ->order([
+                        'EventResponses.updated_at'=>'ASC', 
+                        'EventResponses.response_state'=>'DESC'
+                    ]);
+            }
         ])
-        ->contain('EventResponses.Users')
-        ->contain('Comments.Users')
         ->first();
+
         if($event->deleted_at && $event->organizer_id != $uid){ //削除されていた時
             $this->Flash->error(__('このイベントはすでに削除されています'));
             return $this->redirect(['controller'=>'Events', 'action'=>'index']);
@@ -196,18 +208,14 @@ class EventsController extends AppController
         $this->Comments = $this->fetchTable('Comments');
         $comment_data = $this->Comments->newEmptyEntity();
         $comment_data = $this->Comments->patchEntity($comment_data,['event_id'=>$event_id,'user_id'=>$uid, 'body'=>$body]);
-        $response['body'] = $comment_data;
-
         try {
             $result = $this->Comments->saveOrFail($comment_data);
         } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
-            // $response['error'] = print_r($e);
-            $response['entity'] = $e->getEntity();
+            $response['error'] = print_r($e);
+            // $response['entity'] = $e->getEntity();
             // $repsonse['model'] = print_r($this->Comments);
-            debug($e);
+            // debug($e);
         }
-        
-        
         
         if ($result){
             $response['status']='ok';
@@ -219,7 +227,38 @@ class EventsController extends AppController
         return $this->response->withStringBody(json_encode($response));
     }
     public function ajaxDeleteComment(){
+        $this->autoRender = false;
+        $response = ['status'=>''];
+        $uid = $this->getLoginUserData(true);
+        if(!$uid){
+            $this->Flash->error(__('ユーザー情報の取得に失敗しました'));
+        }
 
+        $data = $this->request->getData();
+        $comment_id = $data['comment_id'];
+        $this->Comments = $this->fetchTable('Comments');
+        $comment_data = $this->Comments->find('all', ['conditions'=>['id'=>$comment_id]])->first();
+        if(!$comment_data){
+            $this->Flash->error(__('コメント情報の取得に失敗しました'));
+        }
+        $comment_data = $this->Comments->patchEntity($comment_data,['deleted_at'=>1]);
+        try {
+            $result = $this->Comments->saveOrFail($comment_data);
+        } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
+            $response['error'] = print_r($e);
+            // $response['entity'] = $e->getEntity();
+            // $repsonse['model'] = print_r($this->Comments);
+            // debug($e);
+        }
+        
+        if ($result){
+            $response['status']='ok';
+        } else {
+            $response['status']='bad';
+        }
+
+        $this->RequestHandler->respondAs('application/json; charset=UTF-8');
+        return $this->response->withStringBody(json_encode($response));
     }
 
     public function ajaxDeleteEvent(){

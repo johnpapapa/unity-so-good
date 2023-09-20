@@ -191,6 +191,8 @@ class EventsTable extends Table
         $contain_not_held_event=false
     ){
         $Events = TableRegistry::getTableLocator()->get('Events');
+        $Comments = TableRegistry::getTableLocator()->get('Comments');
+        $Users = TableRegistry::getTableLocator()->get('Users');
 
         $conditions = [];
         if(!$contain_deleted_event){ $conditions['AND']['Events.deleted_at'] = 0; }
@@ -202,16 +204,20 @@ class EventsTable extends Table
         $events_query = $events_query
         ->contain([
             'Locations',
-            'Comments',
-            'EventResponses' => [
-                'sort' => [
-                    'response_state' => 'DESC',
-                    'EventResponses.updated_at' => 'ASC'
-                ]
-            ]
+            'Comments' => function (Query $query){
+                return $query
+                    ->contain('Users')
+                    ->where(['Comments.deleted_at' => 0]);
+            },
+            'EventResponses' => function (Query $query){
+                return $query
+                    ->contain('Users')
+                    ->order([
+                        'EventResponses.updated_at'=>'ASC', 
+                        'EventResponses.response_state'=>'DESC'
+                    ]);
+            }
         ])
-        ->contain('EventResponses.Users') //EventResponses以下Usersオブジェクト作成
-        ->contain('Comments.Users')
         ->order(['Events.start_time'=>'DESC'])
         ->limit(Configure::read('event_item_limit')); 
         $events = $events_query->all()->toArray();
