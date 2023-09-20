@@ -73,7 +73,7 @@
                 </p>
                 <input type="text" class="pure-u-1" name="display_name" id="display_name" placeholder="コート名" required="required">
                 <div class="location-data-exist-status">
-                    コート情報<span id="status-text" class="is-notexist">未入力</span>
+                    コート情報 : <span id="status-text" class="is-notexist">新規コート</span>
                 </div>
             </div>
 
@@ -221,7 +221,7 @@
                 obj_usage_price.val(location['usage_price']);
                 obj_night_price.val(location['night_price']);
                 obj_location_id.val(location['id']);
-                obj_location_data_exist_status[0].innerHTML='入力済';
+                obj_location_data_exist_status[0].innerHTML='既存コート';
                 obj_location_data_exist_status.removeClass('is-notexist')
                 obj_location_data_exist_status.addClass('is-exist')
                 location_data_input_toggle_view(false);
@@ -230,7 +230,7 @@
                 obj_usage_price.val("");
                 obj_night_price.val("");
                 obj_location_id.val("");
-                obj_location_data_exist_status[0].innerHTML='未入力';
+                obj_location_data_exist_status[0].innerHTML='新規コート';
                 obj_location_data_exist_status.removeClass('is-exist')
                 obj_location_data_exist_status.addClass('is-notexist')
                 location_data_input_toggle_view(true);
