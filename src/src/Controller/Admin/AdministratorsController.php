@@ -8,6 +8,7 @@ use Cake\Event\EventInterface;
 use Cake\I18n\FrozenTime;
 use Cake\Utility\Hash;
 use Cake\Datasource\ConnectionManager;
+use Cake\Datasource\ConnectionManager;
 
 /**
  * Administrators Controller
