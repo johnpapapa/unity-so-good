@@ -191,13 +191,13 @@ class EventsTable extends Table
         $contain_not_held_event=false
     ){
         $Events = TableRegistry::getTableLocator()->get('Events');
-        $Comments = TableRegistry::getTableLocator()->get('Comments');
-        $Users = TableRegistry::getTableLocator()->get('Users');
+        // $Comments = TableRegistry::getTableLocator()->get('Comments');
+        // $Users = TableRegistry::getTableLocator()->get('Users');
 
         $conditions = [];
         if(!$contain_deleted_event){ $conditions['AND']['Events.deleted_at'] = 0; }
-        if($contain_held_event){ $conditions['OR']['Events.end_time <='] = date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s") . "now")); }
-        if($contain_not_held_event){ $conditions['OR']['Events.start_time >='] = date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s") . "now")); }
+        if($contain_held_event){ $conditions['OR']['Events.start_time <='] = date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s") . "now")); }
+        if($contain_not_held_event){ $conditions['OR']['Events.end_time >='] = date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s") . "now")); }
         if($organizer_user_id){ $conditions['Events.organizer_id IN'] = $organizer_user_id; }
 
         $events_query = $Events->find("all", ['conditions'=>$conditions]);

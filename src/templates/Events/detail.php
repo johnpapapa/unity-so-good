@@ -165,8 +165,16 @@ $day_of_weeks = Configure::read('day_of_weeks');
         <div class="row mb20">
             <div class="label mb5">コート代</div>
             <div class="content">
-                <?= ($event->location->usage_price) ? $event->location->usage_price : '---' ?>円
-                (ナイター:<?= ($event->location->night_price) ? $event->location->night_price : '---' ?>円)
+                <?php $area_count = count(explode(",", h($event->area))); ?>
+                <?php $usage_price_total = ($event->location->usage_price < 0 ? 0:$event->location->usage_price) * $area_count; ?>
+                <?php $night_price_total = ($event->location->night_price < 0 ? 0:$event->location->night_price) * $area_count; ?>
+                昼間料金 : <?= $usage_price_total ?> (<?= $event->location->usage_price.'円' ?> × <?= $area_count ?>コート)
+                <br>夜間料金 : <?= $night_price_total ?> (<?= $event->location->night_price.'円' ?> × <?= $area_count ?>コート)
+                <p class="note-p">
+                    コート料金が設定されていない場合0円が表示されます。
+                    <br>ナイター料金が設定されていない場合、夜の料金は昼と同じ合計金額が表示されます。
+                </p>
+                
             </div>
         </div>
         <div class="row mb20">

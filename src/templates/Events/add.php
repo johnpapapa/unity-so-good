@@ -112,8 +112,11 @@
 
         <div class="input text mb20">
             <label for="area">コート番号</label>
-            <p style="font-size: 12px; color:gray;">無入力可</p>
-            <input type="text" class="pure-u-1" name="area" id="area" value="" maxlength="255"  placeholder="コート番号">
+            <p style="font-size: 12px; color:gray;">
+                無入力可
+                <br>カンマ区切りの英数字を入力してください
+            </p>
+            <input type="text" class="pure-u-1" name="area" id="area" value="" maxlength="255"  placeholder="コート番号 (例:A,B,1,2)">
         </div>        
         <div class="input number required mb20">
             <label for="participants_limit">参加人数上限</label>

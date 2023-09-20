@@ -140,9 +140,8 @@ class Initial extends AbstractMigration
                 'limit' => null,
                 'null' => true,
             ])
-            ->addColumn('deleted_at', 'integer', [
+            ->addColumn('deleted_at', 'boolean', [
                 'default' => 0,
-                'limit' => null,
                 'null' => false,
             ])
             ->addColumn('start_time', 'datetime', [
@@ -220,9 +219,8 @@ class Initial extends AbstractMigration
                 'limit' => null,
                 'null' => true,
             ])
-            ->addColumn('deleted_at', 'integer', [
+            ->addColumn('deleted_at', 'boolean', [
                 'default' => 0,
-                'limit' => null,
                 'null' => false,
             ])
             ->addColumn('body', 'string', [
@@ -502,9 +500,8 @@ class Initial extends AbstractMigration
                 'limit' => null,
                 'null' => true,
             ])
-            ->addColumn('deleted_at', 'integer', [
+            ->addColumn('deleted_at', 'boolean', [
                 'default' => 0,
-                'limit'=>null,
                 'null' => false,
             ])
             ->addIndex(
