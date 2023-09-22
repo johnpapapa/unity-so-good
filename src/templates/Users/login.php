@@ -20,7 +20,7 @@
         font-weight: bold;
     }
 </style>
-<p class="p-note mb20">
+<p class="note-p mb20">
     メンバー専用画面へアクセスするには<br>
     ログインが必要です。
 </p>
@@ -35,7 +35,7 @@
                         LINEでログイン
                     </button>
                 </a>
-                <p class="p-note">
+                <p class="note-p">
                     アカウント未作成の方がLINEログインを行うと<br>
                     自動でアカウントが作成されます。
                 </p>

@@ -153,6 +153,7 @@ class EventsTable extends Table
     public function getEventIdList($uid, $is_unrespond=false, $start_order='ASC'){
         $event_where = ($is_unrespond) ? ' WHERE ISNULL(er.responder_id)':'';
         $event_join_type = ($is_unrespond) ? 'LEFT JOIN':'JOIN';
+        $event_to_now = ($is_unrespond) ? 'NOW()':'CURRENT_DATE';
         $sql = <<<EOF
             SELECT e.id
             FROM ( 
@@ -160,7 +161,7 @@ class EventsTable extends Table
                 FROM (
                     SELECT events.id, events.start_time
                     FROM events
-                    WHERE events.deleted_at=0 AND events.start_time between cast(CURRENT_DATE as datetime) and cast(CURRENT_DATE + interval 1 year as datetime) 
+                    WHERE events.deleted_at=0 AND events.start_time between cast({$event_to_now} as datetime) and cast(CURRENT_DATE + interval 1 year as datetime) 
                 ) as e
                 {$event_join_type} ( 
                     SELECT event_responses.responder_id, event_responses.event_id 

@@ -1,5 +1,8 @@
 <?php $this->assign('title', 'event add'); ?>
 <?php $this->assign('content-title', 'イベントの追加'); ?>
+<p class="note-p mb20">
+    イベントの追加が可能です。
+</p>
 <?= $this->Html->script('jquery.ui.autocomplete.scroll.min.js', array('inline' => false)); ?>
 <script>
     let locations = <?= json_encode($locations) ?>;

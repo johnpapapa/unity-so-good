@@ -123,7 +123,7 @@ class EventsController extends AppController
                 return $query
                     ->contain('Users')
                     ->where(['Comments.deleted_at' => 0])
-                    ->order(['Comments.updated_at'=>'ASC']);
+                    ->order(['Comments.updated_at'=>'DESC']);
             },
             'EventResponses' => function (Query $query){
                 return $query
@@ -305,8 +305,11 @@ class EventsController extends AppController
                     "usage_price"=>$data['usage_price'],
                     "night_price"=>$data['night_price'],
                 ]);
-                $result_location = $this->Locations->save($location_data);
-                if(!$result_location){
+
+                try {
+                    $result_location = $this->Locations->saveOrFail($location_data);
+                } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
+                    $this->log(print_r($e, true));
                     $this->Flash->error(__('The location could not be saved. Please, try again.'));
                     return;
                 }
@@ -323,11 +326,15 @@ class EventsController extends AppController
                 "usage_price"=>$data['usage_price'],
                 "night_price"=>$data['night_price'],
             ], ['accessibleFields' => ['id' => true]]);
-            $result_location = $this->Locations->save($location_data);
-            if (!$result_location) {
+
+            try {
+                $result_location = $this->Locations->saveOrFail($location_data);
+            } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
+                $this->log(print_r($e, true));
                 $this->Flash->error(__('The location could not be saved. Please, try again.'));
                 return $this->redirect(['controller'=>'Events','action' => 'created']);
             }
+            
 
             $start_time = FrozenTime::createFromFormat('H:i',$data['start_time'])->i18nFormat('HH:mm:00');
             $end_time = FrozenTime::createFromFormat('H:i',$data['end_time'])->i18nFormat('HH:mm:00');
@@ -344,8 +351,10 @@ class EventsController extends AppController
                 "location_id"=>$data['location_id'],
             ]);
 
-            $result_event = $this->Events->save($event_data);
-            if (!$result_event) {
+            try {
+                $result_event = $this->Events->saveOrFail($event_data);
+            } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
+                $this->log(print_r($e, true));
                 $this->Flash->error(__('The event could not be saved. Please, try again.'));
                 return $this->redirect(['controller'=>'Events','action' => 'created']);
             }
@@ -410,13 +419,17 @@ class EventsController extends AppController
                     "usage_price"=>$data['usage_price'],
                     "night_price"=>$data['night_price'],
                 ]);
-                $result_location = $this->Locations->save($location_data);
-                if(!$result_location){
+
+                try {
+                    $result_location = $this->Locations->saveOrFail($location_data);
+                } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
+                    $this->log(print_r($e, true));
                     $this->Flash->error(__('The location could not be saved. Please, try again.'));
-                    return;
+                    return $this->redirect(['controller'=>'Events','action' => 'created']);
                 }
                 $this->Flash->success(__('The location has been saved.'));
                 $data["location_id"] = $result_location->id;
+
             } else {
                 $location_data = $this->Locations->newEmptyEntity();
             }
@@ -428,12 +441,14 @@ class EventsController extends AppController
                 "usage_price"=>$data['usage_price'],
                 "night_price"=>$data['night_price'],
             ], ['accessibleFields' => ['id' => true]]);
-            $result_location = $this->Locations->save($location_data);
-            if (!$result_location) {
+
+            try {
+                $result_location = $this->Locations->saveOrFail($location_data);
+            } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
+                $this->log(print_r($e, true));
                 $this->Flash->error(__('The location could not be updated. Please, try again.'));
                 return $this->redirect(['controller'=>'Events','action' => 'created']);
             }
-
             $area = str_replace(["、", "，", "､"], ",", mb_convert_kana($data['area'], "as"));
 
             $event_data = $this->Events->patchEntity($event_data,[

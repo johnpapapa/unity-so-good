@@ -1,7 +1,7 @@
 <?php $this->assign('title', 'information about'); ?>
 <?php $this->assign('content-title', '概要'); ?>
 <link href="https://use.fontawesome.com/releases/v6.4.2/css/all.css" rel="stylesheet">
-<p class="p-note mb20">ここはてきとうにいろいろかくぺーじ</p>
+<p class="note-p mb20">ここはてきとうにいろいろかくぺーじ</p>
 
 <h3 class="mb10">サイト説明・サークル説明</h3>
 <div class="mb30">

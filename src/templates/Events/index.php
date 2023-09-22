@@ -1,6 +1,6 @@
 <?php $this->assign('title', 'event index'); ?>
 <?php $this->assign('content-title', 'イベント一覧'); ?>
-<p class="p-note mb20">
+<p class="note-p mb20">
     14日前までのイベントが表示されます
 </p>
 

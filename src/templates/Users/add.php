@@ -1,7 +1,9 @@
 <?php $this->assign('title', 'user register'); ?>
 <?php $this->assign('content-title', 'ユーザー新規登録'); ?>
-
-
+<p class="note-p mb20">
+    ユーザーの新規登録を行います。
+    このページは現在機能していません。
+</p>
 <div class="user-detail-content disp-flex just-center">
     <div class="detail form pure-g pure-form pure-form-stacked">
         <?= $this->Form->create($user) ?>

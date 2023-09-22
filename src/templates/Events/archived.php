@@ -1,6 +1,6 @@
 <?php $this->assign('title', 'event archived'); ?>
 <?php $this->assign('content-title', 'アーカイブ一覧'); ?>
-<p class="p-note mb20">
+<p class="note-p mb20">
     開催済みのイベントが表示されます
 </p>
 

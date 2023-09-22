@@ -1,18 +1,17 @@
 <?php $this->assign('title', 'event detail'); ?>
 <?php $this->assign('content-title', 'イベント詳細'); ?>
 <?= $this->Html->script('event-response', array('inline' => false));  ?>
-<?php //$this->Html->script('sparkle', array('inline' => false));  
-?>
-
+<p class="note-p mb20">
+    イベントの詳細です。
+    <br>イベントへの参加表明やコメント記入が可能です。
+</p>
 <?php
-
 use Cake\Core\Configure;
 use Cake\I18n\FrozenTime;
 
 $user_response_state = (!is_null($event->user_response_state)) ? Configure::read('response_states')[$event->user_response_state] : null;
 $event_state = Configure::read('event_states')[$event->event_state];
 $day_of_weeks = Configure::read('day_of_weeks');
-
 ?>
 <script>
     let current_user = <?= json_encode($current_user) ?>;
@@ -167,10 +166,21 @@ $day_of_weeks = Configure::read('day_of_weeks');
             <div class="label mb5">コート代</div>
             <div class="content">
                 <?php $area_count = count(explode(",", h($event->area))); ?>
-                <?php $usage_price_total = ($event->location->usage_price < 0 ? 0:$event->location->usage_price) * $area_count; ?>
-                <?php $night_price_total = ($event->location->night_price < 0 ? 0:$event->location->night_price) * $area_count; ?>
-                昼間料金 : <?= $usage_price_total ?>円 (<?= $event->location->usage_price.'円' ?> × <?= $area_count ?>コート)
-                <br>夜間料金 : <?= $night_price_total ?>円 (<?= $event->location->night_price.'円' ?> × <?= $area_count ?>コート)
+                <?php $usage_price_total = ($event->location->usage_price > 0 ? $event->location->usage_price:0) * $area_count; ?>
+                <?php $night_price_total = ($event->location->night_price > 0 ? $event->location->night_price:0) * $area_count; ?>
+                昼間料金 : <?= $usage_price_total ?>円 (<?= (($event->location->night_price > 0) ? $event->location->night_price : 0).'円' ?> × <?= $area_count ?>コート)
+                <?php if($event->location->usage_price > 0): ?>
+                    <br>一人あたり<?= ceil(count($event->event_responses[1]) / $usage_price_total) ?>円(参加人数<?= count($event->event_responses[1]) ?>人の場合)
+                <?php endif; ?>
+
+                <br>
+                
+                <br>夜間料金 : <?= $night_price_total ?>円 (<?= (($event->location->night_price > 0) ? $event->location->night_price : 0).'円' ?> × <?= $area_count ?>コート)
+                <?php if($event->location->night_price > 0): ?>
+                    <br>一人あたり<?= round(count($event->event_responses[1]) / $night_price_total) ?>円(参加人数<?= count($event->event_responses[1]) ?>人の場合)
+                <?php endif; ?>
+                
+                
                 <p class="note-p">
                     コート料金が設定されていない場合0円が表示されます。
                     <br>ナイター料金が設定されていない場合、夜の料金は昼と同じ合計金額が表示されます。
@@ -260,11 +270,13 @@ $day_of_weeks = Configure::read('day_of_weeks');
                     <div class="state-title mb10">
                         <?= Configure::read('response_states')[$state_idx]["text"] ?>
                     </div>
-                    <?php foreach ($event->event_responses[$state_idx] as $event_response) : ?>
-                        <div class="state-content over-ellipsis">
-                            <div class="fs-medium  fs-m-midium"><?= h($event_response["display_name"]); ?></div>
-                        </div>
-                    <?php endforeach; ?>
+                    <div style="height:200px; overflow:scroll;">
+                        <?php foreach ($event->event_responses[$state_idx] as $event_response) : ?>
+                            <div class="state-content over-ellipsis">
+                                <div class="fs-medium  fs-m-midium"><?= h($event_response["display_name"]); ?></div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
             </div>
         </div>
