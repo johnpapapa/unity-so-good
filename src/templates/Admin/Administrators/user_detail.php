@@ -35,15 +35,9 @@ $day_of_weeks = Configure::read('day_of_weeks');
                 <?php foreach($event_response_history_list as $event_response): ?>
                     <div class="history pb10">
                         <div class="disp-flex just-center align-center">
-                            <?php if(is_null($event_response["response_state"])): ?>
-                                <div class="state tc" style="width:120px; background-color: white;">
-                                    未反応
-                                </div>
-                            <?php else: ?>
-                                <div class="state tc" style="width:120px; background-color: <?= Configure::read('response_states')[$event_response["response_state"]]["tag_color"] ?>;">
-                                    <?= Configure::read('response_states')[$event_response["response_state"]]["text"] ?>
-                                </div>
-                            <?php endif; ?>
+                            <div class="state tc" style="width:120px; background-color: <?= Configure::read('response_states')[$event_response["response_state"]]["tag_color"] ?>;">
+                                <?= Configure::read('response_states')[$event_response["response_state"]]["text"] ?>
+                            </div>
                             <div class="location-name w100 over-ellipsis">
                                 <?= $event_response["display_name"] ?>
                             </div>
@@ -75,30 +69,25 @@ $day_of_weeks = Configure::read('day_of_weeks');
     </div>
     <div class="mb30">
         <div class="header mb10">
-            直近10イベントの反応履歴
+            未反応イベント
         </div>
         <div class="content">
             <div class="history-list" style="height: 300px; overflow:scroll;">
-                <?php foreach($event_response_history_limit_list  as $event_response): ?>
+                <?php foreach($unresponded_history_list as $unresponded_data): ?>
                     <div class="history pb10">
                         <div class="disp-flex just-center align-center">
-                            <?php if(is_null($event_response["response_state"])): ?>
-                                <div class="state tc" style="width:120px; background-color: white;">
-                                    未反応 
-                                </div>
-                            <?php else: ?>
-                                <div class="state tc" style="width:120px; background-color: <?= Configure::read('response_states')[$event_response["response_state"]]["tag_color"] ?>;">
-                                    <?= Configure::read('response_states')[$event_response["response_state"]]["text"] ?>
-                                </div>
-                            <?php endif; ?>
+                            <div class="state tc" style="width:120px; background-color: <?= Configure::read('response_states')[$unresponded_data["response_state"]]["tag_color"] ?>;">
+                                <?= Configure::read('response_states')[$unresponded_data["response_state"]]["text"] ?>
+                            </div>
+
                             <div class="location-name w100 over-ellipsis">
-                                <?= $event_response["display_name"] ?>
+                                <?= $unresponded_data["display_name"] ?>
                             </div>
                         </div>
                         <div class="date" style="font-size:small;">
                             <?php
-                                $start_time = new FrozenTime($event_response["start_time"]);
-                                $end_time = new FrozenTime($event_response["end_time"]);
+                                $start_time = new FrozenTime($unresponded_data["start_time"]);
+                                $end_time = new FrozenTime($unresponded_data["end_time"]);
                             ?>
                             <?= $start_time->i18nFormat('yyyy-MM-dd'); ?>
                             (<?= $day_of_weeks[$start_time->dayOfWeek] ?>)
@@ -114,8 +103,45 @@ $day_of_weeks = Configure::read('day_of_weeks');
             コート別参加率
         </div>
         <div class="content">
-            実装予定
-        </div>
+            <!-- <div class="disp-flex just-center align-center" style="border-bottom: black 1px solid;">
+                <div class="w100 tc">コート名</div>
+                <div class="w100 disp-flex just-center align-center">
+                    <div style="font-size:small; width: 50px;">合計</div>
+                    <div style="font-size:small; width: 50px;">未定</div>
+                    <div style="font-size:small; width: 50px;">参加</div>
+                    <div style="font-size:small; width: 50px;">不参加</div>
+                </div>
+            </div> -->
+            <div class="location-ratio-list" style="height: 300px; overflow:scroll;">
+                <?php foreach($location_counted_response_count_list as $location_counted_response_cound_data): ?>
+                    <div class="location-ratio p10">
+                        <div class="disp-flex just-center align-center" style="border: black 1px solid;">
+                            <div class="w100 over-ellipsis p10"><?= $location_counted_response_cound_data["display_name"] ?></div>
+                            <div class="w100 disp-flex just-center align-center dir-column">
+                                <div class="w100 disp-flex just-center align-center" style="font-size:small;">
+                                    <div class="w100 tc">合計</div>
+                                    <div class="w100"><?= $location_counted_response_cound_data["sum_all"] ?>回</div>
+                                </div>
+                                <div class="w100 disp-flex just-center align-center" style="font-size:small;">
+                                    <div class="w100 tc">未定</div>
+                                    <div class="w100"><?= $location_counted_response_cound_data["ratio_0"] ?>%</div>
+                                </div>
+                                <div class="w100 disp-flex just-center align-center" style="font-size:small;">
+                                    <div class="w100 tc">参加</div>
+                                    <div class="w100"><?= $location_counted_response_cound_data["ratio_1"] ?>%</div>
+                                    
+                                </div>
+                                <div class="w100 disp-flex just-center align-center" style="font-size:small;">
+                                    <div class="w100 tc">不参加</div>
+                                    <div class="w100"><?= $location_counted_response_cound_data["ratio_2"] ?>%</div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <div>
     </div>
     <div class="mb30">
         <div class="header mb10">

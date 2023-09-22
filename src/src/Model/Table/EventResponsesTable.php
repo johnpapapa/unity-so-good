@@ -117,16 +117,17 @@ class EventResponsesTable extends Table
      */
     public function getEventResponseListByEventId($event_id){
         $sql = <<<EOF
-        SELECT users.id, users.display_name, er.response_state 
+        SELECT users.id, users.display_name, er.response_state , er.updated_at
         FROM users 
         LEFT JOIN ( 
-            SELECT event_responses.responder_id, event_responses.response_state 
+            SELECT event_responses.responder_id, event_responses.response_state, event_responses.updated_at
             FROM event_responses 
             WHERE event_responses.event_id={$event_id} 
         ) as er 
         ON users.id = er.responder_id
         ORDER BY er.response_state DESC;
         EOF;
+        return $this->executeSql($sql);
     }
 
     /**

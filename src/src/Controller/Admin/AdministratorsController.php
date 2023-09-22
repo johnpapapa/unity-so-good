@@ -8,10 +8,11 @@ use Cake\Event\EventInterface;
 use Cake\I18n\FrozenTime;
 use Cake\Utility\Hash;
 use Cake\Datasource\ConnectionManager;
+use Cake\ORM\Query;
 
 /**
  * Administrators Controller
- *
+ * @property \App\Controller\Component\EventComponent $Event
  * @property \App\Model\Table\AdministratorsTable $Administrators
  * @method \App\Model\Entity\Administrator[]|\Cake\Datasource\ResultSetInterface paginate($object = null, array $settings = [])
  */
@@ -90,21 +91,74 @@ class AdministratorsController extends AppController
 
         $this->Events = $this->fetchTable('Events');
         $this->Locations = $this->fetchTable('Locations');
-
-        // 参加履歴
-        $event_response_history_list = $this->Event->getAllEventResponseListByUserId($id);
         
-        // 反応回数
-        $event_response_history_count_list = array_count_values(array_map('strval', Hash::extract($event_response_history_list, '{n}.response_state')));
-        if(isset($event_response_history_count_list[''])){
-            $event_response_history_count_list['null'] = $event_response_history_count_list['']; //空文字はnull
-            unset($event_response_history_count_list['']); //空文字があるのは嫌なので削除
-        }
+        $sql_statement = <<<EOF
+        select 
+            e.id as eid,
+            events.start_time, 
+            events.end_time, 
+            locations.display_name,
+            CASE 
+                WHEN ISNULL(event_responses.response_state) THEN 'null' 
+                ELSE event_responses.response_state 
+            END as response_state
+        from (
+            select events.id
+            from events
+            where events.start_time <= cast(CURRENT_DATE as date) 
+        ) as e
+        cross join ( select users.id from users where users.id = {$id} ) as u
+        left join event_responses on event_responses.responder_id = u.id AND event_responses.event_id = e.id
+        inner join events on events.id = e.id
+        inner join locations on locations.id = events.location_id
+        order by events.start_time DESC
+        EOF;
+        $event_response_history_list = ConnectionManager::get('default')->execute($sql_statement)->fetchAll('assoc');
 
-        // 直近10イベントの反応履歴
-        $event_response_history_limit_list = $this->Event->getAllEventResponseListByUserId($id, 10);
+        $unresponded_history_list = Hash::extract($event_response_history_list, '{n}[response_state=null]');
+
+        // 反応回数算出
+        $event_response_history_count_list = array_count_values(Hash::extract($event_response_history_list, '{n}.response_state'));
 
         // コート別参加率
+        // where events.start_time <= cast(CURRENT_DATE as date)
+        $sql_statement = <<<EOF
+        select 
+            locations.id,
+            locations.display_name,
+            COUNT(events.id) as sum_all,
+            COUNT(CASE WHEN event_responses.response_state=2 THEN event_responses.response_state END) AS sum_2,
+            COUNT(CASE WHEN event_responses.response_state=1 THEN event_responses.response_state END) AS sum_1,
+            COUNT(CASE WHEN event_responses.response_state=0 THEN event_responses.response_state END) AS sum_0
+        from (
+            select events.id
+            from events
+        ) as e
+        cross join ( select users.id from users where users.id = {$id} ) as u
+        left join 
+            event_responses 
+        on 
+            event_responses.responder_id = u.id AND event_responses.event_id = e.id
+        join events on events.id = e.id
+        join locations on locations.id = events.location_id
+        group by locations.id;
+        EOF;
+        $location_counted_response_count_list = ConnectionManager::get('default')->execute($sql_statement)->fetchAll('assoc');
+        $location_response_ratio_list = [];
+        for($lcrcl=0; $lcrcl<count($location_counted_response_count_list); $lcrcl++){
+            $sum_all = $location_counted_response_count_list[$lcrcl]["sum_all"];
+            if($sum_all <= 0){
+                $location_counted_response_count_list[$lcrcl]["ratio_0"] = 0;
+                $location_counted_response_count_list[$lcrcl]["ratio_1"] = 0;
+                $location_counted_response_count_list[$lcrcl]["ratio_2"] = 0;
+            } else {
+                $location_counted_response_count_list[$lcrcl]["ratio_0"] = round(($location_counted_response_count_list[$lcrcl]["sum_0"] / $sum_all)*100, 1);
+                $location_counted_response_count_list[$lcrcl]["ratio_1"] = round(($location_counted_response_count_list[$lcrcl]["sum_1"] / $sum_all)*100, 1);
+                $location_counted_response_count_list[$lcrcl]["ratio_2"] = round(($location_counted_response_count_list[$lcrcl]["sum_2"] / $sum_all)*100, 1);
+            }
+        }
+        
+
         // 曜日別参加率
         // 時間別参加率
 
@@ -113,7 +167,8 @@ class AdministratorsController extends AppController
             'user_data', 
             'event_response_history_list', 
             'event_response_history_count_list',
-            'event_response_history_limit_list' 
+            'unresponded_history_list',
+            'location_counted_response_count_list',
         ));
 
     }
@@ -125,49 +180,94 @@ class AdministratorsController extends AppController
         $this->Locations = $this->fetchTable('Locations');
         $this->Users = $this->fetchTable('Users');
 
-        //userの数だけleftjoinしている状態なのでかなり非効率;countの個数で並び替えが煩雑になる;
         //削除済みのuserは集計しない
-        $user_data_list = $this->Users->find("all", ['conditions'=>['deleted_at'=>0]])->select(['id', 'display_name'])->all()->toArray();
+        $sql_statement = <<<EOF
+        select t.uid as uid, count(t.uid) as cnt
+        from (
+            select events.id as eid, users.id as uid, users.display_name
+            from (
+                select e.id as eid, u.id as uid
+                from (
+                    select events.id
+                    from events
+                    where events.start_time BETWEEN cast('1970-01-01' as date) AND cast(CURRENT_DATE as date)
+                ) as e
+                cross join (select users.id from users where users.deleted_at=0) as u
+            ) as cross_t
+            inner join events on events.id = cross_t.eid
+            inner join users on users.id = cross_t.uid
+            WHERE events.start_time > users.created_at AND events.start_time < NOW()
+        ) as t
+        inner join  event_responses
+        on t.eid = event_responses.event_id AND t.uid = event_responses.responder_id
+        group by (t.uid)
+        EOF;
+
+        $participants_count_data = ConnectionManager::get('default')->execute($sql_statement)->fetchAll('assoc');
+
+
+        $sql_statement = <<<EOF
+        select users.id as uid, count(users.id) as cnt, users.display_name
+        from (
+            select e.id as eid, u.id as uid
+            from (
+                select events.id
+                from events
+                where events.start_time BETWEEN cast('1970-01-01' as date) AND cast(CURRENT_DATE as date)
+            ) as e
+            cross join (select users.id from users where users.deleted_at=0) as u
+        ) as cross_t
+        inner join events on events.id = cross_t.eid
+        inner join users on users.id = cross_t.uid
+        WHERE events.start_time > users.created_at AND events.start_time < NOW()
+        group by (users.id)
+        EOF;
+        $all_count_data = ConnectionManager::get('default')->execute($sql_statement)->fetchAll('assoc');        
 
         $participants_count_list = [];
-        $border_unresponded = 0; //集計した結果を表示させる無反応イベントの数
-        $cnt_event = $this->Events->find("all", ['conditions'=>['deleted_at'=>0]])->count();
+        $pcd_idx_diff  = 0; //$participants_count_dataを参照する時に$all_count_dataとのoffsetを表すindex
+        for($idx=0; $idx<count($all_count_data); $idx++){
+            $cnt = 0;
 
-        foreach($user_data_list as $user_data){
-            $sql_statement = <<<EOF
-            SELECT 
-                count(e.id) AS cnt
-            FROM (
-                SELECT events.id
-                FROM events
-            ) as e
-            LEFT JOIN (
-                SELECT event_responses.event_id, event_responses.responder_id
-                FROM event_responses
-                WHERE event_responses.responder_id={$user_data["id"]}
-            ) as er
-            ON e.id=er.event_id
-            LEFT JOIN (
-                SELECT users.id, users.display_name
-                FROM users
-            ) as u
-            ON er.responder_id = u.id
-            GROUP BY u.id
-            EOF;
-            $participants_count_data = ConnectionManager::get('default')->execute($sql_statement)->fetchAll('assoc');
-            if(count($participants_count_data) > 0){
-                $cnt_unresponded = $cnt_event - $participants_count_data[0]["cnt"];
-                if($cnt_unresponded >= $border_unresponded){
-                    $participants_count_list[] = [
-                        "id"=>$user_data["id"],
-                        "display_name"=>$user_data["display_name"],
-                        "cnt"=>$cnt_unresponded,
-                    ];
-                }
+            $cond_isset = '0';
+            $cond_same = '0';
+            if(isset($participants_count_data[$idx - $pcd_idx_diff])){
+                $cond_isset = '1';
             }
+            if($all_count_data[$idx]['uid'] == $participants_count_data[$idx + $pcd_idx_diff]['uid']){
+                $cond_same = '1';
+            }
+            $this->log("EventId:{$idx} {$cond_isset}:{$cond_same}");
+            if($cond_isset == '1'){
+                $pcd_uid = $participants_count_data[$idx + $pcd_idx_diff]['uid'];
+                $pcd_idx = $idx - $pcd_idx_diff;
+                $this->log("[{$idx}] == [{$idx} + {$pcd_idx_diff} = {$pcd_idx}] => [{$all_count_data[$idx]['uid']}] == [{$pcd_uid}]");
+            }
+
+            if(
+                isset($participants_count_data[$idx - $pcd_idx_diff]) 
+                && $all_count_data[$idx]['uid'] == $participants_count_data[$idx - $pcd_idx_diff]['uid']
+            ){ //参照している配列のuidが一致している場合all_count(全イベント数) - participants_count(全部反応数)を算出する
+                $cnt = $all_count_data[$idx]['cnt'] - $participants_count_data[$idx - $pcd_idx_diff]['cnt'];
+                // debug($all_count_data[$idx]['uid']);
+                // debug($participants_count_data[$idx - $pcd_idx_diff]['uid']);
+                // debug($all_count_data[$idx]['cnt']);
+                // debug($participants_count_data[$idx - $pcd_idx_diff]['cnt']);
+            } else { //一度も反応してない人の場合全イベント数を未反応数とする
+                $cnt = $all_count_data[$idx]['cnt'];
+                $pcd_idx_diff = $pcd_idx_diff + 1;
+            }
+            
+
+            $participants_count_list[] = [
+                "id" => $all_count_data[$idx]['uid'],
+                "display_name" => $all_count_data[$idx]['display_name'],
+                "cnt" => $cnt
+            ];
         }
+        $participants_count_list = Hash::sort($participants_count_list, '{n}.cnt', 'desc', 'numeric');
+
         $this->set(compact('participants_count_list'));
-        
     }
 
     public function eventDetail($id=null){
@@ -179,19 +279,29 @@ class AdministratorsController extends AppController
         $this->loadComponent('Event');
 
         $this->Events = $this->fetchTable('Events');
-        $this->Locations = $this->fetchTable('Locations');
         $event = $this->Events->find("all", [
             "conditions" => ["Events.id" => $id]
         ])
         ->contain([
-            'Users', 
             'Locations',
-            'EventResponses' => ['sort' => ['response_state' => 'DESC', 'EventResponses.updated_at' => 'ASC']]
+            'Comments' => function (Query $query){
+                return $query
+                    ->contain('Users')
+                    ->where(['Comments.deleted_at' => 0])
+                    ->order(['Comments.updated_at'=>'ASC']);
+            },
+            'EventResponses' => function (Query $query){
+                return $query
+                    ->contain('Users')
+                    ->order([
+                        'EventResponses.updated_at'=>'ASC', 
+                        'EventResponses.response_state'=>'DESC'
+                    ]);
+            }
         ])
-        ->contain('EventResponses.Users')
-        ->first();
-                    
+        ->first();                    
         $event = $this->Event->getFormatEventData($event);
+
         $event_response_list = $this->Event->getEventResponseListByEventId($id);
         $categorized_event_response_list = $this->Event->categorizedEventResponseList($event_response_list);
 

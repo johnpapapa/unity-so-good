@@ -183,6 +183,14 @@ class Initial extends AbstractMigration
             ])
             ->addIndex(
                 [
+                    'start_time',
+                ],
+                [
+                    'name' => 'start_time_index',
+                ]
+            )
+            ->addIndex(
+                [
                     'organizer_id',
                 ],
                 [

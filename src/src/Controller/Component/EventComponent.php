@@ -34,7 +34,7 @@ class eventComponent extends Component
     }
 
     public function getEventResponseListByEventId($event_id){
-        return $this->Events->getEventResponseListByEventId($event_id);
+        return $this->EventResponses->getEventResponseListByEventId($event_id);
     }
 
     public function getEventResponseListByUserId($user_id, $limit=null){
@@ -152,9 +152,25 @@ class eventComponent extends Component
     public function categorizedEventResponseList($event_response_list){
         $categorized_event_response_list = [0=>[], 1=>[], 2=>[], 'null'=>[]];
         foreach($event_response_list as $event_response){
+            if(isset($event_response->user)){
+                $user_id = $event_response->user->id;
+                $display_name = $event_response->user->display_name;
+            } else {
+                $user_id = $event_response["id"];
+                $display_name = $event_response["display_name"];
+            }
+
+            if(isset($event_response->updated_at)){
+                $time = $event_response->updated_at;
+            } else {
+                $time = $event_response["updated_at"];
+            }
+
             $categorized_event_response_list[(is_null($event_response["response_state"]) ? 'null':$event_response["response_state"])][] =[
-                "name"=>$event_response->user->display_name, 
-                "time"=>$event_response->updated_at,
+                "id"=>$user_id,
+                "display_name"=>$display_name,
+                "name"=>'',
+                "time"=>$time
             ];
         }
         return $categorized_event_response_list;

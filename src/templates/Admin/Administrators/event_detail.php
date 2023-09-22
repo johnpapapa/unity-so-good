@@ -85,9 +85,8 @@ $day_of_weeks = Configure::read('day_of_weeks');
         <div>
             <div class="switch-state-btn-list disp-flex just-center align-center tc mb10">
                 <?php foreach (Configure::read('response_states') as $state_idx => $state) : ?>
-                    <div class="switch-state-btn w100 br <?= ($state_idx===0)?'enable':''?>" id="<?= $state_idx ?>"><?= $state["text"] ?></div>
+                    <div class="switch-state-btn w100 <?= ($state_idx===0)?'enable':''?>" id="<?= $state_idx ?>"><?= $state["text"] ?></div>
                 <?php endforeach; ?>
-                <div class="switch-state-btn w100" id="null">未反応</div>
             </div>
 
             <?php foreach ($categorized_event_response_list as $response_state => $event_response_list) : ?>

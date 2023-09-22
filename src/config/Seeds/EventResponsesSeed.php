@@ -22,11 +22,17 @@ class EventResponsesSeed extends AbstractSeed
     public function run(): void
     {
         $location_count = 30;
-        $user_count = 150;
-        $event_count = 10;
         
-        $event_datetime_min = strtotime('2023-9-1 00:00:00');
-        $event_datetime_max = strtotime('2023-10-1 00:00:00');
+        $user_count = 10;
+        $event_count = 10;
+        $event_datetime_min = strtotime('2023-9-10 00:00:00');
+        $event_datetime_max = strtotime('2023-10-20 00:00:00');
+
+
+        $user_count = 150; //負荷チェック(unityの多い時100人よりも少し多いくらいの場合)
+        $event_count = 416 * 4; //負荷チェック(土日4回 * 1年)
+        $event_datetime_min = strtotime('2019-10-20 00:00:00'); //負荷チェック
+        $event_datetime_max = strtotime('2023-10-20 00:00:00'); //負荷チェック
         
         $faker = Faker\Factory::create('ja_JP');
 
@@ -36,7 +42,7 @@ class EventResponsesSeed extends AbstractSeed
         $location_table->insert($location_data)->save();
 
         //users
-        $user_data = $this->gen_user_data($faker, $user_count);
+        $user_data = $this->gen_user_data($faker, $user_count, $event_datetime_min, $event_datetime_max);
         $user_table = $this->table('users');
         $user_table->insert($user_data)->save();
 
@@ -115,23 +121,28 @@ class EventResponsesSeed extends AbstractSeed
             $prc = $faker->prefecture(); 
             $cit = $faker->city(); 
             $sta = $faker->streetAddress();
+            $usage_price = $faker->numberBetween($min = 1000, $max = 9000);
+            $night_price = $usage_price + $faker->numberBetween($min = 200, $max = 1000);
+
             $location_data[] = [
                 'display_name' => $display_name_lists[$l_i],
                 'address' => $prc.$cit.$sta,
-                'usage_price' => $faker->numberBetween($min = 1000, $max = 9000),
-                'night_price' => $faker->numberBetween($min = 200, $max = 1000),
+                'usage_price' => $usage_price,
+                'night_price' => $night_price,
             ];
         }
         return $location_data;
     }
 
-    public function gen_user_data($faker, $user_count){
+    public function gen_user_data($faker, $user_count, $event_datetime_min, $event_datetime_max){
         $user_data = [];
         for($u_i = 0; $u_i < $user_count; $u_i++){
             $idx = $u_i % 3;
             if ($idx == 0) { $display_name = $faker->unique()->name; }
             elseif ($idx == 1) { $display_name = $faker->unique()->kanaName; }
             else { $display_name = $faker->unique()->userName; }
+            $rand_start = rand($event_datetime_min, $event_datetime_max);
+            $created_time = date('Y-m-d H:i:s', $rand_start);
             
             $user_data[] = [
                 'display_name' => $display_name,
@@ -139,8 +150,8 @@ class EventResponsesSeed extends AbstractSeed
                 'line_user_id' => null,
                 'password' => null,
                 'remember_token' => null,
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s'),
+                'created_at' => $created_time,
+                'updated_at' => $created_time,
                 'deleted_at' => 0
             ];
         }
