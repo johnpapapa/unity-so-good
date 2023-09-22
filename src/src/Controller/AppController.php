@@ -93,8 +93,8 @@ class AppController extends Controller
     }
 
     public function isAdministrator(){ //管理者権限を持つ場合true
-        $uid = $this->getLoginUserData($id_only=false);
-        $admin = $this->Administrators->find("all", ["conditions"=>["administrators.user_id"=>$uid]]);
+        $uid = $this->getLoginUserData($id_only=true);
+        $admin = $this->Administrators->exists(["administrators.user_id"=>$uid]);
         if($admin){
             return true; 
         }
@@ -120,7 +120,7 @@ class AppController extends Controller
     }
 
     public function getLoginUserData($id_only=false){
-        $user_data = $this->Authentication->getResult()->getData();        
+        $user_data = $this->Authentication->getResult()->getData(); 
         if($this->isActiveCookieData()){
             $user_data = $this->getUserDataFromCookie();
             $this->setIdentity($user_data);
