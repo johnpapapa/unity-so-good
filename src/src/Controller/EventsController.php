@@ -41,28 +41,6 @@ class EventsController extends AppController
     {
         $uid = $this->getLoginUserData(true);   
         
-        // $this->Locations = $this->fetchTable('Locations');
-        // $conditions = [
-        //     'Events.deleted_at IS' => 0, //削除前のイベント
-        //     'Events.end_time >=' => date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s") . "-14days")) //14日前までのイベント
-        // ]; 
-        // $events_query = $this->Events->find("all", ['conditions'=>$conditions]);
-        // $events_query = $events_query
-        // ->contain([
-        //     'Locations',
-        //     'EventResponses' => [
-        //         'sort' => [
-        //             'response_state' => 'DESC', //反応した種類順
-        //             'EventResponses.updated_at' => 'ASC' //反応した時間順
-        //         ]
-        //     ]
-        // ])
-        // ->select($this->Events)
-        // ->select($this->Locations)
-        // ->contain('EventResponses.Users') //EventResponsesに紐づくUsersオブジェクト作成
-        // ->order(['Events.start_time'=>'ASC']) //Eventが表示される順番
-        // ->limit(Configure::read('event_item_limit')); 
-        // $events = $events_query->all()->toArray();
         $events = $this->Event->getEventList(false, false, false, true);
         $events = $this->Event->getFormatEventDataList($events, $uid);
         

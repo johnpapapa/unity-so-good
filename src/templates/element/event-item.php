@@ -114,8 +114,8 @@
                         </div>
                         <?php if($response_count[$state_idx] > 0): ?>
                         <div class="state-content mt10">
-                            <?php foreach($event->event_responses[$state_idx] as $idx=>$event_response): ?>
-                                <div class="over-ellipsis"><?= h($event_response['name']); ?></div>
+                            <?php foreach($event->event_responses[$state_idx] as $event_response): ?>
+                                <div class="over-ellipsis"><?= h($event_response['display_name']); ?></div>
                             <?php endforeach; ?>
                         </div>
                         <?php endif; ?>
@@ -130,7 +130,7 @@
                         <?php if($response_count[$state_idx] > 0): ?>
                         <div class="state-content mt10">
                             <?php foreach($event->event_responses[$state_idx] as $event_response): ?>
-                                <div class="over-ellipsis"><?= h($event_response['name']); ?></div>
+                                <div class="over-ellipsis"><?= h($event_response['display_name']); ?></div>
                             <?php endforeach; ?>
                         </div>
                         <?php endif; ?>

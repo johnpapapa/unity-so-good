@@ -207,7 +207,8 @@ class EventsTable extends Table
             'Comments' => function (Query $query){
                 return $query
                     ->contain('Users')
-                    ->where(['Comments.deleted_at' => 0]);
+                    ->where(['Comments.deleted_at' => 0])
+                    ->order(['Comments.updated_at'=>'DESC']);
             },
             'EventResponses' => function (Query $query){
                 return $query

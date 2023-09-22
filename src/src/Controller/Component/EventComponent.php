@@ -169,7 +169,6 @@ class eventComponent extends Component
             $categorized_event_response_list[(is_null($event_response["response_state"]) ? 'null':$event_response["response_state"])][] =[
                 "id"=>$user_id,
                 "display_name"=>$display_name,
-                "name"=>'',
                 "time"=>$time
             ];
         }
