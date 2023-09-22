@@ -7,6 +7,7 @@
 <?php
 
 use Cake\Core\Configure;
+use Cake\I18n\FrozenTime;
 
 $user_response_state = (!is_null($event->user_response_state)) ? Configure::read('response_states')[$event->user_response_state] : null;
 $event_state = Configure::read('event_states')[$event->event_state];
@@ -168,8 +169,8 @@ $day_of_weeks = Configure::read('day_of_weeks');
                 <?php $area_count = count(explode(",", h($event->area))); ?>
                 <?php $usage_price_total = ($event->location->usage_price < 0 ? 0:$event->location->usage_price) * $area_count; ?>
                 <?php $night_price_total = ($event->location->night_price < 0 ? 0:$event->location->night_price) * $area_count; ?>
-                昼間料金 : <?= $usage_price_total ?> (<?= $event->location->usage_price.'円' ?> × <?= $area_count ?>コート)
-                <br>夜間料金 : <?= $night_price_total ?> (<?= $event->location->night_price.'円' ?> × <?= $area_count ?>コート)
+                昼間料金 : <?= $usage_price_total ?>円 (<?= $event->location->usage_price.'円' ?> × <?= $area_count ?>コート)
+                <br>夜間料金 : <?= $night_price_total ?>円 (<?= $event->location->night_price.'円' ?> × <?= $area_count ?>コート)
                 <p class="note-p">
                     コート料金が設定されていない場合0円が表示されます。
                     <br>ナイター料金が設定されていない場合、夜の料金は昼と同じ合計金額が表示されます。
@@ -204,9 +205,10 @@ $day_of_weeks = Configure::read('day_of_weeks');
         <div class="row mb20">
             <div class="label mb5">参加表明</div>
             <div class="content disp-flex just-center g10">
-                <button class="pure-button response-btn pure-u-1 undecided" value="0" <?= ($event->user_response_state === 0) ? 'disabled' : '' ?>>参加未定</button>
-                <button class="pure-button response-btn pure-u-1 present" value="1" <?= ($event->user_response_state === 1) ? 'disabled' : '' ?>>参加</button>
-                <button class="pure-button response-btn pure-u-1 absent " value="2" <?= ($event->user_response_state === 2) ? 'disabled' : '' ?>>不参加</button>
+                <?php $is_closed = FrozenTime::now() > $event->end_time; ?>
+                <button class="pure-button response-btn pure-u-1 undecided" value="0" <?= ($event->user_response_state === 0 | $is_closed) ? 'disabled' : '' ?>>参加未定</button>
+                <button class="pure-button response-btn pure-u-1 present" value="1" <?= ($event->user_response_state === 1 | $is_closed) ? 'disabled' : '' ?>>参加</button>
+                <button class="pure-button response-btn pure-u-1 absent " value="2" <?= ($event->user_response_state === 2 | $is_closed) ? 'disabled' : '' ?>>不参加</button>
             </div>
         </div>
 
@@ -230,8 +232,10 @@ $day_of_weeks = Configure::read('day_of_weeks');
                         </div>
                         <?php foreach($event->event_responses[$state_idx] as $event_response): ?>
                             <div class="state-content over-ellipsis disp-iblock pure-u-1 mt10">
-                                <div class="name disp-m-block disp-iblock over-ellipsis fs-large fs-m-large"><?= h($event_response["name"]); ?></div>
-                                <div class="time disp-iblock fr fs-small fs-m-small"><?= $event_response["time"]->i18nFormat('MM/dd HH:mm:ss') ?></div>
+                                <div class="name disp-m-block disp-iblock over-ellipsis fs-large fs-m-large"><?= h($event_response["display_name"]); ?></div>
+                                <?php if($event->participants_limit > 0): ?>
+                                    <div class="time disp-iblock fr fs-small fs-m-small"><?= $event_response["time"]->i18nFormat('MM/dd HH:mm:ss') ?></div>
+                                <?php endif; ?>
                             </div>
                         <?php endforeach; ?>
                     </div>
@@ -243,8 +247,10 @@ $day_of_weeks = Configure::read('day_of_weeks');
                         </div>
                         <?php foreach($event->event_responses[$state_idx] as $event_response): ?>
                             <div class="state-content over-ellipsis disp-iblock pure-u-1 mt10">
-                                <div class="name disp-m-block disp-iblock over-ellipsis fs-large fs-m-large"><?= h($event_response["name"]); ?></div>
-                                <div class="time disp-iblock fr fs-small fs-m-small"><?= $event_response["time"]->i18nFormat('MM/dd HH:mm:ss') ?></div>
+                                <div class="name disp-m-block disp-iblock over-ellipsis fs-large fs-m-large"><?= h($event_response["display_name"]); ?></div>
+                                <?php if($event->participants_limit > 0): ?>
+                                    <div class="time disp-iblock fr fs-small fs-m-small"><?= $event_response["time"]->i18nFormat('MM/dd HH:mm:ss') ?></div>
+                                <?php endif ?>
                             </div>
                         <?php endforeach; ?>
                     </div>
@@ -256,7 +262,7 @@ $day_of_weeks = Configure::read('day_of_weeks');
                     </div>
                     <?php foreach ($event->event_responses[$state_idx] as $event_response) : ?>
                         <div class="state-content over-ellipsis">
-                            <div class="fs-medium  fs-m-midium"><?= h($event_response["name"]); ?></div>
+                            <div class="fs-medium  fs-m-midium"><?= h($event_response["display_name"]); ?></div>
                         </div>
                     <?php endforeach; ?>
                 </div>
