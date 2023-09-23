@@ -94,7 +94,10 @@ class AppController extends Controller
 
     public function isAdministrator(){ //管理者権限を持つ場合true
         $uid = $this->getLoginUserData($id_only=true);
-        $admin = $this->Administrators->exists(["administrators.user_id"=>$uid]);
+        if(!$uid){
+            return false;
+        }
+        $admin = FactoryLocator::get('Table')->get('Administrators')->exists(["user_id"=>$uid]);
         if($admin){
             return true; 
         }
