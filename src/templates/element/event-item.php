@@ -24,7 +24,7 @@
             <?php if($event->deleted_at): ?>
                 <a class="buttons pure-u-1-3" href="<?= $this->Url->build(['controller' => 'events','action' => 'restore', $event->id]); ?>">
                     <button class="pure-button w100" type="button">
-                        削除済
+                        復元
                     </button>
                 </a>
             <?php else: ?>
@@ -43,8 +43,12 @@
             </div>
             <?php if(!is_null($user_response_state)): ?>
                 <div class="tag disp-iblock" , style="background-color: <?= $user_response_state['tag_color'] ?>;">
-                    <?= $user_response_state['text'] ?>
-                    
+                    <?= $user_response_state['text'] ?>    
+                </div>
+            <?php endif; ?>
+            <?php if($event->deleted_at): ?>
+                <div class="tag disp-iblock" style="background-color: indianred;">
+                    削除済
                 </div>
             <?php endif; ?>
             
