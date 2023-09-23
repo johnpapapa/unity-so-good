@@ -105,7 +105,7 @@ class AdministratorsController extends AppController
         from (
             select events.id
             from events
-            where events.start_time <= cast(CURRENT_DATE as date) 
+            where events.start_time <= cast(CURRENT_DATE as date)  AND events.start_time > cast('{$user_data->created_at->i18nFormat("YYYY/MM/dd HH:mm:ss")}' as datetime)
         ) as e
         cross join ( select users.id from users where users.id = {$id} ) as u
         left join event_responses on event_responses.responder_id = u.id AND event_responses.event_id = e.id
@@ -133,6 +133,7 @@ class AdministratorsController extends AppController
         from (
             select events.id
             from events
+            where events.start_time > '{$user_data->created_at->i18nFormat("YYYY/MM/dd HH:mm:ss")}'
         ) as e
         cross join ( select users.id from users where users.id = {$id} ) as u
         left join 
@@ -228,35 +229,46 @@ class AdministratorsController extends AppController
         $pcd_idx_diff  = 0; //$participants_count_dataを参照する時に$all_count_dataとのoffsetを表すindex
         for($idx=0; $idx<count($all_count_data); $idx++){
             $cnt = 0;
+            
+            // $this->log("{$idx}");
+            // $this->log("{$pcd_idx_diff}");
 
-            $cond_isset = '0';
-            $cond_same = '0';
-            if(isset($participants_count_data[$idx - $pcd_idx_diff])){
-                $cond_isset = '1';
+            $isset_response_data = isset($participants_count_data[$pcd_idx_diff]) ;
+            if($isset_response_data){
+                $issame_responder = ($all_count_data[$idx]['uid'] == $participants_count_data[$pcd_idx_diff]['uid']);
+                $all_uid = $all_count_data[$idx]['uid'];
+                $p_uid = $participants_count_data[$pcd_idx_diff]['uid'];
+                $dis = $all_count_data[$idx]['display_name'];
+                $all_c = $all_count_data[$idx]['cnt'];
+                $p_c = $participants_count_data[$pcd_idx_diff]['cnt'];
+                $cc = $all_count_data[$idx]['cnt'] - $participants_count_data[$pcd_idx_diff]['cnt'];
+                $this->log("( all:{$all_uid} == p:{$p_uid} ) = {$issame_responder}, {$dis}");
+                $this->log("all:{$all_c} - p:{$p_c} = {$cc}");
+            } else {
+                $an = $all_count_data[$idx]['display_name'];
+                $this->log("{$an}");
             }
-            if($all_count_data[$idx]['uid'] == $participants_count_data[$idx + $pcd_idx_diff]['uid']){
-                $cond_same = '1';
-            }
-            $this->log("EventId:{$idx} {$cond_isset}:{$cond_same}");
-            if($cond_isset == '1'){
-                $pcd_uid = $participants_count_data[$idx + $pcd_idx_diff]['uid'];
-                $pcd_idx = $idx - $pcd_idx_diff;
-                $this->log("[{$idx}] == [{$idx} + {$pcd_idx_diff} = {$pcd_idx}] => [{$all_count_data[$idx]['uid']}] == [{$pcd_uid}]");
-            }
-
-            if(
-                isset($participants_count_data[$idx - $pcd_idx_diff]) 
-                && $all_count_data[$idx]['uid'] == $participants_count_data[$idx - $pcd_idx_diff]['uid']
-            ){ //参照している配列のuidが一致している場合all_count(全イベント数) - participants_count(全部反応数)を算出する
-                $cnt = $all_count_data[$idx]['cnt'] - $participants_count_data[$idx - $pcd_idx_diff]['cnt'];
-                // debug($all_count_data[$idx]['uid']);
-                // debug($participants_count_data[$idx - $pcd_idx_diff]['uid']);
-                // debug($all_count_data[$idx]['cnt']);
-                // debug($participants_count_data[$idx - $pcd_idx_diff]['cnt']);
-            } else { //一度も反応してない人の場合全イベント数を未反応数とする
+            
+            if($isset_response_data && $issame_responder){
+                $cnt = $all_count_data[$idx]['cnt'] - $participants_count_data[$pcd_idx_diff]['cnt'];
+                $pcd_idx_diff++;
+            } else {
                 $cnt = $all_count_data[$idx]['cnt'];
-                $pcd_idx_diff = $pcd_idx_diff + 1;
             }
+
+            // if(
+            //     isset($participants_count_data[$pcd_idx_diff]) 
+            //     && $all_count_data[$idx]['uid'] == $participants_count_data[$pcd_idx_diff]['uid']
+            // ){ //参照している配列のuidが一致している場合all_count(全イベント数) - participants_count(全部反応数)を算出する
+            //     $cnt = $all_count_data[$idx]['cnt'] - $participants_count_data[$$pcd_idx_diff]['cnt'];
+            //     // debug($all_count_data[$idx]['uid']);
+            //     // debug($participants_count_data[$idx - $pcd_idx_diff]['uid']);
+            //     // debug($all_count_data[$idx]['cnt']);
+            //     // debug($participants_count_data[$idx - $pcd_idx_diff]['cnt']);
+            //     $pcd_idx_diff = $pcd_idx_diff + 1;
+            // } else { //一度も反応してない人の場合全イベント数を未反応数とする
+            //     $cnt = $all_count_data[$idx]['cnt'];
+            // }
             
 
             $participants_count_list[] = [
@@ -265,6 +277,8 @@ class AdministratorsController extends AppController
                 "cnt" => $cnt
             ];
         }
+        $this->log("{$idx}");
+        $this->log("{$pcd_idx_diff}");
         $participants_count_list = Hash::sort($participants_count_list, '{n}.cnt', 'desc', 'numeric');
 
         $this->set(compact('participants_count_list'));

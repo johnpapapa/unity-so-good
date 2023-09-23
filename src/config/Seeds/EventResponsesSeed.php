@@ -21,7 +21,7 @@ class EventResponsesSeed extends AbstractSeed
      */
     public function run(): void
     {
-        $location_count = 30;
+        $location_count = 5;
         
         $user_count = 10;
         $event_count = 10;
@@ -29,10 +29,15 @@ class EventResponsesSeed extends AbstractSeed
         $event_datetime_max = strtotime('2023-10-20 00:00:00');
 
 
-        $user_count = 150; //負荷チェック(unityの多い時100人よりも少し多いくらいの場合)
-        $event_count = 416 * 4; //負荷チェック(土日4回 * 1年)
-        $event_datetime_min = strtotime('2019-10-20 00:00:00'); //負荷チェック
-        $event_datetime_max = strtotime('2023-10-20 00:00:00'); //負荷チェック
+        // $user_count = 150; //負荷チェック(unityの多い時100人よりも少し多いくらいの場合)
+        // $event_count = 416 * 4; //負荷チェック(土日4回 * 1年)
+        // $event_datetime_min = strtotime('2019-10-20 00:00:00'); //負荷チェック
+        // $event_datetime_max = strtotime('2023-10-20 00:00:00'); //負荷チェック
+
+        // $user_count = 10; //動作チェック
+        // $event_count = 10 ; //動作チェック
+        // $event_datetime_min = strtotime('2023-9-10 00:00:00'); //動作チェック
+        // $event_datetime_max = strtotime('2023-9-20 00:00:00'); //動作チェック
         
         $faker = Faker\Factory::create('ja_JP');
 
