@@ -158,12 +158,21 @@ class EventsController extends AppController
 
         $this->EventResponses = $this->fetchTable('EventResponses');
         $event_response = $this->EventResponses->find('all', ['conditions'=>['responder_id'=>$data['user_id'],'event_id'=>$data['event_id']]])->first();
+
+        $before_response_state = "null";
         if(!$event_response){
             $event_response = $this->EventResponses->newEntity(['responder_id'=>$data['user_id'],'event_id'=>$data['event_id']]);
+        } else {
+            $before_response_state = $event_response->response_state;
         }
         $event_response = $this->EventResponses->patchEntity($event_response, ['response_state' => $data['response_state']]);
         if ($this->EventResponses->save($event_response)) {
-            $response = ['status'=>'ok'];
+            $response = [
+                'status'=>'ok',
+                'response_state'=>$event_response->response_state,
+                "bef_response_state"=>$before_response_state,
+                'updated_at'=>$event_response->updated_at->i18nFormat('MM-dd HH:mm:ss')
+            ];
         } else {
             $response = ['status'=>'bad'];
         }

@@ -197,9 +197,10 @@ $day_of_weeks = Configure::read('day_of_weeks');
         <div class="row mb20">
             <div class="label mb5">イベントの参加人数</div>
             <div class="content">
-                ?:<?= count($event->event_responses[0]) ?>
-                o:<?= count($event->event_responses[1]) ?>
-                x:<?= count($event->event_responses[2]) ?>
+                ?:<span id="state-count-0"><?= count($event->event_responses[0]) ?></span>
+                o:<span id="state-count-1"><?= count($event->event_responses[1]) ?></span>
+                x:<span id="state-count-2"><?= count($event->event_responses[2]) ?></span>
+                
             </div>
         </div>
         <div class="row mb20">
@@ -240,14 +241,16 @@ $day_of_weeks = Configure::read('day_of_weeks');
                         <div class="state-title text-center p5">
                             <?= Configure::read('response_states')[$state_idx]["text"] ?>
                         </div>
-                        <?php foreach($event->event_responses[$state_idx] as $event_response): ?>
-                            <div class="state-content over-ellipsis disp-iblock pure-u-1 mt10">
-                                <div class="name disp-m-block disp-iblock over-ellipsis fs-large fs-m-large"><?= h($event_response["display_name"]); ?></div>
-                                <?php if($event->participants_limit > 0): ?>
-                                    <div class="time disp-iblock fr fs-small fs-m-small"><?= $event_response["time"]->i18nFormat('MM/dd HH:mm:ss') ?></div>
-                                <?php endif; ?>
-                            </div>
-                        <?php endforeach; ?>
+                        <div id="state-contents-<?= $state_idx ?>">
+                            <?php foreach($event->event_responses[$state_idx] as $event_response): ?>
+                                <div <?= ($event_response['id'] == $current_user['id']) ? "id='user-state'":""  ?> class="state-content over-ellipsis disp-iblock pure-u-1 mt10">
+                                    <div class="name disp-m-block disp-iblock over-ellipsis fs-large fs-m-large"><?= h($event_response["display_name"]); ?></div>
+                                    <?php if($event->participants_limit > 0): ?>
+                                        <div class="time disp-iblock fr fs-small fs-m-small"><?= $event_response["time"]->i18nFormat('MM-dd HH:mm:ss') ?></div>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
                     </div>
 
                     <?php $state_idx = 0; ?>
@@ -255,14 +258,16 @@ $day_of_weeks = Configure::read('day_of_weeks');
                         <div class="state-title text-center p5">
                             <?= Configure::read('response_states')[$state_idx]["text"] ?>
                         </div>
+                        <div id="state-contents-<?= $state_idx ?>">
                         <?php foreach($event->event_responses[$state_idx] as $event_response): ?>
-                            <div class="state-content over-ellipsis disp-iblock pure-u-1 mt10">
+                            <div <?= ($event_response['id'] == $current_user['id']) ? "id='user-state'":""  ?> class="state-content over-ellipsis disp-iblock pure-u-1 mt10">
                                 <div class="name disp-m-block disp-iblock over-ellipsis fs-large fs-m-large"><?= h($event_response["display_name"]); ?></div>
                                 <?php if($event->participants_limit > 0): ?>
-                                    <div class="time disp-iblock fr fs-small fs-m-small"><?= $event_response["time"]->i18nFormat('MM/dd HH:mm:ss') ?></div>
+                                    <div class="time disp-iblock fr fs-small fs-m-small"><?= $event_response["time"]->i18nFormat('MM-dd HH:mm:ss') ?></div>
                                 <?php endif ?>
                             </div>
                         <?php endforeach; ?>
+                        </div>
                     </div>
                 </div>
                 <?php $state_idx = 2; ?>
@@ -270,9 +275,9 @@ $day_of_weeks = Configure::read('day_of_weeks');
                     <div class="state-title mb10">
                         <?= Configure::read('response_states')[$state_idx]["text"] ?>
                     </div>
-                    <div style="height:200px; overflow:scroll;">
+                    <div style="height:200px; overflow:scroll;" id="state-contents-<?= $state_idx ?>">
                         <?php foreach ($event->event_responses[$state_idx] as $event_response) : ?>
-                            <div class="state-content over-ellipsis">
+                            <div <?= ($event_response['id'] == $current_user['id']) ? "id='user-state'":"" ?> class="state-content over-ellipsis">
                                 <div class="fs-medium  fs-m-midium"><?= h($event_response["display_name"]); ?></div>
                             </div>
                         <?php endforeach; ?>

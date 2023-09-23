@@ -107,6 +107,7 @@
                 <input type="number" class="pure-u-1" style="margin-bottom: 20px;" name="usage_price" id="usage_price" placeholder="コート使用料">
                 
                 <label for="night_price">コート使用料(ナイター)</label>
+                <p class="note-p">コート使用料+照明代等</p>
                 <input type="number" class="pure-u-1" style="margin-bottom: 20px;" name="night_price" id="night_price" placeholder="コート使用料(ナイター)">
 
                 <input type="hidden" id="location_id" name="location_id" value="">
@@ -115,7 +116,7 @@
 
         <div class="input text mb20">
             <label for="area">コート番号</label>
-            <p style="font-size: 12px; color:gray;">
+            <p class="note-p">
                 無入力可
                 <br>カンマ区切りの英数字を入力してください
             </p>
