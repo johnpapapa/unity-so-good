@@ -117,17 +117,17 @@ $day_of_weeks = Configure::read('day_of_weeks');
 
 <div class="detail">
     <div class="event-jump disp-flex just-space mb20">
-        <? if ($event_prev_id) : ?>
+        <?php if ($event_prev_id) : ?>
             <div class="disp-iblock fl">
                 <a href="<?= $this->Url->build(['controller' => 'events', 'action' => 'detail', $event_prev_id]); ?>">前のイベントへ移動</a>
             </div>
-        <? endif; ?>
+        <?php endif; ?>
 
-        <? if ($event_next_id) : ?>
+        <?php if ($event_next_id) : ?>
             <div class="disp-iblock fr">
                 <a href="<?= $this->Url->build(['controller' => 'events', 'action' => 'detail', $event_next_id]); ?>">次のイベントへ移動</a>
             </div>
-        <? endif; ?>
+        <?php endif; ?>
     </div>
 
     <div class="detail-content">
