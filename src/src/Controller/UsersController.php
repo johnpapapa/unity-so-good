@@ -28,21 +28,42 @@ class UsersController extends AppController
         $this->loadComponent('Login');
     }
 
-    // public function login(){
-    //     $login_user_data = $this->Login->processLogin();
-    // }
     public function login()
     {
-        $login_user_data = $this->getLoginUserData();
-        if($login_user_data){ //ログイン済みの場合cookieを更新しない
-            $this->Login->processSetLogin($login_user_data, false);
+        //cookieが残っている場合cookieによるログインを行う
+        $login_user_data = $this->Login->processCookieAutoLogin();
+        if($login_user_data){ //ログイン済みの場合TOPに遷移
+            $this->Flash->success("セッション情報が切れていた為再ログインしました");
             return $this->redirect(['controller'=>'Events', 'action'=>'index']);
         }
     }
 
+    public function lineLogin(){
+        $this->autoRender = false;
+
+        //LINEからLINEユーザー情報の取得
+        $line_user_data = $this->Login->getLineUserData();
+        if(!$line_user_data){
+            $this->Flash->error("LINEログインに失敗しました");
+            return $this->redirect(['controller'=>'Events','action'=>'index']);
+        }
+
+        //LINEユーザ情報を使用したユーザー情報の取得
+        $user_data = $this->Login->processLineLogin($line_user_data);
+        if(!$user_data){
+            $this->Flash->error("LINE情報を使用したユーザー情報の取得に失敗しました");
+        }
+        
+        //ログイン情報の更新
+        $this->Login->processSetLogin($user_data);
+        $this->Flash->success(__('LINEログインに成功しました'));
+
+        return $this->redirect(['controller'=>'Events','action'=>'index']);
+    }
+
     public function logout()
     {
-        $login_user_data = $this->getLoginUserData();
+        $login_user_data = $this->Login->getLoginUserData();
         if ($login_user_data) {
             $this->Login->removeIdentity();
             $this->Login->removeCookieAutoLogin();
@@ -53,8 +74,7 @@ class UsersController extends AppController
     }
 
     public function detail(){
-        $login_user_data = $this->getLoginUserData();
-        // Log::write('debug', print_r($login_user_data, true));
+        $login_user_data = $this->Login->getLoginUserData();
         
         if(!$login_user_data){
             $this->log($login_user_data);
@@ -78,34 +98,6 @@ class UsersController extends AppController
             }
             $this->Flash->error(__('The user data could not be saved. Please, try again.'));
         }
-    }
-
-    public function lineLogin(){
-        $this->autoRender = false;
-
-        $line_user_data = $this->getLineUserData();
-        $user_data = $this->Users->find('all', ['conditions'=>['line_user_id' => $line_user_data['line_user_id']]])->first();
-        if(!$user_data){ //該当するline_user_idが存在しない場合新規ユーザー作成
-            $save_data = $this->Users->newEntity([
-                'display_name' => $line_user_data['display_name'],   
-                'line_user_id' => $line_user_data['line_user_id'],
-            ]);
-            $user_data = $this->Users->save($save_data);
-            if (!$user_data) {
-                $this->Flash->error(__('The event could not be saved. Please, try again.'));
-                return $this->redirect(['controller'=>'Events','action'=>'index']);
-            }
-            $this->Flash->success(__('The user has been saved.'));
-        }
-
-        $key_auto_login = $this->Login->genKeyAutoLogin();
-        $this->Login->setCookieAutoLogin($key_auto_login);
-        $this->Login->setDataAutoLogin($user_data, $key_auto_login);
-        $this->Login->setIdentity($user_data);
-
-        $this->Flash->success(__('Login successful'));
-
-        return $this->redirect(['controller'=>'Events','action'=>'index']);
     }
 
     /**
