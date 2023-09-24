@@ -168,7 +168,7 @@ $day_of_weeks = Configure::read('day_of_weeks');
                 <?php $area_count = count(explode(",", h($event->area))); ?>
                 <?php $usage_price_total = ($event->location->usage_price > 0 ? $event->location->usage_price:0) * $area_count; ?>
                 <?php $night_price_total = ($event->location->night_price > 0 ? $event->location->night_price:0) * $area_count; ?>
-                昼間料金 : <?= $usage_price_total ?>円 (<?= (($event->location->night_price > 0) ? $event->location->night_price : 0).'円' ?> × <?= $area_count ?>コート)
+                昼間料金 : <?= $usage_price_total ?>円 (<?= (($event->location->usage_price > 0) ? $event->location->usage_price : 0).'円' ?> × <?= $area_count ?>コート)
                 <?php if($event->location->usage_price > 0 && count($event->event_responses[1])): ?>
                     <br>一人あたり<?= ceil($usage_price_total / count($event->event_responses[1])) ?>円(参加人数<?= count($event->event_responses[1]) ?>人の場合)
                 <?php else: ?>
