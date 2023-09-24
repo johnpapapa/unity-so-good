@@ -169,15 +169,18 @@ $day_of_weeks = Configure::read('day_of_weeks');
                 <?php $usage_price_total = ($event->location->usage_price > 0 ? $event->location->usage_price:0) * $area_count; ?>
                 <?php $night_price_total = ($event->location->night_price > 0 ? $event->location->night_price:0) * $area_count; ?>
                 昼間料金 : <?= $usage_price_total ?>円 (<?= (($event->location->night_price > 0) ? $event->location->night_price : 0).'円' ?> × <?= $area_count ?>コート)
-                <?php if($event->location->usage_price > 0): ?>
-                    <br>一人あたり<?= ceil(count($event->event_responses[1]) / $usage_price_total) ?>円(参加人数<?= count($event->event_responses[1]) ?>人の場合)
+                <?php if($event->location->usage_price > 0 && count($event->event_responses[1])): ?>
+                    <br>一人あたり<?= ceil($usage_price_total / count($event->event_responses[1])) ?>円(参加人数<?= count($event->event_responses[1]) ?>人の場合)
+                <?php else: ?>
+                    <br>一人あたり0円(参加人数<?= count($event->event_responses[1]) ?>人の場合)
                 <?php endif; ?>
-
                 <br>
                 
                 <br>夜間料金 : <?= $night_price_total ?>円 (<?= (($event->location->night_price > 0) ? $event->location->night_price : 0).'円' ?> × <?= $area_count ?>コート)
-                <?php if($event->location->night_price > 0): ?>
-                    <br>一人あたり<?= round(count($event->event_responses[1]) / $night_price_total) ?>円(参加人数<?= count($event->event_responses[1]) ?>人の場合)
+                <?php if($event->location->night_price > 0 && count($event->event_responses[1])): ?>
+                    <br>一人あたり<?= ceil($night_price_total / count($event->event_responses[1])) ?>円(参加人数<?= count($event->event_responses[1]) ?>人の場合)
+                <?php else: ?>
+                    <br>一人あたり0円(参加人数<?= count($event->event_responses[1]) ?>人の場合)
                 <?php endif; ?>
                 
                 
@@ -200,7 +203,6 @@ $day_of_weeks = Configure::read('day_of_weeks');
                 参加未定 : <span id="state-count-0"><?= count($event->event_responses[0]) ?></span>
                 参加 : <span id="state-count-1"><?= count($event->event_responses[1]) ?></span>
                 不参加 : <span id="state-count-2"><?= count($event->event_responses[2]) ?></span>
-                
             </div>
         </div>
         <div class="row mb20">
