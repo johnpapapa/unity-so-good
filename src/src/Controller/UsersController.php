@@ -4,12 +4,14 @@ declare(strict_types=1);
 namespace App\Controller;
 use Cake\Core\Configure; 
 use Cake\Http\Cookie\Cookie;
+use Cake\Log\Log;
 use DateTime;
 
 /**
  * Users Controller
  *
  * @property \App\Model\Table\UsersTable $Users
+ * @property \App\Controller\Component\loginComponent $Login
  * @method \App\Model\Entity\User[]|\Cake\Datasource\ResultSetInterface paginate($object = null, array $settings = [])
  */
 class UsersController extends AppController
@@ -20,63 +22,62 @@ class UsersController extends AppController
         $this->Authentication->addUnauthenticatedActions(['login', 'add', 'lineLogin']); //認証不要のアクション
     }
 
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->loadComponent('Login');
+    }
+
     public function login()
     {
-        $login_user_data = $this->getLoginUserData();
-        if ($login_user_data) {
-            //ログインに成功した場合クッキーをセット
-            $key_auto_login = $this->genKeyAutoLogin();
-            $this->setCookieAutoLogin($key_auto_login);
-            $this->setDataAutoLogin($key_auto_login, $login_user_data);
+        //cookieが残っている場合cookieによるログインを行う
+        $login_user_data = $this->Login->processCookieAutoLogin();
+        if($login_user_data){ //ログイン済みの場合TOPに遷移
+            $this->Flash->success("セッション情報が切れていた為再ログインしました");
+            return $this->redirect(['controller'=>'Events', 'action'=>'index']);
+        }
+    }
 
-            // ログイン後の画面にリダイレクト
-            $target = $this->Authentication->getLoginRedirect() ?? '/events/index';
-            return $this->redirect($target);
+    public function lineLogin(){
+        $this->autoRender = false;
 
-        } else {
-            // ログインしていない場合cookieを確認
-            $cookie = $this->getCookieAutoLogin();
-            if($cookie){
-                // cookieが存在する場合にcookieのidを持つuserを検索
-                $user_data = $this->Users->find('all', ['conditions'=>['remember_token' => $cookie]])->first();
-                if($user_data){
-                    //cookieのidを持つuserがいた場合再ログイン
-                    $this->setIdentity($user_data);
-                    $this->Flash->success('セッションが切れていた為、再ログインしました.');
-                    $target = $this->Authentication->getLoginRedirect() ?? '/events/index';
-                    return $this->redirect($target);
-                } else {
-                    //cookieのidを持つuserがいない場合cookieを削除
-                    $this->removeCookieAutoLogin();
-                }
-            }
+        //LINEからLINEユーザー情報の取得
+        $line_user_data = $this->Login->getLineUserData();
+        if(!$line_user_data){
+            $this->Flash->error("LINEログインに失敗しました");
+            return $this->redirect(['controller'=>'Events','action'=>'index']);
         }
 
-        // ログイン認証に失敗した場合はエラーを表示する
-        if ($this->request->is('post')) {
-            $login_user_data = $this->getLoginUserData();
-            if(!$login_user_data){
-                $this->Flash->error(__('メールアドレスまたはパスワードが誤っています。'));
-            } 
-        } 
+        //LINEユーザ情報を使用したユーザー情報の取得
+        $user_data = $this->Login->processLineLogin($line_user_data);
+        if(!$user_data){
+            $this->Flash->error("LINE情報を使用したユーザー情報の取得に失敗しました");
+        }
         
+        //ログイン情報の更新
+        $this->Login->processSetLogin($user_data);
+        $this->Flash->success(__('LINEログインに成功しました'));
+
+        return $this->redirect(['controller'=>'Events','action'=>'index']);
     }
 
     public function logout()
     {
-        $login_user_data = $this->getLoginUserData();
+        $login_user_data = $this->Login->getLoginUserData();
         if ($login_user_data) {
-            $this->removeIdentity();
-            $this->removeCookieAutoLogin();
-            $this->removeDataAutoLogin($login_user_data);
+            $this->Login->removeIdentity();
+            $this->Login->removeCookieAutoLogin();
+            $this->Login->removeDataAutoLogin($login_user_data);
 
         }
         return $this->redirect(['controller' => 'Users', 'action' => 'login']);
     }
 
     public function detail(){
-        $login_user_data = $this->getLoginUserData();
+        $login_user_data = $this->Login->getLoginUserData();
+        
         if(!$login_user_data){
+            $this->log($login_user_data);
             $this->Flash->error(__('ユーザー情報の取得に失敗しました。'));
             return $this->redirect(['controller' => 'Users', 'action' => 'login']);
         }
@@ -97,34 +98,6 @@ class UsersController extends AppController
             }
             $this->Flash->error(__('The user data could not be saved. Please, try again.'));
         }
-    }
-
-    public function lineLogin(){
-        $this->autoRender = false;
-
-        $line_user_data = $this->getLineUserData();
-        $user_data = $this->Users->find('all', ['conditions'=>['line_user_id' => $line_user_data['line_user_id']]])->first();
-        if(!$user_data){ //該当するline_user_idが存在しない場合新規ユーザー作成
-            $save_data = $this->Users->newEntity([
-                'display_name' => $line_user_data['display_name'],   
-                'line_user_id' => $line_user_data['line_user_id'],
-            ]);
-            $user_data = $this->Users->save($save_data);
-            if (!$user_data) {
-                $this->Flash->error(__('The event could not be saved. Please, try again.'));
-                return $this->redirect(['controller'=>'Events','action'=>'index']);
-            }
-            $this->Flash->success(__('The user has been saved.'));
-        }
-
-        $key_auto_login = $this->genKeyAutoLogin();
-        $this->setCookieAutoLogin($key_auto_login);
-        $this->setDataAutoLogin($key_auto_login, $user_data);
-        $this->setIdentity($user_data);
-
-        $this->Flash->success(__('Login successful'));
-
-        return $this->redirect(['controller'=>'Events','action'=>'index']);
     }
 
     /**

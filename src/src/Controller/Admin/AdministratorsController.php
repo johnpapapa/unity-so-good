@@ -21,7 +21,7 @@ class AdministratorsController extends AppController
     public function beforeFilter(EventInterface $event)
     {
         parent::beforeFilter($event);
-        if(!$this->isAdministrator()){
+        if(!$this->Login->isAdministrator()){
             $this->Flash->error(__('管理者権限がありません。'));
             return $this->redirect(['prefix'=>false,'controller' => 'Events', 'action' => 'index']);
         }

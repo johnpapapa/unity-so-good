@@ -39,7 +39,7 @@ class EventsController extends AppController
 
     public function index()
     {
-        $uid = $this->getLoginUserData(true);   
+        $uid = $this->Login->getLoginUserData(true);   
         
         $events = $this->Event->getEventList(false, false, false, true);
         $events = $this->Event->getFormatEventDataList($events, $uid);
@@ -48,7 +48,7 @@ class EventsController extends AppController
     }
 
     public function archived(){ //開催済み
-        $uid = $this->getLoginUserData(true);   
+        $uid = $this->Login->getLoginUserData(true);   
         
         $events = $this->Event->getEventList(false, false, true, false);
         $events = $this->Event->getFormatEventDataList($events);
@@ -57,7 +57,7 @@ class EventsController extends AppController
     }
 
     public function unresponded(){ //未表明
-        $uid = $this->getLoginUserData(true);
+        $uid = $this->Login->getLoginUserData(true);
         if(!$uid){
             $this->Flash->error(__('ユーザー情報の取得に失敗しました。'));
             return $this->redirect(['controller' => 'Users', 'action' => 'login']);
@@ -73,7 +73,7 @@ class EventsController extends AppController
     }
 
     public function participate(){ //表明済み
-        $uid = $this->getLoginUserData(true);
+        $uid = $this->Login->getLoginUserData(true);
         if(!$uid){
             $this->Flash->error(__('ユーザー情報の取得に失敗しました。'));
             return $this->redirect(['controller' => 'Users', 'action' => 'login']);
@@ -89,7 +89,7 @@ class EventsController extends AppController
     }
 
     public function created(){
-        $uid = $this->getLoginUserData(true);
+        $uid = $this->Login->getLoginUserData(true);
         if(!$uid){
             $this->Flash->error(__('ユーザー情報の取得に失敗しました。'));
             return $this->redirect(['controller' => 'Users', 'action' => 'login']);
@@ -103,7 +103,7 @@ class EventsController extends AppController
 
     public function detail($id = null)
     {
-        $uid = $this->getLoginUserData(true);
+        $uid = $this->Login->getLoginUserData(true);
         if(!$uid){
             $this->Flash->error(__('ユーザー情報の取得に失敗しました。'));
             return $this->redirect(['controller' => 'Users', 'action' => 'login']);
@@ -184,7 +184,7 @@ class EventsController extends AppController
     public function ajaxSubmitComment(){
         $this->autoRender = false;
         $response = ['status'=>''];
-        $uid = $this->getLoginUserData(true);
+        $uid = $this->Login->getLoginUserData(true);
         if(!$uid){
             $this->Flash->error(__('ユーザー情報の取得に失敗しました'));
         }
@@ -216,7 +216,7 @@ class EventsController extends AppController
     public function ajaxDeleteComment(){
         $this->autoRender = false;
         $response = ['status'=>''];
-        $uid = $this->getLoginUserData(true);
+        $uid = $this->Login->getLoginUserData(true);
         if(!$uid){
             $this->Flash->error(__('ユーザー情報の取得に失敗しました'));
         }
@@ -251,7 +251,7 @@ class EventsController extends AppController
     public function ajaxDeleteEvent(){
         $this->autoRender = false;
         $response = ['status'=>''];
-        $uid = $this->getLoginUserData(true);
+        $uid = $this->Login->getLoginUserData(true);
         if(!$uid){
             $this->Flash->error(__('ユーザー情報の取得に失敗しました'));
         }
@@ -291,7 +291,7 @@ class EventsController extends AppController
      */
     public function add()
     {
-        $uid = $this->getLoginUserData(true);
+        $uid = $this->Login->getLoginUserData(true);
         if(!$uid){
             $this->Flash->error(__('ユーザー情報の取得に失敗しました。'));
             return $this->redirect(['controller' => 'Users', 'action' => 'login']);
@@ -380,7 +380,7 @@ class EventsController extends AppController
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
     public function edit($id = null){
-        $uid = $this->getLoginUserData(true);
+        $uid = $this->Login->getLoginUserData(true);
         if(!$uid){
             $this->Flash->error(__('ユーザー情報の取得に失敗しました'));
             return $this->redirect(['controller' => 'Users', 'action' => 'login']);
@@ -490,7 +490,7 @@ class EventsController extends AppController
     public function delete($id = null) //events/createdからしかアクセスされない
     {
         $this->autoRender = false;
-        $uid = $this->getLoginUserData(true);
+        $uid = $this->Login->getLoginUserData(true);
         if(!$uid){
             $this->Flash->error(__('ユーザー情報の取得に失敗しました'));
             return $this->redirect(['controller' => 'Users', 'action' => 'login']);
@@ -521,7 +521,7 @@ class EventsController extends AppController
     public function restore($id = null) //events/createdからしかアクセスされない
     {
         $this->autoRender = false;
-        $uid = $this->getLoginUserData(true);
+        $uid = $this->Login->getLoginUserData(true);
         if(!$uid){
             $this->Flash->error(__('ユーザー情報の取得に失敗しました'));
             return $this->redirect(['controller' => 'Users', 'action' => 'login']);
