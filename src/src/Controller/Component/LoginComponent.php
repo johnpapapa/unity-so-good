@@ -158,7 +158,7 @@ class loginComponent extends Component
 
     //管理者権限を持つuserでログインしているか
     public function isAdministrator(){ 
-        $user_id = $this->getLoginUserData($id_only=true);
+        $user_id = $this->getLoginUserData(true);
         if(!$user_id){
             return false;
         }
