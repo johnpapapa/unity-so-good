@@ -192,8 +192,6 @@ class EventsTable extends Table
         $contain_not_held_event=false
     ){
         $Events = TableRegistry::getTableLocator()->get('Events');
-        // $Comments = TableRegistry::getTableLocator()->get('Comments');
-        // $Users = TableRegistry::getTableLocator()->get('Users');
 
         $conditions = [];
         if(!$contain_deleted_event){ $conditions['AND']['Events.deleted_at'] = 0; }
@@ -220,7 +218,7 @@ class EventsTable extends Table
                     ]);
             }
         ])
-        ->order(['Events.start_time'=>'DESC'])
+        ->order(['Events.start_time'=>'ASC'])
         ->limit(Configure::read('event_item_limit')); 
         $events = $events_query->all()->toArray();
         return $events;

@@ -197,9 +197,9 @@ $day_of_weeks = Configure::read('day_of_weeks');
         <div class="row mb20">
             <div class="label mb5">イベントの参加人数</div>
             <div class="content">
-                ?:<span id="state-count-0"><?= count($event->event_responses[0]) ?></span>
-                o:<span id="state-count-1"><?= count($event->event_responses[1]) ?></span>
-                x:<span id="state-count-2"><?= count($event->event_responses[2]) ?></span>
+                参加未定 : <span id="state-count-0"><?= count($event->event_responses[0]) ?></span>
+                参加 : <span id="state-count-1"><?= count($event->event_responses[1]) ?></span>
+                不参加 : <span id="state-count-2"><?= count($event->event_responses[2]) ?></span>
                 
             </div>
         </div>
