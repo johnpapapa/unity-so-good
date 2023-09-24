@@ -18,9 +18,6 @@ class loginComponent extends Component
         $this->Events = FactoryLocator::get('Table')->get('Events');
         $this->Users = FactoryLocator::get('Table')->get('Users');
         $this->EventResponses = FactoryLocator::get('Table')->get('EventResponses');
-        
-        // $this->loadComponent('RequestHandler');
-        // $this->loadComponent('Authentication.Authentication'); //認証ロジック
     }
 
     public function hello(){

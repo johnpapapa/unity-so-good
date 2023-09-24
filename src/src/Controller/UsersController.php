@@ -20,6 +20,12 @@ class UsersController extends AppController
         $this->Authentication->addUnauthenticatedActions(['login', 'add', 'lineLogin']); //認証不要のアクション
     }
 
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->loadComponent('Login');
+    }
+
     public function login()
     {
         $login_user_data = $this->getLoginUserData();
