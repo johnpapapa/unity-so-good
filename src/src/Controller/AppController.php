@@ -23,7 +23,7 @@ use Cake\Core\Configure;
 use Cake\Event\EventInterface;
 use DateTime;
 use Cake\Routing\Router;
-use Psr\Log\LogLevel;
+use Cake\Log\Log;
 
 /**
  * Application Controller
@@ -32,6 +32,8 @@ use Psr\Log\LogLevel;
  * will inherit them.
  *
  * @link https://book.cakephp.org/4/en/controllers.html#the-app-controller
+ * @property \App\Controller\Component\loginComponent $Login
+ * 
  */
 class AppController extends Controller
 {
@@ -55,67 +57,75 @@ class AppController extends Controller
 
     public function beforeFilter(EventInterface $event)
     {
-        //ログインユーザ情報の取得
-        $login_user_data = $this->getLoginUserData();
-        if(!$login_user_data){
-            $cookie = $this->getCookieAutoLogin();
-            if($cookie){
-                // cookieが存在する場合にcookieのidを持つuserを検索
-                $user_data = FactoryLocator::get('Table')->get('Users')->find('all', ['conditions'=>['remember_token' => $cookie]])->first();
-                if($user_data){
-                    //cookieのidを持つuserがいた場合ログイン
-                    $this->setIdentity($user_data);
-                    $login_user_data = $user_data;
-                } else { //userが存在しない場合はcookieを削除
-                    $this->removeCookieAutoLogin();
-                }
+
+        //ログイン情報をページ表示する前に取得//ログインページではこれらのチェックをスルー
+        $controller = $this->getRequest()->getParam('controller');
+        $action = $this->getRequest()->getParam('action');
+        if(!($controller=='Users' && $action=='login')){
+            $this->setLog("[AppController.beforeFilter.{$action}]is not login action");
+            $login_user_data = $this->Login->getLoginUserData();
+            $this->setLog("[AppController.beforeFilter.{$action}]get login user data");
+            if(!$login_user_data){ 
+                $this->setLog("[AppController.beforeFilter.{$action}]false login user data");
+                // $this->Flash->error('クッキーの期限が切れているので再ログインしてください');
+                return $this->redirect(['controller'=>'Users','action'=>'login']);
             }
+            $this->setLog("[AppController.beforeFilter.{$action}]set login user data");
+        } else {
+            $login_user_data = false;
         }
 
         $this->set("current_user", $login_user_data);
     }
-
-    public function isAdministrator(){ //管理者権限を持つ場合true
-        $uid = $this->getLoginUserData($id_only=true);
-        if(!$uid){
-            return false;
-        }
-        $admin = FactoryLocator::get('Table')->get('Administrators')->exists(["user_id"=>$uid]);
-        if($admin){
-            return true; 
-        }
-        return false;
+    public function setLog($message){
+        Log::write('debug', print_r($message, true));
     }
-
-    public function isActiveCookieData(){ //有効なcookieが存在する場合true
-        $cookie = $this->getCookieAutoLogin();
-        $result = false;
-        if($cookie){
-            $result = FactoryLocator::get('Table')->get('Users')->exists(['remember_token' => $cookie]);
-        }
-        return $result;
-    }
-
-    public function getUserDataFromCookie(){
-        $cookie = $this->getCookieAutoLogin();
-        $user_data = FactoryLocator::get('Table')->get('Users')->find('all', ['conditions'=>['remember_token' => $cookie]])->first();
-        if($user_data){
-            return $user_data;
-        }
-        return null;
-    }
-
+    
     public function getLoginUserData($id_only=false){
-        $user_data = $this->Authentication->getResult()->getData(); 
-        if($this->isActiveCookieData()){
-            $user_data = $this->getUserDataFromCookie();
-            $this->setIdentity($user_data);
-        }
-        if($id_only && $user_data){
-            return $user_data['id'];
-        }
-        return $user_data;
+        return $this->Login->getLoginUserData($id_only);
     }
+
+    // public function isAdministrator(){ //管理者権限を持つ場合true
+    //     $uid = $this->getLoginUserData($id_only=true);
+    //     if(!$uid){
+    //         return false;
+    //     }
+    //     $admin = FactoryLocator::get('Table')->get('Administrators')->exists(["user_id"=>$uid]);
+    //     if($admin){
+    //         return true; 
+    //     }
+    //     return false;
+    // }
+
+    // public function isActiveCookieData(){ //有効なcookieが存在する場合true
+    //     $cookie = $this->getCookieAutoLogin();
+    //     $result = false;
+    //     if($cookie){
+    //         $result = FactoryLocator::get('Table')->get('Users')->exists(['remember_token' => $cookie]);
+    //     }
+    //     return $result;
+    // }
+
+    // public function getUserDataFromCookie(){
+    //     $cookie = $this->getCookieAutoLogin();
+    //     $user_data = FactoryLocator::get('Table')->get('Users')->find('all', ['conditions'=>['remember_token' => $cookie]])->first();
+    //     if($user_data){
+    //         return $user_data;
+    //     }
+    //     return null;
+    // }
+
+    // public function getLoginUserData($id_only=false){
+    //     $user_data = $this->Authentication->getResult()->getData(); 
+    //     if($this->isActiveCookieData()){
+    //         $user_data = $this->getUserDataFromCookie();
+    //         $this->setIdentity($user_data);
+    //     }
+    //     if($id_only && $user_data){
+    //         return $user_data['id'];
+    //     }
+    //     return $user_data;
+    // }
 
     public function getLineUserData(){
         $postData = array(
@@ -165,53 +175,53 @@ class AppController extends Controller
         return $line_user_data;
     }
 
-    public function genKeyAutoLogin(){
-        return hash('sha256', (uniqid() . mt_rand(1, 999999999) . '_auto_logins'));
-    }
+    // public function genKeyAutoLogin(){
+    //     return hash('sha256', (uniqid() . mt_rand(1, 999999999) . '_auto_logins'));
+    // }
 
-    public function setIdentity($user_data){
-        return $this->Authentication->setIdentity($user_data);
-    }
+    // public function setIdentity($user_data){
+    //     return $this->Authentication->setIdentity($user_data);
+    // }
 
-    public function removeIdentity(){
-        return $this->Authentication->logout();
-    }
+    // public function removeIdentity(){
+    //     return $this->Authentication->logout();
+    // }
 
-    public function getCookieAutoLogin(){
-        return $this->request->getCookie(Configure::read('cookie.key'));
-    }
+    // public function getCookieAutoLogin(){
+    //     return $this->request->getCookie(Configure::read('cookie.key'));
+    // }
 
-    public function setCookieAutoLogin($key_auto_login){
-        $this->response = $this->response->withCookie(Cookie::create(
-            Configure::read('cookie.key'),
-            $key_auto_login,
-            ['expires'=>new DateTime('+ 10 min'), 'http'=>true]
-        ));
-        return ;
-    }
+    // public function setCookieAutoLogin($key_auto_login){
+    //     $this->response = $this->response->withCookie(Cookie::create(
+    //         Configure::read('cookie.key'),
+    //         $key_auto_login,
+    //         ['expires'=>new DateTime('+ 10 min'), 'http'=>true]
+    //     ));
+    //     return ;
+    // }
 
-    public function removeCookieAutoLogin(){
-        $this->response = $this->response->withCookie(Cookie::create(
-            Configure::read('cookie.key'),
-            '',
-            ['expires'=>new DateTime('-1 day'), 'http'=>true]
-        ));
-        return ;
-    }
+    // public function removeCookieAutoLogin(){
+    //     $this->response = $this->response->withCookie(Cookie::create(
+    //         Configure::read('cookie.key'),
+    //         '',
+    //         ['expires'=>new DateTime('-1 day'), 'http'=>true]
+    //     ));
+    //     return ;
+    // }
 
-    public function setDataAutoLogin($key_auto_login, $user_data){
-        $update_data = $this->Users->patchEntity($user_data, [
-            'id' => $user_data['id'],
-            'remember_token' => $key_auto_login
-        ]);
+    // public function setDataAutoLogin($key_auto_login, $user_data){
+    //     $update_data = $this->Users->patchEntity($user_data, [
+    //         'id' => $user_data['id'],
+    //         'remember_token' => $key_auto_login
+    //     ]);
 
-        $result = $this->Users->save($update_data);
-        if(!$result){
-            $this->Flash->error('cannot set user identity. retry login.');
-            return true;
-        }
-        return false;
-    }
+    //     $result = $this->Users->save($update_data);
+    //     if(!$result){
+    //         $this->Flash->error('cannot set user identity. retry login.');
+    //         return true;
+    //     }
+    //     return false;
+    // }
 
     public function removeDataAutoLogin($user_data){
         $update_data = $update_data = $this->Users->patchEntity($user_data, [
