@@ -17,6 +17,34 @@ class Initial extends AbstractMigration
      */
     public function up(): void
     {
+        $this->table('informations')
+            ->addColumn('id', 'biginteger', [
+                'autoIncrement' => true,
+                'default' => null,
+                'limit' => null,
+                'null' => false,
+                'signed' => false,
+            ])
+            ->addPrimaryKey(['id'])
+            ->addColumn('created_at', 'timestamp', [
+                'default' => null,
+                'limit' => null,
+                'null' => true,
+            ])
+            ->addColumn('updated_at', 'timestamp', [
+                'default' => null,
+                'limit' => null,
+                'null' => true,
+            ])
+            ->addColumn('about', 'text', [
+                'default' => null,
+                'null' => true,
+            ])
+            ->addColumn('rule', 'text', [
+                'default' => null,
+                'null' => true,
+            ])
+            ->create();
         $this->table('announces')
             ->addColumn('id', 'biginteger', [
                 'autoIncrement' => true,
@@ -664,7 +692,8 @@ class Initial extends AbstractMigration
             ->dropForeignKey(
                 'location_id'
             )->save();
-
+        
+        $this->table('informations')->drop()->save();
         $this->table('announces')->drop()->save();
         $this->table('event_responses')->drop()->save();
         $this->table('events')->drop()->save();
