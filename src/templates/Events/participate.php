@@ -1,5 +1,7 @@
 <?php $this->assign('title', 'event participate'); ?>
 <?php $this->assign('content-title', '参加予定イベント'); ?>
+<?= $this->Html->css(['templates']) ?>
+
 <p class="note-p mb20">
     今日以降の参加/参加未定イベントが表示されます。
 </p>

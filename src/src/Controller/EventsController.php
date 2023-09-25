@@ -363,7 +363,7 @@ class EventsController extends AppController
             try {
                 $result_event = $this->Events->saveOrFail($event_data);
             } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
-                $this->log(print_r($e, true));
+                $this->setLog(print_r($event_data, true));
                 $this->Flash->error(__('The event could not be saved. Please, try again.'));
                 return $this->redirect(['controller'=>'Events','action' => 'created']);
             }
@@ -432,7 +432,7 @@ class EventsController extends AppController
                 try {
                     $result_location = $this->Locations->saveOrFail($location_data);
                 } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
-                    $this->log(print_r($e, true));
+                    $this->setLog(print_r($location_data, true));
                     $this->Flash->error(__('The location could not be saved. Please, try again.'));
                     return $this->redirect(['controller'=>'Events','action' => 'created']);
                 }
@@ -454,7 +454,7 @@ class EventsController extends AppController
             try {
                 $result_location = $this->Locations->saveOrFail($location_data);
             } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
-                $this->log(print_r($e, true));
+                $this->setLog(print_r($location_data, true));
                 $this->Flash->error(__('The location could not be updated. Please, try again.'));
                 return $this->redirect(['controller'=>'Events','action' => 'created']);
             }

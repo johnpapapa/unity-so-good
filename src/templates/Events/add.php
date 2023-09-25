@@ -3,7 +3,6 @@
 <p class="note-p mb20">
     イベントの追加が可能です。
 </p>
-<?= $this->Html->script('jquery.ui.autocomplete.scroll.min.js', array('inline' => false)); ?>
 <script>
     let locations = <?= json_encode($locations) ?>;
 </script>
@@ -160,6 +159,9 @@
 <?= $this->Form->end() ?>
 </div>
 
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/themes/overcast/jquery-ui.min.css">
+<?= $this->Html->script('jquery.ui.autocomplete.scroll.min.js', array('inline' => false)); ?>
 <script>
     $(function(){
         let obj_display_name = $("#display_name");

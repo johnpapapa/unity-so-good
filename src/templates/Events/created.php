@@ -1,5 +1,7 @@
 <?php $this->assign('title', 'event created'); ?>
 <?php $this->assign('content-title', '作成済イベント一覧'); ?>
+<?= $this->Html->css(['templates']) ?>
+
 <p class="note-p mb20">
     追加したイベントが表示されます。
 </p>

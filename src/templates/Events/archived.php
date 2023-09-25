@@ -1,5 +1,7 @@
 <?php $this->assign('title', 'event archived'); ?>
 <?php $this->assign('content-title', 'アーカイブ一覧'); ?>
+<?= $this->Html->css(['templates']) ?>
+
 <p class="note-p mb20">
     開催済みのイベントが表示されます
 </p>

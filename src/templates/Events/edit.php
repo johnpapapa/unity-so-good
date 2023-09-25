@@ -1,6 +1,6 @@
 <?php $this->assign('title', 'event edit'); ?>
 <?php $this->assign('content-title', 'イベントの編集'); ?>
-<?= $this->Html->script('jquery.ui.autocomplete.scroll.min.js', array('inline' => false)); ?>
+
 <script>
     let locations = <?= json_encode($locations) ?>;
 </script>
@@ -151,6 +151,10 @@
 <?= $this->Form->end() ?>
 </div>
 
+
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/themes/overcast/jquery-ui.min.css">
+<?= $this->Html->script('jquery.ui.autocomplete.scroll.min.js', array('inline' => false)); ?>
 <script>
     $(function(){
         let obj_display_name = $("#display_name");

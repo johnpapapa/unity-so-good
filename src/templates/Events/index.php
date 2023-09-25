@@ -1,5 +1,7 @@
 <?php $this->assign('title', 'event index'); ?>
 <?php $this->assign('content-title', 'イベント一覧'); ?>
+<?= $this->Html->css(['templates']) ?>
+
 <p class="note-p mb20">
     14日前までのイベントが表示されます
 </p>
