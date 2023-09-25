@@ -2,7 +2,6 @@
 <?php $this->assign('content-title', '概要'); ?>
 <link href="https://use.fontawesome.com/releases/v6.4.2/css/all.css" rel="stylesheet">
 
-
 <a class="nostyle-a" href="<?= $this->Url->build(['controller' => 'informations','action' => 'edit']); ?>">
     <div class="pure-button pure-u-1-2 mb30">
         概要・ルールの編集

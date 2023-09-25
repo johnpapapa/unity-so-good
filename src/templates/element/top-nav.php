@@ -28,20 +28,20 @@
   }
 
   #top-nav,
-  #top-nav #top-nav-links {
+  #top-nav-links {
     display: flex;
     align-items: center;
     column-gap: 30px;
     list-style: none;
   }
 
-  #top-nav #top-nav-user-links {
+  #top-nav-user-links {
     display: flex;
     align-items: center;
     justify-content: flex-end;
   }
 
-  #top-nav #top-nav-user-links a {
+  #top-nav-user-links a {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -57,7 +57,7 @@
   }
 
   #top-nav .navOpenBtn,
-  #top-nav #top-nav-user-links {
+  #top-nav-user-links {
     width: 100px;
   }
 
@@ -66,7 +66,7 @@
     font-size: 25px;
   }
 
-  #top-nav #top-nav-logo {
+  #top-nav-logo {
     font-size: 22px;
     font-weight: 500;
   }
@@ -103,7 +103,7 @@
       padding: 5px 10px;
     }
 
-    #top-nav #top-nav-links {
+    #top-nav-links {
       position: fixed;
       top: 0;
       left: -100%;
@@ -171,7 +171,9 @@
 </nav>
 
 <script>
-  const nav = document.querySelector("#top-nav");
+  const nav = document.getElementById('top-nav');
+  // const nav = document.querySelector("#top-nav");
+  
   const navOpenBtn = document.querySelector(".navOpenBtn");
   const navCloseBtn = document.querySelector(".navCloseBtn");
 
