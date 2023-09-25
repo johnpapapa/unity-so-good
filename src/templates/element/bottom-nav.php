@@ -38,7 +38,9 @@
       text-decoration: none;
   }
   #bottom-nav-links a.enable {
-    background-color: #d25100;
+    /* background-color: #d25100; */
+    background-color: #1AFF39;
+    color: #404040;
   }
 
   #bottom-nav-links a:hover {
