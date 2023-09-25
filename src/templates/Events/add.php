@@ -59,7 +59,7 @@
 </style>
 
 <div class="events form pure-form pure-form-stacked">
-<a class="nostyle-a" href="<?= $this->Url->build(['controller' => 'events','action' => 'created']); ?>">
+<a href="<?= $this->Url->build(['controller' => 'events','action' => 'created']); ?>">
     <div class="pure-button pure-u-1-2 mb30">
         作成したイベント一覧
     </div>

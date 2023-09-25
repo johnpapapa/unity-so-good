@@ -217,7 +217,7 @@ $day_of_weeks = Configure::read('day_of_weeks');
         </div>
         <div class="row mb20">
             <div class="label mb5">参加表明</div>
-            <div class="content disp-flex just-center g10">
+            <div class="content disp-flex just-center" style="gap:10px;">
                 <?php $is_closed = FrozenTime::now() > $event->end_time; ?>
                 <button class="pure-button response-btn pure-u-1 undecided" value="0" <?= ($event->user_response_state === 0 | $is_closed) ? 'disabled' : '' ?>>参加未定</button>
                 <button class="pure-button response-btn pure-u-1 present" value="1" <?= ($event->user_response_state === 1 | $is_closed) ? 'disabled' : '' ?>>参加</button>
@@ -295,7 +295,7 @@ $day_of_weeks = Configure::read('day_of_weeks');
                     <div class="comment w100 mb5 p10 disp-flex align-center dir-column">
                         <div class="comment-header mb5 w100 disp-flex just-center align-center dir-row">
                             <div class="name w100 over-ellipsis"><?= $comment->user->display_name ?></div>
-                            <div class="w100 disp-flex align-center just-end">
+                            <div class="w100 disp-flex align-center" style="justify-content: flex-end;">
                                 <?php if($comment->user_id == $current_user->id): ?>
                                 <div class="delete-comment-btn w100 tr">コメントを削除<input type="hidden" value="<?= $comment->id ?>"></div>
                                 <?php endif; ?>

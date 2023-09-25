@@ -23,13 +23,16 @@ class InformationsController extends AppController
      * @return \Cake\Http\Response|null|void Renders view
      */
     public function about(){
+        $is_admin = $this->Login->isAdministrator();
+
         $information_data = $this->Informations->find("all")->first();
         if(!$information_data){
             $information_data = $this->Informations->newEmptyEntity();
         }
         $information_data["about"] = $information_data["about"];
         $information_data["rule"] = $information_data["rule"];
-        $this->set(compact('information_data'));
+
+        $this->set(compact('information_data', 'is_admin'));
     }
 
     public function edit(){

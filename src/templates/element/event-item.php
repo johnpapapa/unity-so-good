@@ -142,7 +142,7 @@
                 </div>
 
                 <?php if(count($event->comments)): ?>
-                    <div class="comments_toggle disp-flex just-center align-center m10">
+                    <div class="comments_toggle disp-flex just-center align-center" style="margin: 10px;">
                         <span class="material-symbols-outlined">expand_all</span>
                         コメント確認
                     </div>

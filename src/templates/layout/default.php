@@ -13,7 +13,7 @@
 
     <?= $this->Html->css(['normalize.min', 'common']) ?>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css" integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.7.0.js"  integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
+    <script async src="https://code.jquery.com/jquery-3.7.0.js"  integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
 
     <?= $this->fetch('meta') ?>
     <?= $this->fetch('css') ?>
@@ -22,6 +22,12 @@
 
 <style>
     /* 全てのページで有効するstyle */
+    @font-face {
+        src: url("/font/nicomoji-plus_v2.woff2") format("woff2");
+        font-family: "Nico Moji";
+        font-style: normal;
+        font-display: swap;
+    }
     * { margin: 0;padding: 0;box-sizing: border-box;}
     a, a:visited {color: black;text-decoration: none;}
     input[type=text],input[type=textarea], textarea,input[type=number],input[type=password] {font-size: 20px !important;}
@@ -40,7 +46,7 @@
         content: "";
         display: block;
         position: fixed;
-        background-image:url("<?= $this->Url->image('unity-background.jpg'); ?>"); 
+        background-image:url("<?= $this->Url->image('unity-background.avif'); ?>"); 
         background-color: rgba(255, 255, 255, 0.8);
         background-blend-mode: overlay;
         background-size: contain;

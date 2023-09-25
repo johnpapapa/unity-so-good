@@ -6,7 +6,7 @@
     開催済みのイベントが表示されます
 </p>
 
-<a class="nostyle-a" href="<?= $this->Url->build(['controller' => 'events','action' => 'index']); ?>">
+<a href="<?= $this->Url->build(['controller' => 'events','action' => 'index']); ?>">
     <div class="pure-button pure-u-1-2 mb30">
         イベント一覧に戻る
     </div>

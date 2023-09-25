@@ -8,12 +8,6 @@
     padding: 0px;
   }
 
-  @font-face {
-    src: url("/font/nicomoji-plus_v2.woff2") format("woff2");
-    font-family: "Nico Moji";
-    font-style: normal;
-    font-display: swap;
-  }
 
   #top-nav {
     top: 0;

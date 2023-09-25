@@ -5,7 +5,7 @@
 <p class="note-p mb20">
     追加したイベントが表示されます。
 </p>
-<a class="nostyle-a" href="<?= $this->Url->build(['controller' => 'events','action' => 'add']); ?>">
+<a href="<?= $this->Url->build(['controller' => 'events','action' => 'add']); ?>">
     <div class="pure-button pure-u-1-2 mb30">
         イベントの新規作成
     </div>
