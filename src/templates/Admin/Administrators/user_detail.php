@@ -28,6 +28,14 @@ $day_of_weeks = Configure::read('day_of_weeks');
     </div>
     <div class="mb30">
         <div class="header mb10">
+            ユーザー作成日
+        </div>
+        <div class="content">
+            <?= $user_data->created_at->i18nFormat('yyyy-MM-dd HH:mm') ?>
+        </div>
+    </div>
+    <div class="mb30">
+        <div class="header mb10">
             参加履歴
         </div>
         <div class="content">
@@ -103,15 +111,8 @@ $day_of_weeks = Configure::read('day_of_weeks');
             コート別参加率
         </div>
         <div class="content">
-            <!-- <div class="disp-flex just-center align-center" style="border-bottom: black 1px solid;">
-                <div class="w100 tc">コート名</div>
-                <div class="w100 disp-flex just-center align-center">
-                    <div style="font-size:small; width: 50px;">合計</div>
-                    <div style="font-size:small; width: 50px;">未定</div>
-                    <div style="font-size:small; width: 50px;">参加</div>
-                    <div style="font-size:small; width: 50px;">不参加</div>
-                </div>
-            </div> -->
+            実装予定
+            <?php /*
             <div class="location-ratio-list" style="height: 300px; overflow:scroll;">
                 <?php foreach($location_counted_response_count_list as $location_counted_response_cound_data): ?>
                     <div class="location-ratio p10">
@@ -140,7 +141,8 @@ $day_of_weeks = Configure::read('day_of_weeks');
                         </div>
                     </div>
                 <?php endforeach; ?>
-            </div>
+            </div> */
+            ?>
         <div>
     </div>
     <div class="mb30">

@@ -1,6 +1,11 @@
 <?php $this->assign('title', 'admin event-list'); ?>
-<?php $this->assign('content-title', 'イベントの一覧'); ?>
-
+<?php $this->assign('content-title', '未反応数一覧'); ?>
+<p class="note-p mb30">
+    イベントに対して未反応の数を表示。
+    <br>イベントの開催日がユーザーの作成日より前だけカウント。
+    <br>つまりユーザーが入る前のイベントはカウントされません。
+    <br>(8日に作成したユーザーは9日のイベントをカウントしない)
+</p>
 <style>
     .event-list .header {
         background-color: darkgray;
