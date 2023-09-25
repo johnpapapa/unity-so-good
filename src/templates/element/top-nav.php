@@ -4,7 +4,7 @@
 
 <style>
   #top-nav #top-nav-logo {
-    font-family: "Nico Moji", "sans-serif";
+    font-family: "Nico Moji";
     padding: 0px;
   }
 
