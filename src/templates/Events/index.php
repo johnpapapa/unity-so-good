@@ -1,6 +1,5 @@
 <?php $this->assign('title', 'event index'); ?>
 <?php $this->assign('content-title', 'イベント一覧'); ?>
-<?= $this->Html->css(['templates']) ?>
 
 <p class="note-p mb20">
     14日前までのイベントが表示されます
@@ -12,6 +11,5 @@
     </div>
 </a>
 
-<?php foreach($events as $event): ?>
-    <?php echo $this->element('event-item', array('event' => $event, 'displayResponseBtn' => false)); ?>
-<?php endforeach; ?>
+
+<?php echo $this->element('event-item', array('events' => $events, 'displayResponseBtn' => false)); ?>

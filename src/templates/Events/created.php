@@ -1,6 +1,5 @@
 <?php $this->assign('title', 'event created'); ?>
 <?php $this->assign('content-title', '作成済イベント一覧'); ?>
-<?= $this->Html->css(['templates']) ?>
 
 <p class="note-p mb20">
     追加したイベントが表示されます。
@@ -11,6 +10,5 @@
     </div>
 </a>
 
-<?php foreach($events as $event): ?>
-    <?php echo $this->element('event-item', array('event' => $event, 'displayCreatedBtn' => true)); ?>
-<?php endforeach; ?>
+
+<?php echo $this->element('event-item', array('events' => $events, 'displayCreatedBtn' => true)); ?>

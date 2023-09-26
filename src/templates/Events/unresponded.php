@@ -1,11 +1,9 @@
 <?php $this->assign('title', 'event unresponded'); ?>
 <?php $this->assign('content-title', '未表明イベント'); ?>
-<?= $this->Html->css(['templates']) ?>
 
 <p class="note-p mb20">
     未開催イベントのうち表明していないイベントが表示されます。<br>
     表明をすることで、この一覧にイベントが表示されなくなります。
 </p>
-<?php foreach($events as $event): ?>
-    <?php echo $this->element('event-item', array('event' => $event, 'displayResponseBtn' => false)); ?>
-<?php endforeach; ?>
+
+<?php echo $this->element('event-item', array('events' => $events, 'displayResponseBtn' => false)); ?>
