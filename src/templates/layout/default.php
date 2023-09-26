@@ -13,7 +13,7 @@
 
     <?= $this->Html->css(['normalize.min', 'common']) ?>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css" integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls" crossorigin="anonymous">
-    <script async src="https://code.jquery.com/jquery-3.7.0.js"  integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
+    <script rel="preload" src="https://code.jquery.com/jquery-3.7.0.js"  integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
 
     <?= $this->fetch('meta') ?>
     <?= $this->fetch('css') ?>
@@ -23,7 +23,7 @@
 <style>
     /* 全てのページで有効するstyle */
     @font-face {
-        src: url("/font/nicomoji-plus_v2.woff2") format("woff2");
+        src: url("/font/nicomoji-plus_v2_subset.woff") format("woff");
         font-family: "Nico Moji";
         font-style: normal;
         font-display: swap;
