@@ -63,7 +63,8 @@ class EventsController extends AppController
             return $this->redirect(['controller' => 'Users', 'action' => 'login']);
         }
         
-        $event_responses = $this->Event->getEventIdList($uid, true);
+        $event_responses = $this->Event->getUnrespondedEventIdListByUserId($uid, ["start_order"=>"ASC", "is_contain_held_event"=>false]);
+        // $this->Events->find()
         $event_id_list = Hash::extract($event_responses, '{n}.id');
         
         $events = $this->Event->getEventListByEventId($event_id_list);
@@ -79,7 +80,7 @@ class EventsController extends AppController
             return $this->redirect(['controller' => 'Users', 'action' => 'login']);
         }
 
-        $event_responses = $this->Event->getEventIdList($uid, false);
+        $event_responses = $this->Event->getParticipateEventIdListByUserId($uid, []);
         $event_id_list = Hash::extract($event_responses, '{n}.id');
 
         $events = $this->Event->getEventListByEventId($event_id_list);

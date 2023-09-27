@@ -32,6 +32,14 @@ class eventComponent extends Component
     public function getEventList($organizer_user_id=false,$contain_deleted_event=false, $contain_held_event=false, $contain_not_held_event=false){
         return $this->Events->getEventList($organizer_user_id, $contain_deleted_event, $contain_held_event, $contain_not_held_event);
     }
+    
+    public function getUnrespondedEventIdListByUserId($uid, $conditions){
+        return $this->Events->getUnrespondedEventIdListByUserId($uid, $conditions);
+    }
+
+    public function getParticipateEventIdListByUserId($uid, $conditions){
+        return $this->Events->getParticipateEventIdListByUserId($uid, $conditions);
+    }
 
     public function getEventResponseListByEventId($event_id){
         return $this->EventResponses->getEventResponseListByEventId($event_id);

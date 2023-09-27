@@ -143,38 +143,102 @@ class EventsTable extends Table
     }
 
     /**
-     * 指定したuserによるevent_responses.stateに応じたeventの取得
-     *
+     * 指定したuserの反応済みeventIdの取得
+     * ### Usage
+     * ```
+     * $event_id_list = $this->Event->getParticipateEventIdListByUserId(
+     *      $uid,[
+     *          "start_order"=>"ASC",
+     *          "is_contain_held_event"=>false
+     *       ]
+     * );
+     * ```
+     * 
      * @param int $uid users.id
-     * @param bool $is_unrespond 未表明イベントを取得するか
-     * @param string $start_order events.start_timeをキーとした並び順
-     * @return array|false eventResponses.*
+     * @param array<string, mixed> $conditions
+     * @return array|false eventResponses.id
      */
-    public function getEventIdList($uid, $is_unrespond=false, $start_order='ASC'){
-        $event_where = ($is_unrespond) ? ' WHERE ISNULL(er.responder_id)':'WHERE er.response_state=1 OR er.response_state=0';
-        $event_select = ($is_unrespond) ? '':',event_responses.response_state';
-        $event_join_type = ($is_unrespond) ? 'LEFT JOIN':'JOIN';
-        $event_to_now = ($is_unrespond) ? 'NOW()':'CURRENT_DATE';
-        $sql = <<<EOF
-            SELECT e.id
-            FROM ( 
-                SELECT e.id, er.responder_id, e.start_time
-                FROM (
-                    SELECT events.id, events.start_time
-                    FROM events
-                    WHERE events.deleted_at=0 AND events.start_time between cast({$event_to_now} as datetime) and cast(CURRENT_DATE + interval 1 year as datetime) 
-                ) as e
-                {$event_join_type} ( 
-                    SELECT event_responses.responder_id, event_responses.event_id {$event_select} 
-                    FROM event_responses
-                    WHERE event_responses.responder_id={$uid}
-                ) as er
-                ON (e.id = er.event_id)
-                {$event_where}
+    public function getParticipateEventIdListByUserId($uid, $conditions=[]){
+        $start_order = "ASC";
+        if(isset($conditions["start_order"])){
+            $start_order = $conditions["start_order"];
+        }
+        $event_start_between_conditions = "events.start_time between cast(NOW() as datetime) and cast(CURRENT_DATE + interval 1 year as datetime)";
+        if(isset($conditions["is_contain_held_event"]) && $conditions["is_contain_held_event"] == true){
+            $event_start_between_conditions = $event_start_between_conditions." OR events.start_time < cast(CURRENT_DATE as datetime)";
+        }
+
+        $sql_statement = <<<EOF
+        SELECT e.id 
+        FROM 
+        (
+            SELECT e.id, er.responder_id, e.start_time
+            FROM
+            (
+                SELECT events.id, events.start_time
+                FROM events
+                WHERE events.deleted_at=0 AND {$event_start_between_conditions}
             ) as e
-            ORDER BY e.start_time {$start_order};
+            JOIN (
+                SELECT event_responses.responder_id, event_responses.event_id
+                FROM event_responses 
+                WHERE event_responses.responder_id = {$uid} AND (event_responses.response_state=0 OR event_responses.response_state=1)
+            ) as er ON (e.id = er.event_id)
+        ) as e
+        ORDER BY e.start_time {$start_order};
         EOF;
-        return $this->executeSql($sql);
+        return $this->executeSql($sql_statement);
+    }
+
+
+    /**
+     * 指定したuserの未反応eventIdの取得
+     * ### Usage
+     * ```
+     * $event_id_list = $this->Event->getUnrespondedEventIdListByUserId(
+     *      $uid,[
+     *          "start_order"=>"ASC",
+     *          "is_contain_held_event"=>false
+     *       ]
+     * );
+     * ```
+     * 
+     * @param int $uid users.id
+     * @param array<string, mixed> $conditions
+     * @return array|false eventResponses.id
+     */
+    public function getUnrespondedEventIdListByUserId($uid, $conditions=[]){
+        $start_order = "ASC";
+        if(isset($conditions["start_order"])){
+            $start_order = $conditions["start_order"];
+        }
+        $event_start_between_conditions = "events.start_time between cast(NOW() as datetime) and cast(CURRENT_DATE + interval 1 year as datetime)";
+        if(isset($conditions["is_contain_held_event"]) && $conditions["is_contain_held_event"] == true){
+            $event_start_between_conditions = $event_start_between_conditions." OR events.start_time < cast(CURRENT_DATE as datetime)";
+        }
+
+        $sql_statement = <<<EOF
+        SELECT e.id 
+        FROM 
+        (
+            SELECT e.id, er.responder_id, e.start_time 
+            FROM 
+            (
+                SELECT events.id, events.start_time 
+                FROM events 
+                WHERE events.deleted_at=0 AND {$event_start_between_conditions}
+            ) as e
+            LEFT JOIN (
+                SELECT
+                event_responses.responder_id, event_responses.event_id
+                FROM event_responses
+                WHERE event_responses.responder_id = {$uid}
+            ) as er ON (e.id = er.event_id)
+            WHERE ISNULL(er.responder_id)
+        ) as e
+        ORDER BY e.start_time {$start_order};
+        EOF;
+        return $this->executeSql($sql_statement);
     }
 
     /**
