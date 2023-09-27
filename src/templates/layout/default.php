@@ -1,3 +1,10 @@
+<?php 
+    $flg_noindex = true;
+    $controller_name = $this->getRequest()->getParam('controller'); 
+    $action_name = $this->getRequest()->getParam('action'); 
+    if($controller_name == 'Events' && $action_name == 'index'){ $flg_noindex = false; }
+    if($controller_name == 'Informations' && $action_name == 'about'){ $flg_noindex = false; }
+?>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -5,6 +12,7 @@
     <meta name="description" content="ソフトテニスサークルUNITYのイベントスケジュール管理">
     <meta name="google-site-verification" content="UQrGAuT7PirzIi15OAbXemRlbpo68bOqPNV5t7khHSE" />
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
+    <?= ($flg_noindex)?"<meta name='robots' content='noindex'>":"" ?>
     <title>
         <?= $this->fetch('title') ?>
     </title>
