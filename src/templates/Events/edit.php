@@ -1,3 +1,10 @@
+<?php
+/**
+ * @var \App\View\AppView $this
+ * @var object $event_data
+ * @var mixed $locations
+ */
+?>
 <?php $this->assign('title', 'event edit'); ?>
 <?php $this->assign('content-title', 'イベントの編集'); ?>
 

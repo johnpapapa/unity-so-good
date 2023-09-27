@@ -1,3 +1,10 @@
+<?php
+/**
+ * @var \App\View\AppView $this
+ * @var mixed $categorized_event_response_list
+ * @var \App\Model\Entity\Event $event
+ */
+?>
 <?php $this->assign('title', 'admin event-detail'); ?>
 <?php $this->assign('content-title', 'イベントの詳細'); ?>
 <?php

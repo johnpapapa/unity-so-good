@@ -14,7 +14,6 @@ use Cake\ORM\Query;
  * Administrators Controller
  * @property \App\Controller\Component\EventComponent $Event
  * @property \App\Model\Table\AdministratorsTable $Administrators
- * @method \App\Model\Entity\Administrator[]|\Cake\Datasource\ResultSetInterface paginate($object = null, array $settings = [])
  */
 class AdministratorsController extends AppController
 {

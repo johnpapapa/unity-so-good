@@ -9,6 +9,7 @@ use Cake\ORM\Entity;
  * Administrator Entity
  *
  * @property int $user_id
+ * @property \App\Model\Entity\User $user
  */
 class Administrator extends Entity
 {

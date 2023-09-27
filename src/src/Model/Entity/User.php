@@ -10,13 +10,15 @@ use Cake\ORM\Entity;
  *
  * @property int $id
  * @property string $display_name
- * @property string $user_id
+ * @property string|null $user_id
  * @property string|null $line_user_id
  * @property string|null $password
  * @property string|null $remember_token
  * @property \Cake\I18n\FrozenTime|null $created_at
  * @property \Cake\I18n\FrozenTime|null $updated_at
- * @property int $deleted_at
+ * @property bool $deleted_at
+ * @property \App\Model\Entity\Event[] $events
+ * @property \App\Model\Entity\Comment[] $comments
  */
 class User extends Entity
 {

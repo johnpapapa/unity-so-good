@@ -1,3 +1,9 @@
+<?php
+/**
+ * @var \App\View\AppView $this
+ * @var mixed $participants_count_list
+ */
+?>
 <?php $this->assign('title', 'admin event-list'); ?>
 <?php $this->assign('content-title', '未反応数一覧'); ?>
 <p class="note-p mb30">

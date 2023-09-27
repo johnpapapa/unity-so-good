@@ -1,3 +1,12 @@
+<?php
+/**
+ * @var \App\View\AppView $this
+ * @var mixed $current_user
+ * @var mixed $event_next_id
+ * @var mixed $event_prev_id
+ * @var \App\Model\Entity\Event $event
+ */
+?>
 <?php $this->assign('title', 'event detail'); ?>
 <?php $this->assign('content-title', 'イベント詳細'); ?>
 <?= $this->Html->script('event-response', array('inline' => false));  ?>

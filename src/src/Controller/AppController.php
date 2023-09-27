@@ -34,6 +34,8 @@ use Cake\Log\Log;
  * @link https://book.cakephp.org/4/en/controllers.html#the-app-controller
  * @property \App\Controller\Component\loginComponent $Login
  * 
+ *
+ * @property \Authentication\Controller\Component\AuthenticationComponent $Authentication
  */
 class AppController extends Controller
 {

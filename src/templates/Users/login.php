@@ -1,3 +1,8 @@
+<?php
+/**
+ * @var \App\View\AppView $this
+ */
+?>
 <?php $this->assign('title', 'login'); ?>
 <?php $this->assign('content-title', 'ログイン'); ?>
 <?php 

@@ -1,3 +1,9 @@
+<?php
+/**
+ * @var \App\View\AppView $this
+ * @var object $current_user
+ */
+?>
 <?php $this->assign('title', 'user detail'); ?>
 <?php $this->assign('content-title', 'ユーザー詳細'); ?>
 

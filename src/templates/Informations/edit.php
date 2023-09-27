@@ -1,3 +1,9 @@
+<?php
+/**
+ * @var \App\View\AppView $this
+ * @var object $information_data
+ */
+?>
 <?php $this->assign('title', 'information edit'); ?>
 <?php $this->assign('content-title', '概要編集'); ?>
 

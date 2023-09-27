@@ -1,4 +1,10 @@
 <?php
+/**
+ * @var \App\View\AppView $this
+ * @var mixed $current_user
+ * @var mixed $displayCreatedBtn
+ * @var mixed $events
+ */
     //一覧内部で繰り返し使用する変数の宣言
     use Cake\Core\Configure;
     //ユーザーの参加情報をconstから読出

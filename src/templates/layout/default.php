@@ -1,4 +1,7 @@
-<?php 
+<?php /**
+ * @var \App\View\AppView $this
+ */
+
     $flg_noindex = true;
     $controller_name = $this->getRequest()->getParam('controller'); 
     $action_name = $this->getRequest()->getParam('action'); 

@@ -1,3 +1,9 @@
+<?php
+/**
+ * @var \App\View\AppView $this
+ * @var mixed $user_data
+ */
+?>
 <?php $this->assign('title', 'admin user-list'); ?>
 <?php $this->assign('content-title', 'ユーザーの一覧'); ?>
 <style>

@@ -11,12 +11,13 @@ use Cake\ORM\Entity;
  * @property int $id
  * @property \Cake\I18n\FrozenTime|null $created_at
  * @property \Cake\I18n\FrozenTime|null $updated_at
- * @property int $deleted_at
+ * @property bool $deleted_at
  * @property string|null $body
  * @property int $user_id
  * @property int $event_id
  *
  * @property \App\Model\Entity\User $user
+ * @property \App\Model\Entity\Event $event
  */
 class Comment extends Entity
 {

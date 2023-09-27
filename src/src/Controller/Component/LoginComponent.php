@@ -10,6 +10,12 @@ use Cake\Http\Cookie\Cookie;
 use DateTime;
 use Cake\Log\Log;
  
+/**
+ * @property \Cake\Controller\Component\RequestHandlerComponent $RequestHandler
+ * @property \Authentication\Controller\Component\AuthenticationComponent $Authentication
+ *
+ * @method \App\Controller\AppController getController()
+ */
 class loginComponent extends Component
 {
     protected $components = ['RequestHandler', 'Authentication.Authentication'];

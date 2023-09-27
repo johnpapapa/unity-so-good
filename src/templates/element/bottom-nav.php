@@ -1,4 +1,7 @@
 <?php
+/**
+ * @var \App\View\AppView $this
+ */
   $action_name = $this->getRequest()->getParam('action');
   if($this->getRequest()->getParam('prefix') == 'Admin'){ //同名のactionについてはprefix次第で空文字にする
     $action_name = '';

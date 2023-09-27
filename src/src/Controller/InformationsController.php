@@ -6,7 +6,6 @@ namespace App\Controller;
 /**
  * Informations Controller
  *
- * @method \App\Model\Entity\Information[]|\Cake\Datasource\ResultSetInterface paginate($object = null, array $settings = [])
  * @property \App\Model\Table\InformationsTable $Informations
  */
 class InformationsController extends AppController

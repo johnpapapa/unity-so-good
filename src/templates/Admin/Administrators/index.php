@@ -1,3 +1,8 @@
+<?php
+/**
+ * @var \App\View\AppView $this
+ */
+?>
 <?php $this->assign('title', 'admin index'); ?>
 <?php $this->assign('content-title', '管理画面ホーム'); ?>
 

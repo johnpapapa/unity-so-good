@@ -14,8 +14,7 @@ use Cake\ORM\Query;
  * Events Controller
  *
  * @property \App\Model\Table\EventsTable $Events
- * @property \App\Controller\Component\EventComponent $Event
- * @method \App\Model\Entity\Event[]|\Cake\Datasource\ResultSetInterface paginate($object = null, array $settings = [])
+ * @property \App\Controller\Component\eventComponent $Event
  */
 class EventsController extends AppController
 {

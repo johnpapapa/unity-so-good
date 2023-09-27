@@ -1,3 +1,9 @@
+<?php
+/**
+ * @var \App\View\AppView $this
+ * @var mixed $events
+ */
+?>
 <?php $this->assign('title', 'event index'); ?>
 <?php $this->assign('content-title', 'イベント一覧'); ?>
 

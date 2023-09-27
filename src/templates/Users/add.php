@@ -1,3 +1,9 @@
+<?php
+/**
+ * @var \App\View\AppView $this
+ * @var \App\Model\Entity\User $user
+ */
+?>
 <?php $this->assign('title', 'user register'); ?>
 <?php $this->assign('content-title', 'ユーザー新規登録'); ?>
 <p class="note-p mb20">

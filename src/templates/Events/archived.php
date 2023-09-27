@@ -1,3 +1,9 @@
+<?php
+/**
+ * @var \App\View\AppView $this
+ * @var mixed $events
+ */
+?>
 <?php $this->assign('title', 'event archived'); ?>
 <?php $this->assign('content-title', 'アーカイブ一覧'); ?>
 

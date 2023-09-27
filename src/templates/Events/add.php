@@ -1,3 +1,9 @@
+<?php
+/**
+ * @var \App\View\AppView $this
+ * @var mixed $locations
+ */
+?>
 <?php $this->assign('title', 'event add'); ?>
 <?php $this->assign('content-title', 'イベントの追加'); ?>
 <p class="note-p mb20">

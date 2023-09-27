@@ -12,7 +12,6 @@ use DateTime;
  *
  * @property \App\Model\Table\UsersTable $Users
  * @property \App\Controller\Component\loginComponent $Login
- * @method \App\Model\Entity\User[]|\Cake\Datasource\ResultSetInterface paginate($object = null, array $settings = [])
  */
 class UsersController extends AppController
 {

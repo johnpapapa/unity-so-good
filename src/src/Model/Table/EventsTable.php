@@ -31,6 +31,8 @@ use Cake\ORM\TableRegistry;
  * @method \App\Model\Entity\Event[]|\Cake\Datasource\ResultSetInterface saveManyOrFail(iterable $entities, $options = [])
  * @method \App\Model\Entity\Event[]|\Cake\Datasource\ResultSetInterface|false deleteMany(iterable $entities, $options = [])
  * @method \App\Model\Entity\Event[]|\Cake\Datasource\ResultSetInterface deleteManyOrFail(iterable $entities, $options = [])
+ * @property \App\Model\Table\CommentsTable&\Cake\ORM\Association\HasMany $Comments
+ * @mixin \Cake\ORM\Behavior\TimestampBehavior
  */
 class EventsTable extends Table
 {

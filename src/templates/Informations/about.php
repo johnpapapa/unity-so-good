@@ -1,3 +1,10 @@
+<?php
+/**
+ * @var \App\View\AppView $this
+ * @var array $information_data
+ * @var mixed $is_admin
+ */
+?>
 <?php $this->assign('title', 'information about'); ?>
 <?php $this->assign('content-title', '概要'); ?>
 <link href="https://use.fontawesome.com/releases/v6.4.2/css/all.css" rel="stylesheet">

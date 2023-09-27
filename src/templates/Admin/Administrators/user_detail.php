@@ -1,3 +1,12 @@
+<?php
+/**
+ * @var \App\View\AppView $this
+ * @var array $event_response_history_count_list
+ * @var mixed $event_response_history_list
+ * @var mixed $unresponded_history_list
+ * @var object $user_data
+ */
+?>
 <?php $this->assign('title', 'admin user-detail'); ?>
 <?php $this->assign('content-title', 'ユーザーの詳細'); ?>
 <?php

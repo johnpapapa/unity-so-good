@@ -10,9 +10,9 @@ use Cake\ORM\Entity;
  *
  * @property int $id
  * @property string $display_name
- * @property string $address
- * @property int $usage_price
- * @property int $night_price
+ * @property string|null $address
+ * @property int|null $usage_price
+ * @property int|null $night_price
  *
  * @property \App\Model\Entity\Event[] $events
  */

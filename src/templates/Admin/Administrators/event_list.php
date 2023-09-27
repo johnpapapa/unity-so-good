@@ -1,3 +1,9 @@
+<?php
+/**
+ * @var \App\View\AppView $this
+ * @var \App\Model\Entity\Event[]|\Cake\Collection\CollectionInterface $events
+ */
+?>
 <?php $this->assign('title', 'admin event-list'); ?>
 <?php $this->assign('content-title', 'イベントの一覧'); ?>
 
