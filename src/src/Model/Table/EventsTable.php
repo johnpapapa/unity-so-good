@@ -148,12 +148,8 @@ class EventsTable extends Table
      * 指定したuserの反応済みeventIdの取得
      * ### Usage
      * ```
-     * $event_id_list = $this->Event->getParticipateEventIdListByUserId(
-     *      $uid,[
-     *          "start_order"=>"ASC",
-     *          "is_contain_held_event"=>false
-     *       ]
-     * );
+     * "start_order"=>"ASC",
+     * "is_contain_held_event"=>false
      * ```
      * 
      * @param int $uid users.id
@@ -197,12 +193,8 @@ class EventsTable extends Table
      * 指定したuserの未反応eventIdの取得
      * ### Usage
      * ```
-     * $event_id_list = $this->Event->getUnrespondedEventIdListByUserId(
-     *      $uid,[
-     *          "start_order"=>"ASC",
-     *          "is_contain_held_event"=>false
-     *       ]
-     * );
+     *"start_order"=>"ASC",
+     *"is_contain_held_event"=>false
      * ```
      * 
      * @param int $uid users.id
@@ -325,6 +317,25 @@ class EventsTable extends Table
         ->limit(Configure::read('event_item_limit')); 
         $events = $events_query->all()->toArray();
         return $events;
+    }
+
+    public function getNeighberEventId($start_time, $type){
+        $conditions = ["Events.deleted_at"=>0];
+        $order = [];
+        if($type == 'previous'){
+            $conditions["Events.start_time <"] = $start_time;
+            $order['Events.start_time'] = 'DESC';
+        }
+        if($type == 'next'){
+            $conditions["Events.start_time >"] = $start_time;
+            $order['Events.start_time'] = 'ASC';
+        }
+
+        $event_data = $this->find("all", [
+            "conditions" => $conditions
+        ])->select('id')->order($order)->limit(1)->first();
+
+        return $event_data;
     }
 
     /**

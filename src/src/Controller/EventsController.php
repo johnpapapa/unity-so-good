@@ -63,7 +63,6 @@ class EventsController extends AppController
         }
         
         $event_responses = $this->Event->getUnrespondedEventIdListByUserId($uid, ["start_order"=>"ASC", "is_contain_held_event"=>false]);
-        // $this->Events->find()
         $event_id_list = Hash::extract($event_responses, '{n}.id');
         
         $events = $this->Event->getEventListByEventId($event_id_list);
@@ -143,11 +142,8 @@ class EventsController extends AppController
                     
         $event = $this->Event->getFormatEventData($event, $uid);
 
-        $event_prev = $this->Event->getNeighberEvent($event["start_time"], 'previous');
-        $event_next = $this->Event->getNeighberEvent($event["start_time"], 'next');
-
-        $event_prev_id = (isset($event_prev->id)) ? $event_prev->id : null;
-        $event_next_id = (isset($event_next->id)) ? $event_next->id : null;
+        $event_prev_id = $this->Event->getNeighberEventId($event["start_time"], 'previous');
+        $event_next_id = $this->Event->getNeighberEventId($event["start_time"], 'next');
 
         $this->set(compact('event', 'event_prev_id', 'event_next_id'));
     }

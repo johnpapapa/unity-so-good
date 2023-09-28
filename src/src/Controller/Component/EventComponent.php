@@ -13,10 +13,12 @@ use Cake\Datasource\ModelAwareTrait;
 /**
  * @property \App\Model\Table\EventsTable $Events
  * @property \App\Model\Table\EventResponsesTable $EventResponses
- * 
+ * @property \Cake\Controller\Component\FlashComponent $Flash
  */
 class eventComponent extends Component
 {
+    protected $components = ['Flash'];
+
     public function initialize(array $config): void
     {
         $this->Locations = FactoryLocator::get('Table')->get('Locations');
@@ -25,34 +27,37 @@ class eventComponent extends Component
         $this->EventResponses = FactoryLocator::get('Table')->get('EventResponses');
     }
 
-    public function getEventIdList($uid, $is_unrespond=false, $start_order='ASC'){
-        return $this->Events->getEventIdList($uid, $is_unrespond, $start_order);
-    }
-
+    // 指定した条件に応じたevent配列の取得
     public function getEventList($organizer_user_id=false,$contain_deleted_event=false, $contain_held_event=false, $contain_not_held_event=false){
         return $this->Events->getEventList($organizer_user_id, $contain_deleted_event, $contain_held_event, $contain_not_held_event);
     }
     
+    // 指定したuserに紐づく未反応のeventId配列の取得
     public function getUnrespondedEventIdListByUserId($uid, $conditions){
         return $this->Events->getUnrespondedEventIdListByUserId($uid, $conditions);
     }
 
+    // 指定したuserに紐づく反応済みのeventId配列の取得
     public function getParticipateEventIdListByUserId($uid, $conditions){
         return $this->Events->getParticipateEventIdListByUserId($uid, $conditions);
     }
-
+    
+    // 指定したeventに紐づくevent_response配列の取得
     public function getEventResponseListByEventId($event_id){
         return $this->EventResponses->getEventResponseListByEventId($event_id);
     }
 
+    // 指定したuserに紐づく全てのevent_response配列の取得
     public function getEventResponseListByUserId($user_id, $limit=null){
         return $this->EventResponses->getEventResponseListByUserId($user_id, $limit);
     }
-
+    
+    // 指定したuserに紐づく全てのevent_response配列の取得
     public function getAllEventResponseListByUserId($user_id, $limit=null){ //未反応のイベントも含めたevent_response
         return $this->EventResponses->getEventResponseListByUserId($user_id, $limit);
     }
 
+    // 指定したevent_id配列からeventを取得
     public function getEventListByEventId($event_id_list, $event_display_order='ASC', $response_display_order='ASC'){
         if(count($event_id_list) <= 0){ //id listが空の場合は空配列を返す
             return [];
@@ -60,21 +65,11 @@ class eventComponent extends Component
         return $this->Events->getEventListByEventId($event_id_list, $event_display_order, $response_display_order);
     }
 
-    public function getNeighberEvent($start_time, $type){
-        $conditions = ["Events.deleted_at"=>0];
-        $order = [];
-        if($type == 'previous'){
-            $conditions["Events.start_time <"] = $start_time;
-            $order['Events.start_time'] = 'DESC';
-        }
-        if($type == 'next'){
-            $conditions["Events.start_time >"] = $start_time;
-            $order['Events.start_time'] = 'ASC';
-        }
-
-        return $this->Events->find("all", [
-            "conditions" => $conditions
-        ])->select('id')->order($order)->limit(1)->first();
+    // 開始時間が隣り合うeventのid取得
+    public function getNeighberEventId($start_time, $type){
+        $event_data = $this->Events->getNeighberEventId($start_time, $type);
+        $event_data_id = (isset($event_data->id)) ? $event_data->id : null;
+        return $event_data_id;
     }
 
     /**
@@ -182,8 +177,4 @@ class eventComponent extends Component
         }
         return $categorized_event_response_list;
     }
-
-    // public function executeSql($sql){
-    //     return ConnectionManager::get('default')->execute($sql)->fetchAll('assoc');
-    // }
 }
