@@ -16,6 +16,7 @@
     <meta name="google-site-verification" content="UQrGAuT7PirzIi15OAbXemRlbpo68bOqPNV5t7khHSE" />
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
     <?= ($flg_noindex)?"<meta name='robots' content='noindex'><meta name='googlebot' content='noindex'>":"" ?>
+    <meta name='robots' content='nofollow'><meta name='googlebot' content='nofollow'>
     <title>
         <?= $this->fetch('title') ?>
     </title>
