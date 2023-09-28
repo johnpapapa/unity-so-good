@@ -36,7 +36,7 @@ class EventsController extends AppController
      * @return \Cake\Http\Response|null|void Renders view
      */
 
-    public function index()
+    public function index() //一覧
     {
         $uid = $this->Login->getLoginUserData(true);   
         
@@ -58,7 +58,7 @@ class EventsController extends AppController
     public function unresponded(){ //未表明
         $uid = $this->Login->getLoginUserData(true);
         if(!$uid){
-            $this->Flash->error(__('ユーザー情報の取得に失敗しました。'));
+            $this->Flash->error(__('ユーザー取得に失敗しました'));
             return $this->redirect(['controller' => 'Users', 'action' => 'login']);
         }
         
@@ -74,7 +74,7 @@ class EventsController extends AppController
     public function participate(){ //表明済み
         $uid = $this->Login->getLoginUserData(true);
         if(!$uid){
-            $this->Flash->error(__('ユーザー情報の取得に失敗しました。'));
+            $this->Flash->error(__('ユーザー取得に失敗しました'));
             return $this->redirect(['controller' => 'Users', 'action' => 'login']);
         }
 
@@ -90,7 +90,7 @@ class EventsController extends AppController
     public function created(){
         $uid = $this->Login->getLoginUserData(true);
         if(!$uid){
-            $this->Flash->error(__('ユーザー情報の取得に失敗しました。'));
+            $this->Flash->error(__('ユーザー取得に失敗しました'));
             return $this->redirect(['controller' => 'Users', 'action' => 'login']);
         }
         
@@ -100,52 +100,37 @@ class EventsController extends AppController
         $this->set(compact('events'));
     }
 
-    public function detail($id = null)
+    public function detail($event_id = null)
     {
         $uid = $this->Login->getLoginUserData(true);
         if(!$uid){
-            $this->Flash->error(__('ユーザー情報の取得に失敗しました。'));
+            $this->Flash->error(__('ユーザー取得に失敗しました'));
             return $this->redirect(['controller' => 'Users', 'action' => 'login']);
         }
 
-        if(!$id){
-            $this->Flash->success(__('The event has not exist.'));
+        if(!$event_id){
+            $this->Flash->success(__('参照するイベントを指定していません'));
             return $this->redirect(['action' => 'index']);
         }
         
-        $event = $this->Events->find("all", [
-            "conditions" => ["Events.id" => $id]
-        ])
-        ->contain([
-            'Locations',
-            'Comments' => function (Query $query){
-                return $query
-                    ->contain('Users')
-                    ->where(['Comments.deleted_at' => 0])
-                    ->order(['Comments.updated_at'=>'DESC']);
-            },
-            'EventResponses' => function (Query $query){
-                return $query
-                    ->contain('Users')
-                    ->order([
-                        'EventResponses.updated_at'=>'ASC', 
-                        'EventResponses.response_state'=>'DESC'
-                    ]);
-            }
-        ])
-        ->first();
+        $event_data = $this->Event->getEventByEventId($event_id);
 
-        if($event->deleted_at && $event->organizer_id != $uid){ //削除されていた時
+        if(!$event_data){
+            $this->Flash->success(__('このイベントは存在していません'));
+            return $this->redirect(['action' => 'index']);
+        }
+
+        if($event_data->deleted_at && $event_data->organizer_id != $uid){ //削除されていた時
             $this->Flash->error(__('このイベントはすでに削除されています'));
             return $this->redirect(['controller'=>'Events', 'action'=>'index']);
         }
                     
-        $event = $this->Event->getFormatEventData($event, $uid);
+        $event_data = $this->Event->getFormatEventData($event_data, $uid);
 
-        $event_prev_id = $this->Event->getNeighberEventId($event["start_time"], 'previous');
-        $event_next_id = $this->Event->getNeighberEventId($event["start_time"], 'next');
+        $event_prev_id = $this->Event->getNeighberEventId($event_data["start_time"], 'previous');
+        $event_next_id = $this->Event->getNeighberEventId($event_data["start_time"], 'next');
 
-        $this->set(compact('event', 'event_prev_id', 'event_next_id'));
+        $this->set(compact('event_data', 'event_prev_id', 'event_next_id'));
     }
 
     public function ajaxChangeResponseState(){
@@ -182,7 +167,7 @@ class EventsController extends AppController
         $response = ['status'=>''];
         $uid = $this->Login->getLoginUserData(true);
         if(!$uid){
-            $this->Flash->error(__('ユーザー情報の取得に失敗しました'));
+            $this->Flash->error(__('ユーザー取得に失敗しました'));
         }
 
         $data = $this->request->getData();
@@ -214,7 +199,7 @@ class EventsController extends AppController
         $response = ['status'=>''];
         $uid = $this->Login->getLoginUserData(true);
         if(!$uid){
-            $this->Flash->error(__('ユーザー情報の取得に失敗しました'));
+            $this->Flash->error(__('ユーザー取得に失敗しました'));
         }
 
         $data = $this->request->getData();
@@ -222,7 +207,7 @@ class EventsController extends AppController
         $this->Comments = $this->fetchTable('Comments');
         $comment_data = $this->Comments->find('all', ['conditions'=>['id'=>$comment_id]])->first();
         if(!$comment_data){
-            $this->Flash->error(__('コメント情報の取得に失敗しました'));
+            $this->Flash->error(__('コメント取得に失敗しました'));
         }
         $comment_data = $this->Comments->patchEntity($comment_data,['deleted_at'=>1]);
         try {
@@ -249,7 +234,7 @@ class EventsController extends AppController
         $response = ['status'=>''];
         $uid = $this->Login->getLoginUserData(true);
         if(!$uid){
-            $this->Flash->error(__('ユーザー情報の取得に失敗しました'));
+            $this->Flash->error(__('ユーザー取得に失敗しました'));
         }
 
         $data = $this->request->getData();
@@ -289,7 +274,7 @@ class EventsController extends AppController
     {
         $uid = $this->Login->getLoginUserData(true);
         if(!$uid){
-            $this->Flash->error(__('ユーザー情報の取得に失敗しました。'));
+            $this->Flash->error(__('ユーザー取得に失敗しました'));
             return $this->redirect(['controller' => 'Users', 'action' => 'login']);
         }
 
@@ -315,10 +300,10 @@ class EventsController extends AppController
                     $result_location = $this->Locations->saveOrFail($location_data);
                 } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
                     $this->log(print_r($e, true));
-                    $this->Flash->error(__('The location could not be saved. Please, try again.'));
+                    $this->Flash->error(__('Location登録に失敗しました'));
                     return;
                 }
-                $this->Flash->success(__('The location has been saved.'));
+                $this->Flash->success(__('Location登録に成功しました'));
                 $data["location_id"] = $result_location->id;
             } else {
                 $location_data = $this->Locations->newEmptyEntity();
@@ -336,7 +321,7 @@ class EventsController extends AppController
                 $result_location = $this->Locations->saveOrFail($location_data);
             } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
                 $this->log(print_r($e, true));
-                $this->Flash->error(__('The location could not be saved. Please, try again.'));
+                $this->Flash->error(__('Location更新に失敗しました'));
                 return $this->redirect(['controller'=>'Events','action' => 'created']);
             }
             
@@ -360,10 +345,10 @@ class EventsController extends AppController
                 $result_event = $this->Events->saveOrFail($event_data);
             } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
                 $this->setLog(print_r($event_data, true));
-                $this->Flash->error(__('The event could not be saved. Please, try again.'));
+                $this->Flash->error(__('イベント登録に失敗しました'));
                 return $this->redirect(['controller'=>'Events','action' => 'created']);
             }
-            $this->Flash->success(__('The event has been saved.'));
+            $this->Flash->success(__('イベント登録に成功しました'));
             return $this->redirect(['controller'=>'Events','action' => 'created']);
         }
     }
@@ -378,7 +363,7 @@ class EventsController extends AppController
     public function edit($id = null){
         $uid = $this->Login->getLoginUserData(true);
         if(!$uid){
-            $this->Flash->error(__('ユーザー情報の取得に失敗しました'));
+            $this->Flash->error(__('ユーザー取得に失敗しました'));
             return $this->redirect(['controller' => 'Users', 'action' => 'login']);
         }
         if(!$id){
@@ -429,10 +414,10 @@ class EventsController extends AppController
                     $result_location = $this->Locations->saveOrFail($location_data);
                 } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
                     $this->setLog(print_r($location_data, true));
-                    $this->Flash->error(__('The location could not be saved. Please, try again.'));
+                    $this->Flash->error(__('Location登録に失敗しました'));
                     return $this->redirect(['controller'=>'Events','action' => 'created']);
                 }
-                $this->Flash->success(__('The location has been saved.'));
+                $this->Flash->success(__('Location登録に成功しました'));
                 $data["location_id"] = $result_location->id;
 
             } else {
@@ -451,7 +436,7 @@ class EventsController extends AppController
                 $result_location = $this->Locations->saveOrFail($location_data);
             } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
                 $this->setLog(print_r($location_data, true));
-                $this->Flash->error(__('The location could not be updated. Please, try again.'));
+                $this->Flash->error(__('Location更新に失敗しました'));
                 return $this->redirect(['controller'=>'Events','action' => 'created']);
             }
             $area = str_replace(["、", "，", "､"], ",", mb_convert_kana($data['area'], "as"));
@@ -468,10 +453,10 @@ class EventsController extends AppController
 
             $result_event = $this->Events->save($event_data);
             if (!$result_event) {
-                $this->Flash->error(__('The event could not be updated. Please, try again.'));
+                $this->Flash->error(__('イベント登録に失敗しました'));
                 return $this->redirect(['controller'=>'Events','action' => 'created']);
             }
-            $this->Flash->success(__('The event has been updated.'));
+            $this->Flash->success(__('イベント登録に成功しました'));
             return $this->redirect(['controller'=>'Events','action' => 'created']);
         }
     }
@@ -488,16 +473,16 @@ class EventsController extends AppController
         $this->autoRender = false;
         $uid = $this->Login->getLoginUserData(true);
         if(!$uid){
-            $this->Flash->error(__('ユーザー情報の取得に失敗しました'));
+            $this->Flash->error(__('ユーザー取得に失敗しました'));
             return $this->redirect(['controller' => 'Users', 'action' => 'login']);
         }
         if(!$id){
-            $this->Flash->error(__('イベントIDが存在していません'));
+            $this->Flash->error(__('削除するイベントを指定していません'));
             return $this->redirect(['controller'=>'Events', 'action'=>'created']);
         }
         $event_data = $this->Events->find("all", ['conditions'=>['id'=>$id]])->first();
         if(!$event_data){
-            $this->Flash->error(__('存在しないイベントIDです'));
+            $this->Flash->error(__('このイベントは存在していません'));
             return $this->redirect(['controller'=>'Events', 'action'=>'index']);
         }
         if ($event_data->organizer_id != $uid){
@@ -510,7 +495,7 @@ class EventsController extends AppController
             $this->Flash->error(__('イベント削除に失敗しました'));
             return $this->redirect(['controller'=>'Events', 'action'=>'created']);
         }
-        $this->Flash->error(__('イベント削除に成功しました'));
+        $this->Flash->success(__('イベント削除に成功しました'));
         return $this->redirect(['controller'=>'Events', 'action'=>'created']);
     }
 
@@ -519,16 +504,16 @@ class EventsController extends AppController
         $this->autoRender = false;
         $uid = $this->Login->getLoginUserData(true);
         if(!$uid){
-            $this->Flash->error(__('ユーザー情報の取得に失敗しました'));
+            $this->Flash->error(__('ユーザー取得に失敗しました'));
             return $this->redirect(['controller' => 'Users', 'action' => 'login']);
         }
         if(!$id){
-            $this->Flash->error(__('イベントIDが存在していません'));
+            $this->Flash->error(__('復元するイベントを指定していません'));
             return $this->redirect(['controller'=>'Events', 'action'=>'created']);
         }
         $event_data = $this->Events->find("all", ['conditions'=>['id'=>$id]])->first();
         if(!$event_data){
-            $this->Flash->error(__('存在しないイベントIDです'));
+            $this->Flash->error(__('このイベントは存在していません'));
             return $this->redirect(['controller'=>'Events', 'action'=>'index']);
         }
         if ($event_data->organizer_id != $uid){
@@ -541,7 +526,7 @@ class EventsController extends AppController
             $this->Flash->error(__('イベント復元に失敗しました'));
             return $this->redirect(['controller'=>'Events', 'action'=>'created']);
         }
-        $this->Flash->error(__('イベント復元に成功しました'));
+        $this->Flash->success(__('イベント復元に成功しました'));
         return $this->redirect(['controller'=>'Events', 'action'=>'created']);
     }
 }

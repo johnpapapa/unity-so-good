@@ -57,6 +57,11 @@ class eventComponent extends Component
         return $this->EventResponses->getEventResponseListByUserId($user_id, $limit);
     }
 
+    // 指定したevent_idからeventを取得
+    public function getEventByEventId($event_id){
+        return $this->Events->getEventByEventId($event_id);
+    }
+
     // 指定したevent_id配列からeventを取得
     public function getEventListByEventId($event_id_list, $event_display_order='ASC', $response_display_order='ASC'){
         if(count($event_id_list) <= 0){ //id listが空の場合は空配列を返す

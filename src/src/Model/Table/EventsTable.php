@@ -282,6 +282,34 @@ class EventsTable extends Table
         $events = $events_query->all()->toArray();
         return $events;
     }
+    
+    /**
+     * 指定したevent_idでeventの取得
+     */
+    public function getEventByEventId($event_id){
+        $event = $this->find("all", [
+            "conditions" => ["Events.id" => $event_id]
+        ])
+        ->contain([
+            'Locations',
+            'Comments' => function (Query $query){
+                return $query
+                    ->contain('Users')
+                    ->where(['Comments.deleted_at' => 0])
+                    ->order(['Comments.updated_at'=>'DESC']);
+            },
+            'EventResponses' => function (Query $query){
+                return $query
+                    ->contain('Users')
+                    ->order([
+                        'EventResponses.updated_at'=>'ASC', 
+                        'EventResponses.response_state'=>'DESC'
+                    ]);
+            }
+        ])
+        ->first();
+        return $event;
+    }
 
     /**
      * 指定したevent_idのリストでeventの取得

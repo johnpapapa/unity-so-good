@@ -4,7 +4,7 @@
  * @var mixed $current_user
  * @var mixed $event_next_id
  * @var mixed $event_prev_id
- * @var \App\Model\Entity\Event $event
+ * @var object $event_data
  */
 ?>
 <?php $this->assign('title', 'event detail'); ?>
@@ -18,13 +18,13 @@
 use Cake\Core\Configure;
 use Cake\I18n\FrozenTime;
 
-$user_response_state = (!is_null($event->user_response_state)) ? Configure::read('response_states')[$event->user_response_state] : null;
-$event_state = Configure::read('event_states')[$event->event_state];
+$user_response_state = (!is_null($event_data->user_response_state)) ? Configure::read('response_states')[$event_data->user_response_state] : null;
+$event_state = Configure::read('event_states')[$event_data->event_state];
 $day_of_weeks = Configure::read('day_of_weeks');
 ?>
 <script>
     let current_user = <?= json_encode($current_user) ?>;
-    let event_data = <?= json_encode($event) ?>;
+    let event_data = <?= json_encode($event_data) ?>;
     let response_ajax_send_url = "<?= $this->Url->build(['controller' => 'Events', 'action' => 'ajaxChangeResponseState']) ?>";
     let comment_submit_ajax_send_url = "<?= $this->Url->build(['controller' => 'Events', 'action' => 'ajaxSubmitComment']) ?>";
     let comment_delete_ajax_send_url = "<?= $this->Url->build(['controller' => 'Events', 'action' => 'ajaxDeleteComment']) ?>";
@@ -143,53 +143,53 @@ $day_of_weeks = Configure::read('day_of_weeks');
         <div class="row mb20">
             <div class="label mb5">場所</div>
             <div class="content">
-                <?= h($event->location->display_name) ?>
+                <?= h($event_data->location->display_name) ?>
             </div>
         </div>
         <div class="row mb20">
             <div class="label mb5">コート</div>
             <div class="content">
-                <?= is_null($event->area) ? '' : h($event->area) . 'コート' ?>
+                <?= is_null($event_data->area) ? '' : h($event_data->area) . 'コート' ?>
             </div>
         </div>
         <div class="row mb20">
             <div class="label mb5">日付</div>
             <div class="content">
-                <?= $event->start_time->i18nFormat('yyyy-MM-dd'); ?>
-                <span>(<?= $day_of_weeks[$event->start_time->dayOfWeek] ?>)</span>
+                <?= $event_data->start_time->i18nFormat('yyyy-MM-dd'); ?>
+                <span>(<?= $day_of_weeks[$event_data->start_time->dayOfWeek] ?>)</span>
             </div>
         </div>
         <div class="row mb20">
             <div class="label mb5">時間</div>
             <div class="content">
-                <?= $event->start_time->i18nFormat('HH:mm'); ?> ~ <?= $event->end_time->i18nFormat('HH:mm');  ?>
+                <?= $event_data->start_time->i18nFormat('HH:mm'); ?> ~ <?= $event_data->end_time->i18nFormat('HH:mm');  ?>
             </div>
         </div>
         <div class="row mb20">
             <div class="label mb5">人数制限</div>
             <div class="content">
-                <?= $event->participants_limit <= 0 ? 'なし' : $event->participants_limit . '人' ?>
+                <?= $event_data->participants_limit <= 0 ? 'なし' : $event_data->participants_limit . '人' ?>
             </div>
         </div>
         <div class="row mb20">
             <div class="label mb5">コート代</div>
             <div class="content">
-                <?php $area_count = count(explode(",", h($event->area))); ?>
-                <?php $usage_price_total = ($event->location->usage_price > 0 ? $event->location->usage_price:0) * $area_count; ?>
-                <?php $night_price_total = ($event->location->night_price > 0 ? $event->location->night_price:0) * $area_count; ?>
-                昼間料金 : <?= $usage_price_total ?>円 (<?= (($event->location->usage_price > 0) ? $event->location->usage_price : 0).'円' ?> × <?= $area_count ?>コート)
-                <?php if($event->location->usage_price > 0 && count($event->event_responses[1])): ?>
-                    <br>一人あたり<?= ceil($usage_price_total / count($event->event_responses[1])) ?>円(参加人数<?= count($event->event_responses[1]) ?>人の場合)
+                <?php $area_count = count(explode(",", h($event_data->area))); ?>
+                <?php $usage_price_total = ($event_data->location->usage_price > 0 ? $event_data->location->usage_price:0) * $area_count; ?>
+                <?php $night_price_total = ($event_data->location->night_price > 0 ? $event_data->location->night_price:0) * $area_count; ?>
+                昼間料金 : <?= $usage_price_total ?>円 (<?= (($event_data->location->usage_price > 0) ? $event_data->location->usage_price : 0).'円' ?> × <?= $area_count ?>コート)
+                <?php if($event_data->location->usage_price > 0 && count($event_data->event_responses[1])): ?>
+                    <br>一人あたり<?= ceil($usage_price_total / count($event_data->event_responses[1])) ?>円(参加人数<?= count($event_data->event_responses[1]) ?>人の場合)
                 <?php else: ?>
-                    <br>一人あたり0円(参加人数<?= count($event->event_responses[1]) ?>人の場合)
+                    <br>一人あたり0円(参加人数<?= count($event_data->event_responses[1]) ?>人の場合)
                 <?php endif; ?>
                 <br>
                 
-                <br>夜間料金 : <?= $night_price_total ?>円 (<?= (($event->location->night_price > 0) ? $event->location->night_price : 0).'円' ?> × <?= $area_count ?>コート)
-                <?php if($event->location->night_price > 0 && count($event->event_responses[1])): ?>
-                    <br>一人あたり<?= ceil($night_price_total / count($event->event_responses[1])) ?>円(参加人数<?= count($event->event_responses[1]) ?>人の場合)
+                <br>夜間料金 : <?= $night_price_total ?>円 (<?= (($event_data->location->night_price > 0) ? $event_data->location->night_price : 0).'円' ?> × <?= $area_count ?>コート)
+                <?php if($event_data->location->night_price > 0 && count($event_data->event_responses[1])): ?>
+                    <br>一人あたり<?= ceil($night_price_total / count($event_data->event_responses[1])) ?>円(参加人数<?= count($event_data->event_responses[1]) ?>人の場合)
                 <?php else: ?>
-                    <br>一人あたり0円(参加人数<?= count($event->event_responses[1]) ?>人の場合)
+                    <br>一人あたり0円(参加人数<?= count($event_data->event_responses[1]) ?>人の場合)
                 <?php endif; ?>
                 
                 
@@ -203,21 +203,21 @@ $day_of_weeks = Configure::read('day_of_weeks');
         <div class="row mb20">
             <div class="label mb5">コメント・注意事項</div>
             <div class="content">
-                <?= ($event->comment == "")?'特になし':h($event->comment) ?>
+                <?= ($event_data->comment == "")?'特になし':h($event_data->comment) ?>
             </div>
         </div>
         <div class="row mb20">
             <div class="label mb5">イベントの参加人数</div>
             <div class="content">
-                参加未定 : <span id="state-count-0"><?= count($event->event_responses[0]) ?></span>
-                参加 : <span id="state-count-1"><?= count($event->event_responses[1]) ?></span>
-                不参加 : <span id="state-count-2"><?= count($event->event_responses[2]) ?></span>
+                参加未定 : <span id="state-count-0"><?= count($event_data->event_responses[0]) ?></span>
+                参加 : <span id="state-count-1"><?= count($event_data->event_responses[1]) ?></span>
+                不参加 : <span id="state-count-2"><?= count($event_data->event_responses[2]) ?></span>
             </div>
         </div>
         <div class="row mb20">
             <div class="label mb5">あなたの参加情報</div>
             <div class="content">
-                <?php if ($event->user_response_state) : ?>
+                <?php if ($event_data->user_response_state) : ?>
                     <?= $user_response_state['text']; ?>
                 <?php else : ?>
                     未表明
@@ -227,10 +227,10 @@ $day_of_weeks = Configure::read('day_of_weeks');
         <div class="row mb20">
             <div class="label mb5">参加表明</div>
             <div class="content disp-flex just-center" style="gap:10px;">
-                <?php $is_closed = FrozenTime::now() > $event->end_time; ?>
-                <button class="pure-button response-btn pure-u-1 undecided" value="0" <?= ($event->user_response_state === 0 | $is_closed) ? 'disabled' : '' ?>>参加未定</button>
-                <button class="pure-button response-btn pure-u-1 present" value="1" <?= ($event->user_response_state === 1 | $is_closed) ? 'disabled' : '' ?>>参加</button>
-                <button class="pure-button response-btn pure-u-1 absent " value="2" <?= ($event->user_response_state === 2 | $is_closed) ? 'disabled' : '' ?>>不参加</button>
+                <?php $is_closed = FrozenTime::now() > $event_data->end_time; ?>
+                <button class="pure-button response-btn pure-u-1 undecided" value="0" <?= ($event_data->user_response_state === 0 | $is_closed) ? 'disabled' : '' ?>>参加未定</button>
+                <button class="pure-button response-btn pure-u-1 present" value="1" <?= ($event_data->user_response_state === 1 | $is_closed) ? 'disabled' : '' ?>>参加</button>
+                <button class="pure-button response-btn pure-u-1 absent " value="2" <?= ($event_data->user_response_state === 2 | $is_closed) ? 'disabled' : '' ?>>不参加</button>
             </div>
         </div>
 
@@ -253,10 +253,10 @@ $day_of_weeks = Configure::read('day_of_weeks');
                             <?= Configure::read('response_states')[$state_idx]["text"] ?>
                         </div>
                         <div id="state-contents-<?= $state_idx ?>">
-                            <?php foreach($event->event_responses[$state_idx] as $event_response): ?>
+                            <?php foreach($event_data->event_responses[$state_idx] as $event_response): ?>
                                 <div <?= ($event_response['id'] == $current_user['id']) ? "id='user-state'":""  ?> class="state-content over-ellipsis disp-iblock pure-u-1 mt10">
                                     <div class="name disp-m-block disp-iblock over-ellipsis fs-large fs-m-large"><?= h($event_response["display_name"]); ?></div>
-                                    <?php if($event->participants_limit > 0): ?>
+                                    <?php if($event_data->participants_limit > 0): ?>
                                         <div class="time disp-iblock fr fs-small fs-m-small"><?= $event_response["time"]->i18nFormat('MM-dd HH:mm:ss') ?></div>
                                     <?php endif; ?>
                                 </div>
@@ -270,10 +270,10 @@ $day_of_weeks = Configure::read('day_of_weeks');
                             <?= Configure::read('response_states')[$state_idx]["text"] ?>
                         </div>
                         <div id="state-contents-<?= $state_idx ?>">
-                        <?php foreach($event->event_responses[$state_idx] as $event_response): ?>
+                        <?php foreach($event_data->event_responses[$state_idx] as $event_response): ?>
                             <div <?= ($event_response['id'] == $current_user['id']) ? "id='user-state'":""  ?> class="state-content over-ellipsis disp-iblock pure-u-1 mt10">
                                 <div class="name disp-m-block disp-iblock over-ellipsis fs-large fs-m-large"><?= h($event_response["display_name"]); ?></div>
-                                <?php if($event->participants_limit > 0): ?>
+                                <?php if($event_data->participants_limit > 0): ?>
                                     <div class="time disp-iblock fr fs-small fs-m-small"><?= $event_response["time"]->i18nFormat('MM-dd HH:mm:ss') ?></div>
                                 <?php endif ?>
                             </div>
@@ -287,7 +287,7 @@ $day_of_weeks = Configure::read('day_of_weeks');
                         <?= Configure::read('response_states')[$state_idx]["text"] ?>
                     </div>
                     <div style="height:200px; overflow:scroll;" id="state-contents-<?= $state_idx ?>">
-                        <?php foreach ($event->event_responses[$state_idx] as $event_response) : ?>
+                        <?php foreach ($event_data->event_responses[$state_idx] as $event_response) : ?>
                             <div <?= ($event_response['id'] == $current_user['id']) ? "id='user-state'":"" ?> class="state-content over-ellipsis">
                                 <div class="fs-medium  fs-m-midium"><?= h($event_response["display_name"]); ?></div>
                             </div>
@@ -296,11 +296,11 @@ $day_of_weeks = Configure::read('day_of_weeks');
                 </div>
             </div>
         </div>
-        <?php if (count($event->comments) > 0) : ?>
+        <?php if (count($event_data->comments) > 0) : ?>
         <div class="row mb20">
             <div class="label mb5">コメント一覧</div>
             <div class="content comments">
-                <?php foreach ($event->comments as $comment) : ?>
+                <?php foreach ($event_data->comments as $comment) : ?>
                     <div class="comment w100 mb5 p10 disp-flex align-center dir-column">
                         <div class="comment-header mb5 w100 disp-flex just-center align-center dir-row">
                             <div class="name w100 over-ellipsis"><?= $comment->user->display_name ?></div>
