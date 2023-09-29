@@ -31,7 +31,7 @@
 </p>
 
 
-<div class="login-content disp-flex just-center">
+<div class="login-content disp-flex align-center dir-column">
     <div class="login form pure-g pure-form pure-form-stacked mb10">
         <?= $this->Form->create() ?>
             <div class="mb30">
@@ -48,4 +48,54 @@
         <?= $this->Form->end() ?>
     </div>
 
+    <div class="policy p10" style="width: 350px; border:black 1px solid; background-color: #e6e5e5; border-radius: 5px; margin-top:20px;">
+        <span style="font-weight:bold;">LINEログインによる個人情報の取り扱い</span>
+        <div class="policy-content mt10 mb10" style="font-size:14px; height:300px; overflow:scroll;">
+        <?php  
+        $policy = <<<EOF
+        このウェブサイト（以下、本サイト）は、ユーザーのプライバシーを尊重し、ユーザー情報の収集と利用に関する方針を以下に示します。
+        
+        <span style="font-weight:bold;">1. 収集する情報</span>
+        
+        本サイトは、ユーザーがLINEログインを使用する際、以下の情報を収集します。
+        ・表示名
+
+
+        <span style="font-weight:bold;">2. 情報の利用目的</span>
+
+        収集した情報は、ユーザーが本サイトを利用する際の識別の目的で使用されます。
+        
+
+        <span style="font-weight:bold;">3. ユーザー情報の保管</span>
+        
+        収集した表示名は、本サイトのデータベースに保管されます。
+        
+        <span style="font-weight:bold;">4. 表示名の変更</span>
+        
+        表示名は、ユーザーの任意により変更可能です。変更した場合、新しい表示名がデータベースに反映され、今後の利用時に使用されます。
+        
+        <span style="font-weight:bold;">5. ユーザー情報の他サービスへの提供</span>
+        
+        本サイトは、LINEログインを通じてユーザー情報を収集しますが、新規登録時以外でLINEに保存されているユーザー情報を引き出すことはありません。
+        ユーザー情報は、本サイト内での利用に制限され、他のサービスへの提供は行いません。
+        
+        <span style="font-weight:bold;">6. プライバシーに関するお問い合わせ</span>
+        
+        ユーザーは、プライバシーに関するご質問や懸念事項がある場合、以下の連絡先にお問い合わせいただけます。
+        
+        <span style="font-weight:bold;">[お問い合わせ先]</span>
+        連絡先メールアドレス: <a href="mailto:userjpcafe@gmail.com" style="color:blue;">userjpcafe@gmail.com</a>
+
+
+        本ポリシーは、ユーザー情報の取り扱いに関する方針を示すものであり、本サイトの利用に関して適用されます。
+        ポリシーの変更がある場合、本サイト上で通知いたします。
+        [最終更新日: 2023年9月29日]
+        EOF;
+        ?>
+        <?= nl2br($policy) ?>
+        </div>
+    </div>
 </div>
+
+
+
