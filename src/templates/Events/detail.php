@@ -21,6 +21,12 @@ use Cake\I18n\FrozenTime;
 $user_response_state = (!is_null($event_data->user_response_state)) ? Configure::read('response_states')[$event_data->user_response_state] : null;
 $event_state = Configure::read('event_states')[$event_data->event_state];
 $day_of_weeks = Configure::read('day_of_weeks');
+
+$area_count = count(explode(",", h($event_data->area)));
+$usage_price_total = ($event_data->location->usage_price > 0 ? $event_data->location->usage_price:0) * $area_count;
+$night_price_total = ($event_data->location->night_price > 0 ? $event_data->location->night_price:0) * $area_count;
+$usage_price_per_responses = ceil($usage_price_total / count($event_data->event_responses[1]));
+$night_price_per_responses = ceil($night_price_total / count($event_data->event_responses[1]));
 ?>
 <script>
     let current_user = <?= json_encode($current_user) ?>;
@@ -174,26 +180,35 @@ $day_of_weeks = Configure::read('day_of_weeks');
         <div class="row mb20">
             <div class="label mb5">コート代</div>
             <div class="content">
-                <?php $area_count = count(explode(",", h($event_data->area))); ?>
-                <?php $usage_price_total = ($event_data->location->usage_price > 0 ? $event_data->location->usage_price:0) * $area_count; ?>
-                <?php $night_price_total = ($event_data->location->night_price > 0 ? $event_data->location->night_price:0) * $area_count; ?>
-                昼間料金 : <?= $usage_price_total ?>円 (<?= (($event_data->location->usage_price > 0) ? $event_data->location->usage_price : 0).'円' ?> × <?= $area_count ?>コート)
-                <?php if($event_data->location->usage_price > 0 && count($event_data->event_responses[1])): ?>
-                    <br>一人あたり<?= ceil($usage_price_total / count($event_data->event_responses[1])) ?>円(参加人数<?= count($event_data->event_responses[1]) ?>人の場合)
-                <?php else: ?>
-                    <br>一人あたり0円(参加人数<?= count($event_data->event_responses[1]) ?>人の場合)
-                <?php endif; ?>
-                <br>
+
+
+                <div class="mt10" style="border-left: 10px orange solid;padding-left: 10px;">
+                    昼間料金 : <?= $usage_price_total ?>円
+                    <br>(<?= (($event_data->location->usage_price > 0) ? $event_data->location->usage_price : 0).'円' ?> × <?= $area_count ?>コート)
+                    <span style="color:light-gray;">
+                        <?php if($event_data->location->usage_price > 0 && count($event_data->event_responses[1])): ?>
+                            <br>一人あたり<?= $usage_price_per_responses ?>円
+                        <?php else: ?>
+                            <br>一人あたり0円
+                        <?php endif; ?>
+                        <br>(参加人数<?= count($event_data->event_responses[1]) ?>人の場合)
+                    </span>
+                </div>
+                <div class="mt10" style="border-left: 10px blue solid;padding-left: 10px;">
+                    夜間料金 : <?= $night_price_total ?>円
+                    <br>(<?= (($event_data->location->night_price > 0) ? $event_data->location->night_price : 0).'円' ?> × <?= $area_count ?>コート)
+                    <span style="color:light-gray;">
+                    <?php if($event_data->location->night_price > 0 && count($event_data->event_responses[1])): ?>
+                        <br>一人あたり<?= $night_price_per_responses ?>円
+                    <?php else: ?>
+                        <br>一人あたり0円
+                    <?php endif; ?>
+                        <br>(参加人数<?= count($event_data->event_responses[1]) ?>人の場合)
+                    </span>    
+                </div>
                 
-                <br>夜間料金 : <?= $night_price_total ?>円 (<?= (($event_data->location->night_price > 0) ? $event_data->location->night_price : 0).'円' ?> × <?= $area_count ?>コート)
-                <?php if($event_data->location->night_price > 0 && count($event_data->event_responses[1])): ?>
-                    <br>一人あたり<?= ceil($night_price_total / count($event_data->event_responses[1])) ?>円(参加人数<?= count($event_data->event_responses[1]) ?>人の場合)
-                <?php else: ?>
-                    <br>一人あたり0円(参加人数<?= count($event_data->event_responses[1]) ?>人の場合)
-                <?php endif; ?>
                 
-                
-                <p class="note-p">
+                <p class="note-p mt10">
                     コート料金が設定されていない場合0円が表示されます。
                     <br>ナイター料金が設定されていない場合、夜の料金は昼と同じ合計金額が表示されます。
                 </p>
