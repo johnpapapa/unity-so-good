@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace App\Model\Table;
 
-use Cake\ORM\Query;
-use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
 
@@ -12,7 +10,6 @@ use Cake\Validation\Validator;
  * Locations Model
  *
  * @property \App\Model\Table\EventsTable&\Cake\ORM\Association\HasMany $Events
- *
  * @method \App\Model\Entity\Location newEmptyEntity()
  * @method \App\Model\Entity\Location newEntity(array $data, array $options = [])
  * @method \App\Model\Entity\Location[] newEntities(array $data, array $options = [])

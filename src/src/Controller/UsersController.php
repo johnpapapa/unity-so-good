@@ -2,10 +2,6 @@
 declare(strict_types=1);
 
 namespace App\Controller;
-use Cake\Core\Configure; 
-use Cake\Http\Cookie\Cookie;
-use Cake\Log\Log;
-use DateTime;
 
 /**
  * Users Controller
@@ -31,33 +27,36 @@ class UsersController extends AppController
     {
         //cookieが残っている場合cookieによるログインを行う
         $login_user_data = $this->Login->processCookieAutoLogin();
-        if($login_user_data){ //ログイン済みの場合TOPに遷移
-            $this->Flash->success("セッション情報が切れていた為再ログインしました");
-            return $this->redirect(['controller'=>'Events', 'action'=>'index']);
+        if ($login_user_data) { //ログイン済みの場合TOPに遷移
+            $this->Flash->success('セッション情報が切れていた為再ログインしました');
+
+            return $this->redirect(['controller' => 'Events', 'action' => 'index']);
         }
     }
 
-    public function lineLogin(){
+    public function lineLogin()
+    {
         $this->autoRender = false;
 
         //LINEからLINEユーザー情報の取得
         $line_user_data = $this->Login->getLineUserData();
-        if(!$line_user_data){
-            $this->Flash->error("LINEログインに失敗しました");
-            return $this->redirect(['controller'=>'Events','action'=>'index']);
+        if (!$line_user_data) {
+            $this->Flash->error('LINEログインに失敗しました');
+
+            return $this->redirect(['controller' => 'Events','action' => 'index']);
         }
 
         //LINEユーザ情報を使用したユーザー情報の取得
         $user_data = $this->Login->processLineLogin($line_user_data);
-        if(!$user_data){
-            $this->Flash->error("LINE情報を使用したユーザー情報の取得に失敗しました");
+        if (!$user_data) {
+            $this->Flash->error('LINE情報を使用したユーザー情報の取得に失敗しました');
         }
-        
+
         //ログイン情報の更新
         $this->Login->processSetLogin($user_data);
         $this->Flash->success(__('LINEログインに成功しました'));
 
-        return $this->redirect(['controller'=>'Events','action'=>'index']);
+        return $this->redirect(['controller' => 'Events','action' => 'index']);
     }
 
     public function logout()
@@ -67,33 +66,38 @@ class UsersController extends AppController
             $this->Login->removeIdentity();
             $this->Login->removeCookieAutoLogin();
             $this->Login->removeDataAutoLogin($login_user_data);
-
         }
+
         return $this->redirect(['controller' => 'Users', 'action' => 'login']);
     }
 
-    public function detail(){
+    public function detail()
+    {
         $login_user_data = $this->Login->getLoginUserData();
-        
-        if(!$login_user_data){
+
+        if (!$login_user_data) {
             $this->log($login_user_data);
             $this->Flash->error(__('ユーザー情報の取得に失敗しました。'));
+
             return $this->redirect(['controller' => 'Users', 'action' => 'login']);
         }
 
-        $current_user = $this->Users->find("all", ['conditions'=>['id'=>$login_user_data['id']]])->first();
+        $current_user = $this->Users->find('all', ['conditions' => ['id' => $login_user_data['id']]])->first();
         $this->set(compact('current_user'));
 
         if ($this->request->is('post')) {
             $data = $this->request->getData();
-            
+
             $save_data = [];
-            if(isset($data['display_name'])){ $save_data['display_name'] = $data['display_name']; }
+            if (isset($data['display_name'])) {
+                $save_data['display_name'] = $data['display_name'];
+            }
             $user_data = $this->Users->patchEntity($current_user, $save_data);
             $result_user = $this->Users->save($user_data);
             if ($result_user) {
                 $this->Flash->success(__('The user data has been saved.'));
-                return $this->redirect(['controller'=>'events', 'action' => 'index']);
+
+                return $this->redirect(['controller' => 'events', 'action' => 'index']);
             }
             $this->Flash->error(__('The user data could not be saved. Please, try again.'));
         }

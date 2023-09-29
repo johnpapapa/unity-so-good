@@ -3,18 +3,16 @@ declare(strict_types=1);
 
 namespace App\Model\Table;
 
-use Cake\ORM\Query;
+use Cake\Datasource\ConnectionManager;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
-use Cake\Datasource\ConnectionManager;
 
 /**
  * EventResponses Model
  *
  * @property \App\Model\Table\UsersTable&\Cake\ORM\Association\BelongsTo $Users
  * @property \App\Model\Table\EventsTable&\Cake\ORM\Association\BelongsTo $Events
- *
  * @method \App\Model\Entity\EventResponse newEmptyEntity()
  * @method \App\Model\Entity\EventResponse newEntity(array $data, array $options = [])
  * @method \App\Model\Entity\EventResponse[] newEntities(array $data, array $options = [])
@@ -116,7 +114,8 @@ class EventResponsesTable extends Table
      * @param int $event_id events.id
      * @return array|false eventResponses.*
      */
-    public function getEventResponseListByEventId($event_id){
+    public function getEventResponseListByEventId($event_id)
+    {
         $sql = <<<EOF
         SELECT users.id, users.display_name, er.response_state , er.updated_at
         FROM users 
@@ -128,6 +127,7 @@ class EventResponsesTable extends Table
         ON users.id = er.responder_id
         ORDER BY er.response_state DESC;
         EOF;
+
         return $this->executeSql($sql);
     }
 
@@ -137,9 +137,12 @@ class EventResponsesTable extends Table
      * @param int $user_id users.id
      * @return array|false eventResponses.*
      */
-    public function getEventResponseListByUserId($user_id, $limit=null){
+    public function getEventResponseListByUserId($user_id, $limit = null)
+    {
         $limit_sql = '';
-        if($limit){ $limit_sql = "LIMIT {$limit}";}
+        if ($limit) {
+            $limit_sql = "LIMIT {$limit}";
+        }
         $sql = <<<EOF
         SELECT 
             e.id,
@@ -170,13 +173,17 @@ class EventResponsesTable extends Table
     /**
      * 指定したuserに紐づくevent_responsesの取得
      *
-     * @param int $event_id events.id
-     * @param int $event_id events.id
+     * @param int $user_id events.id
+     * @param int $limit events.id
      * @return array|false eventResponses.*
      */
-    public function getAllEventResponseListByUserId($user_id, $limit=null){ //未反応のイベントも含めたevent_response
+    public function getAllEventResponseListByUserId($user_id, $limit = null)
+    {
+ //未反応のイベントも含めたevent_response
         $limit_sql = '';
-        if($limit){ $limit_sql = "LIMIT {$limit}";}
+        if ($limit) {
+            $limit_sql = "LIMIT {$limit}";
+        }
         $sql = <<<EOF
         SELECT 
             e.id,
@@ -210,7 +217,8 @@ class EventResponsesTable extends Table
         return $this->executeSql($sql);
     }
 
-    public function executeSql($sql){
+    public function executeSql($sql)
+    {
         return ConnectionManager::get('default')->execute($sql)->fetchAll('assoc');
     }
 }

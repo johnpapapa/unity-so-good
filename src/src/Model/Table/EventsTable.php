@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace App\Model\Table;
 
-use Cake\ORM\Query;
 use Cake\Core\Configure;
+use Cake\Datasource\ConnectionManager;
+use Cake\ORM\Query;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
-use Cake\Validation\Validator;
-use Cake\Datasource\ConnectionManager;
 use Cake\ORM\TableRegistry;
+use Cake\Validation\Validator;
 
 /**
  * Events Model
@@ -17,7 +17,6 @@ use Cake\ORM\TableRegistry;
  * @property \App\Model\Table\UsersTable&\Cake\ORM\Association\BelongsTo $Users
  * @property \App\Model\Table\LocationsTable&\Cake\ORM\Association\BelongsTo $Locations
  * @property \App\Model\Table\EventResponsesTable&\Cake\ORM\Association\HasMany $EventResponses
- *
  * @method \App\Model\Entity\Event newEmptyEntity()
  * @method \App\Model\Entity\Event newEntity(array $data, array $options = [])
  * @method \App\Model\Entity\Event[] newEntities(array $data, array $options = [])
@@ -73,7 +72,6 @@ class EventsTable extends Table
                 ],
             ],
         ]);
-        
     }
 
     /**
@@ -151,19 +149,20 @@ class EventsTable extends Table
      * "start_order"=>"ASC",
      * "is_contain_held_event"=>false
      * ```
-     * 
+     *
      * @param int $uid users.id
      * @param array<string, mixed> $conditions
      * @return array|false eventResponses.id
      */
-    public function getParticipateEventIdListByUserId($uid, $conditions=[]){
-        $start_order = "ASC";
-        if(isset($conditions["start_order"])){
-            $start_order = $conditions["start_order"];
+    public function getParticipateEventIdListByUserId($uid, $conditions = [])
+    {
+        $start_order = 'ASC';
+        if (isset($conditions['start_order'])) {
+            $start_order = $conditions['start_order'];
         }
-        $event_start_between_conditions = "events.start_time between cast(NOW() as datetime) and cast(CURRENT_DATE + interval 1 year as datetime)";
-        if(isset($conditions["is_contain_held_event"]) && $conditions["is_contain_held_event"] == true){
-            $event_start_between_conditions = $event_start_between_conditions." OR events.start_time < cast(CURRENT_DATE as datetime)";
+        $event_start_between_conditions = 'events.start_time between cast(NOW() as datetime) and cast(CURRENT_DATE + interval 1 year as datetime)';
+        if (isset($conditions['is_contain_held_event']) && $conditions['is_contain_held_event'] == true) {
+            $event_start_between_conditions = $event_start_between_conditions . ' OR events.start_time < cast(CURRENT_DATE as datetime)';
         }
 
         $sql_statement = <<<EOF
@@ -185,30 +184,31 @@ class EventsTable extends Table
         ) as e
         ORDER BY e.start_time {$start_order};
         EOF;
+
         return $this->executeSql($sql_statement);
     }
-
 
     /**
      * 指定したuserの未反応eventIdの取得
      * ### Usage
      * ```
-     *"start_order"=>"ASC",
-     *"is_contain_held_event"=>false
+     * "start_order"=>"ASC",
+     * "is_contain_held_event"=>false
      * ```
-     * 
+     *
      * @param int $uid users.id
      * @param array<string, mixed> $conditions
      * @return array|false eventResponses.id
      */
-    public function getUnrespondedEventIdListByUserId($uid, $conditions=[]){
-        $start_order = "ASC";
-        if(isset($conditions["start_order"])){
-            $start_order = $conditions["start_order"];
+    public function getUnrespondedEventIdListByUserId($uid, $conditions = [])
+    {
+        $start_order = 'ASC';
+        if (isset($conditions['start_order'])) {
+            $start_order = $conditions['start_order'];
         }
-        $event_start_between_conditions = "events.start_time between cast(NOW() as datetime) and cast(CURRENT_DATE + interval 1 year as datetime)";
-        if(isset($conditions["is_contain_held_event"]) && $conditions["is_contain_held_event"] == true){
-            $event_start_between_conditions = $event_start_between_conditions." OR events.start_time < cast(CURRENT_DATE as datetime)";
+        $event_start_between_conditions = 'events.start_time between cast(NOW() as datetime) and cast(CURRENT_DATE + interval 1 year as datetime)';
+        if (isset($conditions['is_contain_held_event']) && $conditions['is_contain_held_event'] == true) {
+            $event_start_between_conditions = $event_start_between_conditions . ' OR events.start_time < cast(CURRENT_DATE as datetime)';
         }
 
         $sql_statement = <<<EOF
@@ -232,12 +232,13 @@ class EventsTable extends Table
         ) as e
         ORDER BY e.start_time {$start_order};
         EOF;
+
         return $this->executeSql($sql_statement);
     }
 
     /**
      * 指定したorganizer_idのeventを取得
-     * 
+     *
      * @param int $organizer_user_id users.id
      * @param bool $contain_deleted_event 削除済のイベントを含める
      * @param bool $contain_held_event 開催済みのイベントを含める
@@ -245,122 +246,136 @@ class EventsTable extends Table
      * @return array|false eventResponses.*
      */
     public function getEventList(
-        $organizer_user_id=false,
-        $contain_deleted_event=false, 
-        $contain_held_event=false, 
-        $contain_not_held_event=false
-    ){
+        $organizer_user_id = false,
+        $contain_deleted_event = false,
+        $contain_held_event = false,
+        $contain_not_held_event = false
+    ) {
         $Events = TableRegistry::getTableLocator()->get('Events');
 
         $conditions = [];
-        if(!$contain_deleted_event){ $conditions['AND']['Events.deleted_at'] = 0; }
-        if($contain_held_event){ $conditions['OR']['Events.start_time <='] = date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s") . "now")); }
-        if($contain_not_held_event){ $conditions['OR']['Events.end_time >='] = date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s") . "now")); }
-        if($organizer_user_id){ $conditions['Events.organizer_id IN'] = $organizer_user_id; }
+        if (!$contain_deleted_event) {
+            $conditions['AND']['Events.deleted_at'] = 0;
+        }
+        if ($contain_held_event) {
+            $conditions['OR']['Events.start_time <='] = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . 'now'));
+        }
+        if ($contain_not_held_event) {
+            $conditions['OR']['Events.end_time >='] = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . 'now'));
+        }
+        if ($organizer_user_id) {
+            $conditions['Events.organizer_id IN'] = $organizer_user_id;
+        }
 
-        $events_query = $Events->find("all", ['conditions'=>$conditions]);
+        $events_query = $Events->find('all', ['conditions' => $conditions]);
         $events_query = $events_query
         ->contain([
             'Locations',
-            'Comments' => function (Query $query){
+            'Comments' => function (Query $query) {
                 return $query
                     ->contain('Users')
                     ->where(['Comments.deleted_at' => 0])
-                    ->order(['Comments.updated_at'=>'DESC']);
+                    ->order(['Comments.updated_at' => 'DESC']);
             },
-            'EventResponses' => function (Query $query){
+            'EventResponses' => function (Query $query) {
                 return $query
                     ->contain('Users')
                     ->order([
-                        'EventResponses.updated_at'=>'ASC', 
-                        'EventResponses.response_state'=>'DESC'
+                        'EventResponses.updated_at' => 'ASC',
+                        'EventResponses.response_state' => 'DESC',
                     ]);
-            }
+            },
         ])
-        ->order(['Events.start_time'=>'ASC'])
-        ->limit(Configure::read('event_item_limit')); 
+        ->order(['Events.start_time' => 'ASC'])
+        ->limit(Configure::read('event_item_limit'));
         $events = $events_query->all()->toArray();
+
         return $events;
     }
-    
+
     /**
      * 指定したevent_idでeventの取得
      */
-    public function getEventByEventId($event_id){
-        $event = $this->find("all", [
-            "conditions" => ["Events.id" => $event_id]
+    public function getEventByEventId($event_id)
+    {
+        $event = $this->find('all', [
+            'conditions' => ['Events.id' => $event_id],
         ])
         ->contain([
             'Locations',
-            'Comments' => function (Query $query){
+            'Comments' => function (Query $query) {
                 return $query
                     ->contain('Users')
                     ->where(['Comments.deleted_at' => 0])
-                    ->order(['Comments.updated_at'=>'DESC']);
+                    ->order(['Comments.updated_at' => 'DESC']);
             },
-            'EventResponses' => function (Query $query){
+            'EventResponses' => function (Query $query) {
                 return $query
                     ->contain('Users')
                     ->order([
-                        'EventResponses.updated_at'=>'ASC', 
-                        'EventResponses.response_state'=>'DESC'
+                        'EventResponses.updated_at' => 'ASC',
+                        'EventResponses.response_state' => 'DESC',
                     ]);
-            }
+            },
         ])
         ->first();
+
         return $event;
     }
 
     /**
      * 指定したevent_idのリストでeventの取得
-     * 
+     *
      * @param array $event_id_list 取得するeventのidの配列
      * @param string $event_display_order 開始時刻によるイベント表示順
      * @param string $response_display_order 反応時刻による反応表示順
      * @return array eventの配列
      */
-    public function getEventListByEventId($event_id_list = [], $event_display_order='ASC', $response_display_order='ASC'){
+    public function getEventListByEventId($event_id_list = [], $event_display_order = 'ASC', $response_display_order = 'ASC')
+    {
         $Locations = TableRegistry::getTableLocator()->get('Locations');
         $Events = TableRegistry::getTableLocator()->get('Events');
         $conditions = [
-            'Events.id IN' => $event_id_list
-        ]; 
+            'Events.id IN' => $event_id_list,
+        ];
 
-        $events_query = $Events->find("all", ['conditions'=>$conditions]);
+        $events_query = $Events->find('all', ['conditions' => $conditions]);
         $events_query = $events_query
         ->contain([
             'Locations',
             'Comments',
             'EventResponses' => [
                 'sort' => [
-                    'EventResponses.updated_at' => $response_display_order //反応した時間順
-                ]
-            ]
+                    'EventResponses.updated_at' => $response_display_order, //反応した時間順
+                ],
+            ],
         ])
         ->select($Events)
         ->select($Locations)
         ->contain('EventResponses.Users') //EventResponsesに紐づくUsersオブジェクト作成
         ->contain('Comments.Users')
-        ->order(['Events.start_time'=>$event_display_order]) //Eventが表示される順番
-        ->limit(Configure::read('event_item_limit')); 
+        ->order(['Events.start_time' => $event_display_order]) //Eventが表示される順番
+        ->limit(Configure::read('event_item_limit'));
         $events = $events_query->all()->toArray();
+
         return $events;
     }
 
-    public function getNeighberEventId($start_time, $type){
-        $conditions = ["Events.deleted_at"=>0];
+    public function getNeighberEventId($start_time, $type)
+    {
+        $conditions = ['Events.deleted_at' => 0];
         $order = [];
-        if($type == 'previous'){
-            $conditions["Events.start_time <"] = $start_time;
+        if ($type == 'previous') {
+            $conditions['Events.start_time <'] = $start_time;
             $order['Events.start_time'] = 'DESC';
         }
-        if($type == 'next'){
-            $conditions["Events.start_time >"] = $start_time;
+        if ($type == 'next') {
+            $conditions['Events.start_time >'] = $start_time;
             $order['Events.start_time'] = 'ASC';
         }
 
-        $event_data = $this->find("all", [
-            "conditions" => $conditions
+        $event_data = $this->find('all', [
+            'conditions' => $conditions,
         ])->select('id')->order($order)->limit(1)->first();
 
         return $event_data;
@@ -372,7 +387,8 @@ class EventsTable extends Table
      * @param string $sql_statement SQL文章
      * @return array|false eventResponses.*
      */
-    public function executeSql($sql_statement){
+    public function executeSql($sql_statement)
+    {
         return ConnectionManager::get('default')->execute($sql_statement)->fetchAll('assoc');
     }
 }

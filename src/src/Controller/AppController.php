@@ -16,13 +16,8 @@ declare(strict_types=1);
  */
 namespace App\Controller;
 
-use Cake\Datasource\FactoryLocator;
 use Cake\Controller\Controller;
-use Cake\Http\Cookie\Cookie;
-use Cake\Core\Configure;
 use Cake\Event\EventInterface;
-use DateTime;
-use Cake\Routing\Router;
 use Cake\Log\Log;
 
 /**
@@ -33,7 +28,7 @@ use Cake\Log\Log;
  *
  * @link https://book.cakephp.org/4/en/controllers.html#the-app-controller
  * @property \App\Controller\Component\loginComponent $Login
- * 
+ *
  *
  * @property \Authentication\Controller\Component\AuthenticationComponent $Authentication
  */
@@ -63,18 +58,20 @@ class AppController extends Controller
         //ログイン情報をページ表示する前に取得//ログインページではこれらのチェックをスルー
         $controller = $this->getRequest()->getParam('controller');
         $action = $this->getRequest()->getParam('action');
-        if(!($controller=='Users' && $action=='login')){
+        if (!($controller == 'Users' && $action == 'login')) {
             $login_user_data = $this->Login->getLoginUserData();
-            if(!$login_user_data){ 
+            if (!$login_user_data) {
                 $login_user_data = false;
             }
         } else {
             $login_user_data = false;
         }
 
-        $this->set("current_user", $login_user_data);
+        $this->set('current_user', $login_user_data);
     }
-    public function setLog($message){
+
+    public function setLog($message)
+    {
         Log::write('debug', print_r($message, true));
     }
 }
