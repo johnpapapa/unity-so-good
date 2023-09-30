@@ -269,23 +269,23 @@ class EventsTable extends Table
 
         $events_query = $Events->find('all', ['conditions' => $conditions]);
         $events_query = $events_query
-        ->contain([
-            'Locations',
-            'Comments' => function (Query $query) {
-                return $query
-                    ->contain('Users')
-                    ->where(['Comments.deleted_at' => 0])
-                    ->order(['Comments.updated_at' => 'DESC']);
-            },
-            'EventResponses' => function (Query $query) {
-                return $query
-                    ->contain('Users')
-                    ->order([
-                        'EventResponses.updated_at' => 'ASC',
-                        'EventResponses.response_state' => 'DESC',
-                    ]);
-            },
-        ])
+            ->contain([
+                'Locations',
+                'Comments' => function (Query $query) {
+                    return $query
+                        ->contain('Users')
+                        ->where(['Comments.deleted_at' => 0])
+                        ->order(['Comments.updated_at' => 'DESC']);
+                },
+                'EventResponses' => function (Query $query) {
+                    return $query
+                        ->contain('Users')
+                        ->order([
+                            'EventResponses.updated_at' => 'ASC',
+                            'EventResponses.response_state' => 'DESC',
+                        ]);
+                },
+            ])
         ->order(['Events.start_time' => 'ASC'])
         ->limit(Configure::read('event_item_limit'));
         $events = $events_query->all()->toArray();
@@ -301,23 +301,23 @@ class EventsTable extends Table
         $event = $this->find('all', [
             'conditions' => ['Events.id' => $event_id],
         ])
-        ->contain([
-            'Locations',
-            'Comments' => function (Query $query) {
-                return $query
-                    ->contain('Users')
-                    ->where(['Comments.deleted_at' => 0])
-                    ->order(['Comments.updated_at' => 'DESC']);
-            },
-            'EventResponses' => function (Query $query) {
-                return $query
-                    ->contain('Users')
-                    ->order([
-                        'EventResponses.updated_at' => 'ASC',
-                        'EventResponses.response_state' => 'DESC',
-                    ]);
-            },
-        ])
+            ->contain([
+                'Locations',
+                'Comments' => function (Query $query) {
+                    return $query
+                        ->contain('Users')
+                        ->where(['Comments.deleted_at' => 0])
+                        ->order(['Comments.updated_at' => 'DESC']);
+                },
+                'EventResponses' => function (Query $query) {
+                    return $query
+                        ->contain('Users')
+                        ->order([
+                            'EventResponses.updated_at' => 'ASC',
+                            'EventResponses.response_state' => 'DESC',
+                        ]);
+                },
+            ])
         ->first();
 
         return $event;
@@ -341,21 +341,21 @@ class EventsTable extends Table
 
         $events_query = $Events->find('all', ['conditions' => $conditions]);
         $events_query = $events_query
-        ->contain([
-            'Locations',
-            'Comments',
-            'EventResponses' => [
-                'sort' => [
-                    'EventResponses.updated_at' => $response_display_order, //反応した時間順
+            ->contain([
+                'Locations',
+                'Comments',
+                'EventResponses' => [
+                    'sort' => [
+                        'EventResponses.updated_at' => $response_display_order, //反応した時間順
+                    ],
                 ],
-            ],
-        ])
-        ->select($Events)
-        ->select($Locations)
-        ->contain('EventResponses.Users') //EventResponsesに紐づくUsersオブジェクト作成
-        ->contain('Comments.Users')
-        ->order(['Events.start_time' => $event_display_order]) //Eventが表示される順番
-        ->limit(Configure::read('event_item_limit'));
+            ])
+            ->select($Events)
+            ->select($Locations)
+            ->contain('EventResponses.Users') //EventResponsesに紐づくUsersオブジェクト作成
+            ->contain('Comments.Users')
+            ->order(['Events.start_time' => $event_display_order]) //Eventが表示される順番
+            ->limit(Configure::read('event_item_limit'));
         $events = $events_query->all()->toArray();
 
         return $events;

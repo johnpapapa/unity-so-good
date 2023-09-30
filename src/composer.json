@@ -47,6 +47,7 @@
         ],
         "cs-check": "phpcs --colors -p  src/ tests/",
         "cs-fix": "phpcbf --colors -p src/ tests/",
+        "cs-rule": "phpcs --config-set installed_paths ./phpcs.xml",
         "stan": "phpstan analyse",
         "test": "phpunit --colors=always"
     },

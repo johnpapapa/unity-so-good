@@ -55,20 +55,20 @@ class AdministratorsController extends AppController
         ];
         $events_query = $this->Events->find('all', ['conditions' => $conditions]);
         $events_query = $events_query
-        ->contain([
-            'Locations',
-            'EventResponses' => [
-                'sort' => [
-                    'response_state' => 'DESC', //反応した種類順
-                    'EventResponses.updated_at' => 'ASC', //反応した時間順
+            ->contain([
+                'Locations',
+                'EventResponses' => [
+                    'sort' => [
+                        'response_state' => 'DESC', //反応した種類順
+                        'EventResponses.updated_at' => 'ASC', //反応した時間順
+                    ],
                 ],
-            ],
-        ])
-        ->select($this->Events)
-        ->select($this->Locations)
-        ->contain('EventResponses.Users') //EventResponsesに紐づくUsersオブジェクト作成
-        ->order(['Events.start_time' => 'ASC']) //Eventが表示される順番
-        ->limit(50);
+            ])
+            ->select($this->Events)
+            ->select($this->Locations)
+            ->contain('EventResponses.Users') //EventResponsesに紐づくUsersオブジェクト作成
+            ->order(['Events.start_time' => 'ASC']) //Eventが表示される順番
+            ->limit(50);
         $events = $events_query->all()->toArray();
 
         $events = $this->Event->getFormatEventDataList($events);
@@ -288,23 +288,23 @@ class AdministratorsController extends AppController
         $event = $this->Events->find('all', [
             'conditions' => ['Events.id' => $id],
         ])
-        ->contain([
-            'Locations',
-            'Comments' => function (Query $query) {
-                return $query
-                    ->contain('Users')
-                    ->where(['Comments.deleted_at' => 0])
-                    ->order(['Comments.updated_at' => 'ASC']);
-            },
-            'EventResponses' => function (Query $query) {
-                return $query
-                    ->contain('Users')
-                    ->order([
-                        'EventResponses.updated_at' => 'ASC',
-                        'EventResponses.response_state' => 'DESC',
-                    ]);
-            },
-        ])
+            ->contain([
+                'Locations',
+                'Comments' => function (Query $query) {
+                    return $query
+                        ->contain('Users')
+                        ->where(['Comments.deleted_at' => 0])
+                        ->order(['Comments.updated_at' => 'ASC']);
+                },
+                'EventResponses' => function (Query $query) {
+                    return $query
+                        ->contain('Users')
+                        ->order([
+                            'EventResponses.updated_at' => 'ASC',
+                            'EventResponses.response_state' => 'DESC',
+                        ]);
+                },
+            ])
         ->first();
         $event = $this->Event->getFormatEventData($event);
 

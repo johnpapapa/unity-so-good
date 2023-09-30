@@ -239,7 +239,7 @@ class loginComponent extends Component
             'redirect_uri'  => Configure::read('param_linelogin.redirect_uri')[$this->request->host()],
             'client_id'     => '2000439541', //非公開予定
             'client_secret' => 'b3b4212b5b7760b442883bb88b1f21f1', //非公開予定
-          ];
+        ];
 
         $ch1 = curl_init();
         curl_setopt($ch1, CURLOPT_HTTPHEADER, ['Content-Type: application/x-www-form-urlencoded']);

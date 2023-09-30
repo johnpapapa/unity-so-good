@@ -400,10 +400,10 @@ class EventsController extends AppController
         $event_data = $this->Events->find('all', [
             'conditions' => ['Events.id' => $id],
         ])
-        ->contain(['Locations'])
-        ->select($this->Events)
-        ->select($this->Locations)
-        ->first();
+            ->contain(['Locations'])
+            ->select($this->Events)
+            ->select($this->Locations)
+            ->first();
         if (!$event_data) {
             $this->Flash->error(__('存在しないイベントIDです'));
 
