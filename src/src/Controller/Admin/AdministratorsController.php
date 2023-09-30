@@ -97,6 +97,8 @@ class AdministratorsController extends AppController
         $this->Events = $this->fetchTable('Events');
         $this->Locations = $this->fetchTable('Locations');
 
+        //未反応情報の取得
+        //ユーザーが作成された日以降のイベントで反応していないものを表示
         $sql_statement = <<<EOF
         select 
             e.id as eid,
@@ -110,7 +112,7 @@ class AdministratorsController extends AppController
         from (
             select events.id
             from events
-            where events.start_time <= cast(CURRENT_DATE as date)  AND events.start_time > cast('{$user_data->created_at->i18nFormat("YYYY/MM/dd HH:mm:ss")}' as datetime)
+            where events.start_time > cast('{$user_data->created_at->i18nFormat("YYYY/MM/dd HH:mm:ss")}' as datetime)
         ) as e
         cross join ( select users.id from users where users.id = {$id} ) as u
         left join event_responses on event_responses.responder_id = u.id AND event_responses.event_id = e.id

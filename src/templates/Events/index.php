@@ -8,7 +8,7 @@
 <?php $this->assign('content-title', 'イベント一覧'); ?>
 
 <p class="note-p mb20">
-    14日前までのイベントが表示されます
+    今日以降のイベントが表示されます
 </p>
 
 <a href="<?= $this->Url->build(['controller' => 'events','action' => 'archived']); ?>">
