@@ -23,10 +23,20 @@ $event_state = Configure::read('event_states')[$event_data->event_state];
 $day_of_weeks = Configure::read('day_of_weeks');
 
 $area_count = count(explode(",", h($event_data->area)));
-$usage_price_total = ($event_data->location->usage_price > 0 ? $event_data->location->usage_price:0) * $area_count;
-$night_price_total = ($event_data->location->night_price > 0 ? $event_data->location->night_price:0) * $area_count;
-$usage_price_per_responses = ceil($usage_price_total / count($event_data->event_responses[1]));
-$night_price_per_responses = ceil($night_price_total / count($event_data->event_responses[1]));
+
+$usage_price_total = 0;
+$night_price_total = 0;
+$usage_price_per_responses = 0;
+$night_price_per_responses = 0;
+
+if($event_data->location->usage_price > 0){
+    $usage_price_total = ($event_data->location->usage_price > 0 ? $event_data->location->usage_price:0) * $area_count;
+    $usage_price_per_responses = ceil($usage_price_total / count($event_data->event_responses[1]));
+}
+if($event_data->location->night_price > 0){
+    $night_price_total = ($event_data->location->night_price > 0 ? $event_data->location->night_price:0) * $area_count;
+    $night_price_per_responses = ceil($night_price_total / count($event_data->event_responses[1]));
+}
 ?>
 <script>
     let current_user = <?= json_encode($current_user) ?>;
