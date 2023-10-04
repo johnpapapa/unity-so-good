@@ -31,4 +31,12 @@
             </button>
         </a>
     </div>
+
+    <div class="mb30">
+        <a href="<?= $this->Url->build(['prefix'=>'Admin', 'controller' => 'administrators','action' => 'edit-information']); ?>">
+            <button class="pure-button">
+                概要・ルールの編集
+            </button>
+        </a>
+    </div>
 </div>

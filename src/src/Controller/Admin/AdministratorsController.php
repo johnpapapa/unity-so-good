@@ -313,4 +313,52 @@ class AdministratorsController extends AppController
 
         $this->set(compact('event', 'categorized_event_response_list'));
     }
+
+    public function editInformation(){
+        $login_user_data = $this->Login->getLoginUserData();
+
+        if (!$login_user_data) {
+            $this->log($login_user_data);
+            $this->Flash->error(__('ユーザー情報の取得に失敗しました。'));
+
+            return $this->redirect(['prefix' => false, 'controller' => 'Users', 'action' => 'login']);
+        }
+
+        if (!$this->Login->isAdministrator()) {
+            $this->Flash->error(__('編集する権限がありません'));
+
+            return $this->redirect(['prefix' => false, 'controller' => 'Informations', 'action' => 'about']);
+        }
+        $this->Informations = $this->fetchTable('Informations');
+        $information_data = $this->Informations->find('all')->first();
+        if (!$information_data) {
+            $information_data = $this->Informations->newEmptyEntity();
+        }
+
+        $this->set(compact('information_data'));
+
+        if ($this->request->is('post')) {
+            $data = $this->request->getData();
+
+            $save_data = [];
+            if (isset($data['about'])) {
+                $save_data['about'] = $data['about'];
+            }
+            if (isset($data['rule'])) {
+                $save_data['rule'] = $data['rule'];
+            }
+
+            $information_data = $this->Informations->patchEntity($information_data, $save_data);
+            $result_information = $this->Informations->save($information_data);
+
+            if ($result_information) {
+                $this->Flash->success(__('The infomation data has been saved.'));
+
+                return $this->redirect(['prefix' => false, 'controller' => 'informations', 'action' => 'about']);
+            }
+            $this->Flash->error(__('The information data could not be saved. Please, try again.'));
+
+            return;
+        }
+    }
 }

@@ -9,14 +9,6 @@
 <?php $this->assign('content-title', '概要'); ?>
 <link href="https://use.fontawesome.com/releases/v6.4.2/css/all.css" rel="stylesheet">
 
-<?php if($is_admin): ?>
-    <a href="<?= $this->Url->build(['controller' => 'informations','action' => 'edit']); ?>">
-        <div class="pure-button pure-u-1-2 mb30">
-            概要・ルールの編集
-        </div>
-    </a>
-<?php endif; ?>
-
 <h3 class="mb10">概要</h3>
 <div class="mb30">
     <?= nl2br(h($information_data["about"])) ?>

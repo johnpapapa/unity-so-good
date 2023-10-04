@@ -103,6 +103,8 @@ if (Configure::read('debug')) {
     // disable router cache during development
     Configure::write('Cache._cake_routes_.duration', '+2 seconds');
 }
+// DebugKit is disabling itself as your host `unity-so-good.com` is not in the known safe list of top-level-domains
+// Configure::write('DebugKit.safeTld', ['com', 'localhost']);
 
 /*
  * Set the default server timezone. Using UTC makes time calculations / conversions easier.
