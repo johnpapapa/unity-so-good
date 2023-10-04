@@ -1,0 +1,12 @@
+User-agent: *
+Disallow: /events/archived
+Disallow: /events/unresponded
+Disallow: /events/participate
+Disallow: /events/add
+Disallow: /events/archived
+Disallow: /events/created
+Disallow: /events/created
+Disallow: /users/detail
+Disallow: /login
+
+Sitemap: /sitemap.xml
