@@ -42,3 +42,8 @@
         </div>
     </a>
 </div>
+
+<h3 class="mb10" id="change-log">更新履歴</h3>
+<div>
+    
+</div>
