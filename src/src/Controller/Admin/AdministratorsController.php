@@ -313,6 +313,7 @@ class AdministratorsController extends AppController
 
         $this->set(compact('event', 'categorized_event_response_list'));
     }
+    
 
     public function editInformation(){
         $login_user_data = $this->Login->getLoginUserData();
