@@ -21,4 +21,8 @@ $git clone [clone_url]
 $docker-compose up -d
 ```
 
-ローカルには`main` `develop` `fix` `feature/[topic]`を用意して、リモートには`main`のみで管理。
+ローカルには`main` `develop` `fix` `feature/[topic]`を用意して、リモートには`main`のみで管理。  
+`main` : デプロイ中の最新ver, 直接コミットx  
+`develop` : テスト環境の最新ver, テスト環境で問題ないことを確認してから`main`ブランチへのmerge, 直接コミットx  
+`fix` : 大小種類問わず既存の機能の修正, コミット後には`develop`ブランチへのmerge  
+`feature/[topic]` : 機能の追加, 追加後には`develop`ブランチへのmerge
