@@ -343,7 +343,12 @@ class EventsTable extends Table
         $events_query = $events_query
             ->contain([
                 'Locations',
-                'Comments',
+                'Comments' => function (Query $query) {
+                    return $query
+                        ->contain('Users')
+                        ->where(['Comments.deleted_at' => 0])
+                        ->order(['Comments.updated_at' => 'DESC']);
+                },
                 'EventResponses' => [
                     'sort' => [
                         'EventResponses.updated_at' => $response_display_order, //反応した時間順
