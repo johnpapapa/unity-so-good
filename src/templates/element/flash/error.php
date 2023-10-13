@@ -11,7 +11,7 @@ if (!isset($params['escape']) || $params['escape'] !== false) {
 <style>
     .error {
         background-color: #ea8e8eaa;
-        display: inline-block;
+        display: block;
         padding: 10px;
         margin: 10px;
         border-radius: 3px;
