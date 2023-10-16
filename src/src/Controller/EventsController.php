@@ -32,19 +32,23 @@ class EventsController extends AppController
      * @return \Cake\Http\Response|null|void Renders view
      */
 
-    public function index() //一覧
+    //一覧
+    public function index() 
     {
+        $this->set(["canonical_url"=>"events/index"]);
+
         $uid = $this->Login->getLoginUserData(true);
 
         $events = $this->Event->getEventList(false, false, false, true);
         $events = $this->Event->getFormatEventDataList($events, $uid);
-
         $this->set(compact('events'));
     }
 
+    //開催済み
     public function archived()
     {
- //開催済み
+        
+        $this->set(["canonical_url"=>"events/archived"]);
         $uid = $this->Login->getLoginUserData(true);
 
         $events = $this->Event->getEventList(false, false, true, false);
@@ -53,9 +57,10 @@ class EventsController extends AppController
         $this->set(compact('events'));
     }
 
+    //未表明
     public function unresponded()
     {
- //未表明
+        $this->set(["canonical_url"=>"events/unresponded"]);
         $uid = $this->Login->getLoginUserData(true);
         if (!$uid) {
             $this->Flash->error(__('ユーザー取得に失敗しました'));
@@ -72,9 +77,10 @@ class EventsController extends AppController
         $this->set(compact('events'));
     }
 
+    //表明済み
     public function participate()
     {
- //表明済み
+        $this->set(["canonical_url"=>"events/participate"]);
         $uid = $this->Login->getLoginUserData(true);
         if (!$uid) {
             $this->Flash->error(__('ユーザー取得に失敗しました'));
@@ -93,6 +99,7 @@ class EventsController extends AppController
 
     public function created()
     {
+        $this->set(["canonical_url"=>"events/created"]);
         $uid = $this->Login->getLoginUserData(true);
         if (!$uid) {
             $this->Flash->error(__('ユーザー取得に失敗しました'));
@@ -108,6 +115,7 @@ class EventsController extends AppController
 
     public function detail($event_id = null)
     {
+        $this->set(["canonical_url"=>"events/detail"]);
         $uid = $this->Login->getLoginUserData(true);
         if (!$uid) {
             $this->Flash->error(__('ユーザー取得に失敗しました'));
@@ -290,6 +298,7 @@ class EventsController extends AppController
      */
     public function add()
     {
+        $this->set(["canonical_url"=>"events/add"]);
         $uid = $this->Login->getLoginUserData(true);
         if (!$uid) {
             $this->Flash->error(__('ユーザー取得に失敗しました'));
@@ -384,6 +393,7 @@ class EventsController extends AppController
      */
     public function edit($id = null)
     {
+        $this->set(["canonical_url"=>"events/edit"]);
         $uid = $this->Login->getLoginUserData(true);
         if (!$uid) {
             $this->Flash->error(__('ユーザー取得に失敗しました'));
