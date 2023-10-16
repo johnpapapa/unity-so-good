@@ -28,14 +28,17 @@ $usage_price_total = 0;
 $night_price_total = 0;
 $usage_price_per_responses = 0;
 $night_price_per_responses = 0;
+$count_responses = count($event_data->event_responses[1]);
 
-if($event_data->location->usage_price > 0){
-    $usage_price_total = ($event_data->location->usage_price > 0 ? $event_data->location->usage_price:0) * $area_count;
-    $usage_price_per_responses = ceil($usage_price_total / count($event_data->event_responses[1]));
-}
-if($event_data->location->night_price > 0){
-    $night_price_total = ($event_data->location->night_price > 0 ? $event_data->location->night_price:0) * $area_count;
-    $night_price_per_responses = ceil($night_price_total / count($event_data->event_responses[1]));
+if($count_responses > 0){
+    if($event_data->location->usage_price > 0){
+        $usage_price_total = ($event_data->location->usage_price > 0 ? $event_data->location->usage_price:0) * $area_count;
+        $usage_price_per_responses = ceil($usage_price_total / count($event_data->event_responses[1]));
+    }
+    if($event_data->location->night_price > 0){
+        $night_price_total = ($event_data->location->night_price > 0 ? $event_data->location->night_price:0) * $area_count;
+        $night_price_per_responses = ceil($night_price_total / count($event_data->event_responses[1]));
+    }
 }
 ?>
 <script>
