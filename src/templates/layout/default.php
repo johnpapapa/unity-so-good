@@ -15,13 +15,18 @@
     <meta name="description" content="ソフトテニスサークルUNITYのイベントスケジュール管理">
     <meta name="google-site-verification" content="UQrGAuT7PirzIi15OAbXemRlbpo68bOqPNV5t7khHSE" />
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
+
     <?= ($flg_noindex)?"<meta name='robots' content='noindex'><meta name='googlebot' content='noindex'>":"" ?>
     <meta name='robots' content='nofollow'><meta name='googlebot' content='nofollow'>
     <title>
         <?= $this->fetch('title') ?>
     </title>
     <?= $this->Html->meta('icon') ?>
-    
+
+    <?php use Cake\Routing\Router; ?>
+    <?php if($canonical_url): ?>
+        <?= $this->Html->meta("canonical", Router::url('/', true).$canonical_url) ?>
+    <?php endif; ?>
 
     <?= $this->Html->css(['normalize.min', 'common']) ?>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css" integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls" crossorigin="anonymous">
