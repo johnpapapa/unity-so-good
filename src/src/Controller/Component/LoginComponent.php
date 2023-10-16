@@ -17,7 +17,7 @@ use DateTime;
  */
 class loginComponent extends Component
 {
-    protected $components = ['RequestHandler', 'Authentication.Authentication'];
+    protected $components = ['RequestHandler', 'Authentication.Authentication', 'Flash'];
     private $controller;
     private $request;
 
@@ -27,6 +27,7 @@ class loginComponent extends Component
         $this->Events = FactoryLocator::get('Table')->get('Events');
         $this->Users = FactoryLocator::get('Table')->get('Users');
         $this->EventResponses = FactoryLocator::get('Table')->get('EventResponses');
+        $this->RejectedTokens = FactoryLocator::get('Table')->get('RejectedTokens');
     }
 
     public function beforeFilter(\Cake\Event\EventInterface $event)
@@ -57,6 +58,7 @@ class loginComponent extends Component
         $cookie = $this->getCookieAutoLogin();
         if ($cookie) {
             $user_data = FactoryLocator::get('Table')->get('Users')->find('all', ['conditions' => ['remember_token' => $cookie]])->first();
+            // BAN確認
             if ($user_data) {
                 $this->processSetLogin($user_data, false); //有効なCookieの場合はDBとCookie情報を更新しない
 
@@ -214,10 +216,17 @@ class loginComponent extends Component
     {
         $user_data = FactoryLocator::get('Table')->get('Users')->find('all', ['conditions' => ['line_user_id' => $line_user_data['line_user_id']]])->first();
         if (!$user_data) { //該当するline_user_idが存在しない場合新規ユーザー作成
+            $line_user_id = $user_data['line_user_id'];
+            if($this->isRejected($line_user_id)){
+                $this->Flash->error(__('有効なアカウントとして認められません'));
+                return false;
+            }
+
             $save_data = $this->Users->newEntity([
                 'display_name' => $line_user_data['display_name'],
                 'line_user_id' => $line_user_data['line_user_id'],
             ]);
+
             $user_data = FactoryLocator::get('Table')->get('Users')->save($save_data);
             if (!$user_data) {
                 // $this->Flash->error(__('The event could not be saved. Please, try again.'));
@@ -225,10 +234,26 @@ class loginComponent extends Component
                 return false;
             }
 
-            // $this->Flash->success(__('The user has been saved.'));
+            $this->Flash->success(__('ユーザー情報を新規に登録しました'));
+        }
+
+        if ($user_data && !is_null($user_data['line_user_id'])){
+            $line_user_id = $user_data['line_user_id'];
+            if($this->isRejected($line_user_id)){
+                $this->Flash->error(__('有効なアカウントとして認められません'));
+                return false;
+            }
         }
 
         return $user_data;
+    }
+
+    public function isRejected($line_user_id){
+        $rejected_data = FactoryLocator::get('Table')->get('RejectedTokens')->find('all', ['conditions'=>['line_user_id'=>$line_user_id]])->first();
+        if(!$rejected_data){
+            return false;
+        }
+        return true;
     }
 
     public function getLineUserData()

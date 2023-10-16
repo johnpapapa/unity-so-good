@@ -15,11 +15,10 @@ class RejectedToken extends AbstractMigration
     public function up(): void
     {
         $this->table('rejected_tokens')
-            ->addColumn('line_user_id', 'biginteger', [
+            ->addColumn('line_user_id', 'string', [
                 'default' => null,
-                'limit' => null,
-                'null' => false,
-                'signed' => false,
+                'limit' => 50,
+                'null' => true,
             ])
             ->create();
     }

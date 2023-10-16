@@ -50,6 +50,7 @@ class UsersController extends AppController
         $user_data = $this->Login->processLineLogin($line_user_data);
         if (!$user_data) {
             $this->Flash->error('LINE情報を使用したユーザー情報の取得に失敗しました');
+            return $this->redirect(['controller' => 'Events','action' => 'index']);
         }
 
         //ログイン情報の更新
