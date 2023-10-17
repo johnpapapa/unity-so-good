@@ -37,8 +37,8 @@ class loginComponent extends Component
         $this->response = $this->getController()->getResponse();
     }
 
+    
     // ログインする際にCookie情報とDB情報を更新する処理
-
     public function processSetLogin($login_user_data, $is_cookie_update = true)
     {
         $this->setIdentity($login_user_data);
@@ -59,9 +59,8 @@ class loginComponent extends Component
         if ($cookie) {
             $user_data = FactoryLocator::get('Table')->get('Users')->find('all', ['conditions' => ['remember_token' => $cookie]])->first();
             // BAN確認
-            if ($user_data) {
+            if ($user_data && $this->isRejected($user_data["line_user_id"]) ) {
                 $this->processSetLogin($user_data, false); //有効なCookieの場合はDBとCookie情報を更新しない
-
                 return $user_data;
             } else {
                 $this->removeCookieAutoLogin();
@@ -197,7 +196,6 @@ class loginComponent extends Component
     }
 
     //管理者権限を持つuserでログインしているか
-
     public function isAdministrator()
     {
         $user_id = $this->getLoginUserData(true);
@@ -217,7 +215,7 @@ class loginComponent extends Component
         $user_data = FactoryLocator::get('Table')->get('Users')->find('all', ['conditions' => ['line_user_id' => $line_user_data['line_user_id']]])->first();
         if (!$user_data) { //該当するline_user_idが存在しない場合新規ユーザー作成
             $line_user_id = $user_data['line_user_id'];
-            if($this->isRejected($line_user_id)){
+            if($this->isRejected($line_user_id)){ //reject対象の場合ユーザー作成を拒否
                 $this->Flash->error(__('有効なアカウントとして認められません'));
                 return false;
             }
@@ -262,8 +260,8 @@ class loginComponent extends Component
             'grant_type'    => 'authorization_code',
             'code'          => $this->request->getQuery('code'),
             'redirect_uri'  => Configure::read('param_linelogin.redirect_uri')[$this->request->host()],
-            'client_id'     => '2000439541', //非公開予定
-            'client_secret' => 'b3b4212b5b7760b442883bb88b1f21f1', //非公開予定
+            'client_id'     => Configure::read('param_linelogin.client_id'), //'2000439541', //非公開予定
+            'client_secret' => Configure::read('param_linelogin.client_secret'), //'b3b4212b5b7760b442883bb88b1f21f1', //非公開予定
         ];
 
         $ch1 = curl_init();

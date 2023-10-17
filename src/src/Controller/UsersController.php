@@ -42,7 +42,6 @@ class UsersController extends AppController
         $line_user_data = $this->Login->getLineUserData();
         if (!$line_user_data) {
             $this->Flash->error('LINEログインに失敗しました');
-
             return $this->redirect(['controller' => 'Events','action' => 'index']);
         }
 
