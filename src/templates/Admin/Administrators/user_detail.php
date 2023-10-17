@@ -29,6 +29,22 @@ $day_of_weeks = Configure::read('day_of_weeks');
 <div class="event-detail">
     <div class="mb30">
         <div class="header mb10">
+            このユーザーに対する操作
+        </div>
+        <div class="content">
+
+            <div>
+                <a href="<?= $this->Url->build(['prefix'=>'Admin', 'controller' => 'administrators','action' => 'user-list']); ?>">
+                    <button class="pure-button">
+                        ユーザー削除
+                    </button>
+                </a>
+                <p class="disp-iblock">てすと</p>
+            </div>
+        </div>
+    </div>
+    <div class="mb30">
+        <div class="header mb10">
             ユーザー名
         </div>
         <div class="content">
