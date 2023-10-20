@@ -23,8 +23,44 @@ $day_of_weeks = Configure::read('day_of_weeks');
     .event-detail .content {
         font-size: 1.2rem;
     }
-
 </style>
+
+<script>
+    let user_id = <?= json_encode($user_id) ?>;
+    let user_delete_ajax_send_url = "<?= $this->Url->build(['controller' => 'Administrators', 'action' => 'ajaxDeleteUser']) ?>";
+    let ajax_send_token = "<?= $this->request->getAttribute('csrfToken') ?>";
+    $(function(){
+        $('.user-delete-btn').on('click', function(){
+            var res = confirm('このユーザーを削除しますか?');
+            if(!res){
+                return;
+            }
+            
+            let button_current = $(this);
+            button_current.prop('disabled', true);
+
+            let send_data = {
+                "user_id": user_id,
+            };
+
+            $.ajax({
+                type: "post",
+                url: user_delete_ajax_send_url,
+                data: send_data,
+                headers: { 'X-CSRF-Token' : ajax_send_token },
+            }).done(function(response){
+                // $("#target").val($.parseJSON(response));
+                console.log(response);
+                button_current.prop('disabled', false);
+                window.location.reload();
+
+            }).fail(function(jqXHR){
+                console.error('Error : ', jqXHR.status, jqXHR.statusText);
+                button_current.prop('disabled', false);
+            });
+        });
+    });
+</script>
 
 <div class="event-detail">
     <div class="mb30">
@@ -32,14 +68,22 @@ $day_of_weeks = Configure::read('day_of_weeks');
             このユーザーに対する操作
         </div>
         <div class="content">
-
-            <div>
-                <a href="<?= $this->Url->build(['prefix'=>'Admin', 'controller' => 'administrators','action' => 'user-list']); ?>">
-                    <button class="pure-button">
+            <div class="disp-flex align-center">
+                <?php if($is_user_deleted): ?>
+                    <button class="pure-button user-delete-btn" disabled>
+                        ユーザー削除済
+                    </button>
+                <?php else: ?>
+                    <button class="pure-button user-delete-btn">
                         ユーザー削除
                     </button>
-                </a>
-                <p class="disp-iblock">てすと</p>
+                <?php endif; ?>
+            
+                <p class="note-p">
+                    このユーザーに関連する情報が管理画面以外から出現しなくなります。<br>
+                    (イベントの参加情報等)<br>
+                    また、このユーザーはログインが出来なくなります。
+                </p>
             </div>
         </div>
     </div>
