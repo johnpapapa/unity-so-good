@@ -266,7 +266,6 @@ class EventsTable extends Table
         if ($organizer_user_id) {
             $conditions['Events.organizer_id IN'] = $organizer_user_id;
         }
-
         $events_query = $Events->find('all', ['conditions' => $conditions]);
         $events_query = $events_query
             ->contain([
@@ -279,7 +278,11 @@ class EventsTable extends Table
                 },
                 'EventResponses' => function (Query $query) {
                     return $query
-                        ->contain('Users')
+                        ->contain([
+                            'Users' => function (Query $uquery){
+                                return $uquery->where(['Users.deleted_at'=>0]);
+                            }
+                        ])
                         ->order([
                             'EventResponses.updated_at' => 'ASC',
                             'EventResponses.response_state' => 'DESC',
@@ -311,7 +314,11 @@ class EventsTable extends Table
                 },
                 'EventResponses' => function (Query $query) {
                     return $query
-                        ->contain('Users')
+                        ->contain([
+                            'Users' => function (Query $uquery){
+                                return $uquery->where(['Users.deleted_at'=>0]);
+                            }
+                        ])
                         ->order([
                             'EventResponses.updated_at' => 'ASC',
                             'EventResponses.response_state' => 'DESC',
@@ -349,16 +356,22 @@ class EventsTable extends Table
                         ->where(['Comments.deleted_at' => 0])
                         ->order(['Comments.updated_at' => 'DESC']);
                 },
-                'EventResponses' => [
-                    'sort' => [
-                        'EventResponses.updated_at' => $response_display_order, //反応した時間順
-                    ],
-                ],
+
+                'EventResponses' => function (Query $query) {
+                    return $query
+                        ->contain([
+                            'Users' => function (Query $uquery){
+                                return $uquery->where(['Users.deleted_at'=>0]);
+                            }
+                        ])
+                        ->order([
+                            'EventResponses.updated_at' => 'ASC',
+                            'EventResponses.response_state' => 'DESC',
+                        ]);
+                },
             ])
             ->select($Events)
             ->select($Locations)
-            ->contain('EventResponses.Users') //EventResponsesに紐づくUsersオブジェクト作成
-            ->contain('Comments.Users')
             ->order(['Events.start_time' => $event_display_order]) //Eventが表示される順番
             ->limit(Configure::read('event_item_limit'));
         $events = $events_query->all()->toArray();
