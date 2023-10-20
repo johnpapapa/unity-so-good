@@ -83,7 +83,8 @@ class AdministratorsController extends AppController
 
             return $this->redirect($this->request->referer());
         }
-
+        $this->set(['user_id'=>$id]);
+        
         $this->Users = $this->fetchTable('Users');
         $user_data = $this->Users->find('all', ['conditions' => ['id' => $id]])->first();
         if (!$user_data) {
@@ -91,6 +92,7 @@ class AdministratorsController extends AppController
 
             return $this->redirect($this->request->referer());
         }
+        $this->set(['is_user_deleted'=>$user_data["deleted_at"]]);
 
         $this->loadComponent('Event');
 
@@ -361,5 +363,69 @@ class AdministratorsController extends AppController
 
             return;
         }
+    }
+
+    public function ajaxDeleteUser()
+    {
+        $this->autoRender = false;
+        $response = ['status' => ''];
+
+        $uid = $this->Login->getLoginUserData(true);
+        if (!$uid) {
+            $this->Flash->error(__('ユーザー取得に失敗しました'));
+        }
+
+        $this->Users = $this->fetchTable('Users');
+        $data = $this->request->getData();
+        $user_id = $data['user_id'];
+        $user_data = $this->Users->find('all', ['conditions'=>['id'=>$user_id]])->first();
+        if (!$user_data) {
+            $this->Flash->error(__('ユーザ情報取得に失敗しました'));
+        }
+
+        $user_data = $this->Users->patchEntity($user_data, ['deleted_at' => 1]);
+        try {
+            $result = $this->Users->saveOrFail($user_data);
+        } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
+            $response['error'] = print_r($e);
+        }
+
+        if (!$result) {
+            $response['status'] = 'bad';
+            $this->RequestHandler->respondAs('application/json; charset=UTF-8');
+            return $this->response->withStringBody(json_encode($response));
+        }
+
+        if(!$user_data['line_user_id']){
+            $response['status'] = 'ok';
+            $response['status2'] = 'not found line_user_id this user.';
+            $this->RequestHandler->respondAs('application/json; charset=UTF-8');
+            return $this->response->withStringBody(json_encode($response));
+        }
+
+        $this->RejectedTokens = $this->fetchTable('RejectedTokens');
+        $rejected_token_data =$this->RejectedTokens->find('all', ['conditions'=>['line_user_id'=>$user_data['line_user_id']]])->first();
+        
+        if (!$rejected_token_data){
+            $rejected_token_data = $this->RejectedTokens->newEntity(['line_user_id'=>$user_data['line_user_id']]);
+            try {
+                $result = $this->RejectedTokens->saveOrFail($rejected_token_data);
+            } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
+                $response['error'] = print_r($e);
+            }
+            
+        }
+
+        
+
+        if ($result) {
+            $response['status'] = 'ok';
+        } else {
+            $response['status'] = 'bad';
+        }
+
+        $this->RequestHandler->respondAs('application/json; charset=UTF-8');
+
+        return $this->response->withStringBody(json_encode($response));
     }
 }
