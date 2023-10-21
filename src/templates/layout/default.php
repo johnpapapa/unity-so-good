@@ -24,7 +24,7 @@
     <?= $this->Html->meta('icon') ?>
 
     <?php use Cake\Routing\Router; ?>
-    <?php if($canonical_url): ?>
+    <?php if(isset($canonical_url)): ?>
         <?= $this->Html->meta("canonical", Router::url('/', true).$canonical_url) ?>
     <?php endif; ?>
 
