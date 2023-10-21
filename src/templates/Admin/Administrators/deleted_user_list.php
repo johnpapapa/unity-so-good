@@ -4,8 +4,8 @@
  * @var mixed $user_data
  */
 ?>
-<?php $this->assign('title', 'admin user-list'); ?>
-<?php $this->assign('content-title', 'ユーザーの一覧'); ?>
+<?php $this->assign('title', 'admin deleted-user-list'); ?>
+<?php $this->assign('content-title', '削除済ユーザーの一覧'); ?>
 <style>
     .user-list .user-list-content-header {
         background-color: darkgray;
@@ -13,9 +13,9 @@
 </style>
 
 <div class="user-list">
-    <a href="<?= $this->Url->build(['controller' => 'administrators','action' => 'deletedUserList']); ?>">
+    <a href="<?= $this->Url->build(['controller' => 'administrators','action' => 'userList']); ?>">
         <div class="pure-button pure-u-1-2 mb30">
-            削除済ユーザーの一覧
+            ユーザーの一覧
         </div>
     </a>
     <div class="user-list-content-header disp-flex just-center dir-row w100 mb10">
