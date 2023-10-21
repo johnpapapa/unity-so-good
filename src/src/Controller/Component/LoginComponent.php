@@ -59,7 +59,7 @@ class loginComponent extends Component
         if ($cookie) {
             $user_data = FactoryLocator::get('Table')->get('Users')->find('all', ['conditions' => ['remember_token' => $cookie]])->first();
             // BAN確認
-            if ($user_data && $this->isRejected($user_data["line_user_id"]) ) {
+            if ($user_data && !$this->isRejected($user_data["line_user_id"]) ) {
                 $this->processSetLogin($user_data, false); //有効なCookieの場合はDBとCookie情報を更新しない
                 return $user_data;
             } else {
@@ -191,7 +191,6 @@ class loginComponent extends Component
         if ($id_only && $user_data) {
             return $user_data['id'];
         }
-
         return $user_data;
     }
 
