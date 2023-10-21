@@ -39,7 +39,14 @@ class AdministratorsController extends AppController
     public function userList()
     {
         $this->Users = $this->fetchTable('Users');
-        $user_data = $this->Users->find('all')->toArray();
+        $user_data = $this->Users->find('all', ['conditions'=>['deleted_at'=>false]])->toArray();
+        $this->set(compact('user_data'));
+    }
+
+    public function deletedUserList()
+    {
+        $this->Users = $this->fetchTable('Users');
+        $user_data = $this->Users->find('all', ['conditions'=>['deleted_at'=>true]])->toArray();
         $this->set(compact('user_data'));
     }
 
