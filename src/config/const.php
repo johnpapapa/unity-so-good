@@ -14,6 +14,7 @@
         'day_of_weeks' => [1=>'月',2=>'火',3=>'水',4=>'木',5=>'金',6=>'土',7=>'日'], //日付変換用の定数:i18nFormat()->dayOfWeek => 1~7
         'event_item_limit' => 50, //表示させるイベントの個数
 
+        
         'param_linelogin' => [
             'client_id'     => '2000439541',
             'client_secret' => 'b3b4212b5b7760b442883bb88b1f21f1',
