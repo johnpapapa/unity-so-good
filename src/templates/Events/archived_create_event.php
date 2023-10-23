@@ -5,10 +5,10 @@
  */
 ?>
 <?php $this->assign('title', 'event created'); ?>
-<?php $this->assign('content-title', '作成済イベント一覧'); ?>
+<?php $this->assign('content-title', '開催済イベント一覧'); ?>
 
 <p class="note-p mb20">
-    追加したイベントが表示されます。
+    開催した作成済イベントが表示されます。
 </p>
 <a href="<?= $this->Url->build(['controller' => 'events','action' => 'add']); ?>">
     <div class="pure-button pure-u-1-2 mb30">
@@ -22,9 +22,9 @@
     </div>
 </a>
 
-<a href="<?= $this->Url->build(['controller' => 'events','action' => 'archivedCreateEvent']); ?>">
-<div class="pure-button pure-u-1-2 mb30">
-        開催済イベントの一覧
+<a href="<?= $this->Url->build(['controller' => 'events','action' => 'created']); ?>">
+    <div class="pure-button pure-u-1-2 mb30">
+        作成イベントの一覧
     </div>
 </a>
 

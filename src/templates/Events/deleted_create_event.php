@@ -18,8 +18,16 @@
 
 <a href="<?= $this->Url->build(['controller' => 'events','action' => 'created']); ?>">
     <div class="pure-button pure-u-1-2 mb30">
-        作成したイベントの一覧
+        作成イベントの一覧
     </div>
 </a>
 
-<?php echo $this->element('event-item', array('events' => $events, 'displayCreatedBtn' => true)); ?>
+<a href="<?= $this->Url->build(['controller' => 'events','action' => 'archivedCreateEvent']); ?>">
+<div class="pure-button pure-u-1-2 mb30">
+        開催済イベントの一覧
+    </div>
+</a>
+
+<div>
+    <?php echo $this->element('event-item', array('events' => $events, 'displayCreatedBtn' => true)); ?>
+</div>

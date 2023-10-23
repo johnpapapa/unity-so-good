@@ -333,7 +333,46 @@ class EventsTable extends Table
         $events = $events_query->all()->toArray();
 
         return $events;
+    }
 
+    public function getArchivedEventList($organizer_user_id=false){
+        if(!$organizer_user_id){
+            return false;
+        }
+
+        $events_query = $this->find('all', ['conditions' => [
+                'Events.organizer_id'=>$organizer_user_id, 
+                'Events.end_time >='=>date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . 'now')),
+                'Events.deleted_at'=>0,
+            ]
+        ]);
+        $events_query = $events_query
+            ->contain([
+                'Locations',
+                'Comments' => function (Query $query) {
+                    return $query
+                        ->contain('Users')
+                        ->where(['Comments.deleted_at' => 0])
+                        ->order(['Comments.updated_at' => 'DESC']);
+                },
+                'EventResponses' => function (Query $query) {
+                    return $query
+                        ->contain([
+                            'Users' => function (Query $uquery){
+                                return $uquery->where(['Users.deleted_at'=>0]);
+                            }
+                        ])
+                        ->order([
+                            'EventResponses.updated_at' => 'ASC',
+                            'EventResponses.response_state' => 'DESC',
+                        ]);
+                },
+            ])
+        ->order(['Events.start_time' => 'ASC'])
+        ->limit(Configure::read('event_item_limit'));
+        $events = $events_query->all()->toArray();
+
+        return $events;
     }
 
     /**
