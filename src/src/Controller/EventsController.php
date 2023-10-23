@@ -107,7 +107,24 @@ class EventsController extends AppController
             return $this->redirect(['controller' => 'Users', 'action' => 'login']);
         }
 
-        $events = $this->Event->getEventList($uid, true, true, true);
+        $events = $this->Event->getEventList($uid, false, true, true);
+        $events = $this->Event->getFormatEventDataList($events, $uid);
+
+        $this->set(compact('events'));
+    }
+
+    public function deletedCreateEvent()
+    {
+        // $this->set(["canonical_url"=>"events/deleted-create-event"]);
+        $uid = $this->Login->getLoginUserData(true);
+        if(!$uid){
+            $this->Flash->error(__('ユーザー取得に失敗しました'));
+
+            return $this->redirect(['controller' => 'Users', 'action' => 'login']);            
+        }
+
+        // $events = $this->Event->getEventList($uid, true, true, true);
+        $events = $this->Events->getDeletedEventList($uid);
         $events = $this->Event->getFormatEventDataList($events, $uid);
 
         $this->set(compact('events'));

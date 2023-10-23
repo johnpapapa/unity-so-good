@@ -5,10 +5,10 @@
  */
 ?>
 <?php $this->assign('title', 'event created'); ?>
-<?php $this->assign('content-title', '作成済イベント一覧'); ?>
+<?php $this->assign('content-title', '削除済イベント一覧'); ?>
 
 <p class="note-p mb20">
-    追加したイベントが表示されます。
+    削除したイベントが表示されます。
 </p>
 <a href="<?= $this->Url->build(['controller' => 'events','action' => 'add']); ?>">
     <div class="pure-button pure-u-1-2 mb30">
@@ -16,9 +16,9 @@
     </div>
 </a>
 
-<a href="<?= $this->Url->build(['controller' => 'events','action' => 'deletedCreateEvent']); ?>">
+<a href="<?= $this->Url->build(['controller' => 'events','action' => 'created']); ?>">
     <div class="pure-button pure-u-1-2 mb30">
-        削除済イベントの一覧
+        作成したイベントの一覧
     </div>
 </a>
 
