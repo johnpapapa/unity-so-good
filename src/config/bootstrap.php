@@ -80,6 +80,8 @@ try {
     Configure::config('default', new PhpConfig());
     Configure::load('app', 'default', false);
     Configure::load('const', 'default'); //config/const.phpの有効化
+    Configure::load('const_secret', 'default');
+    Configure::load('const_change_log', 'default');
     Configure::load('const_messages', 'default'); //config/const_messages.phpの有効化
 } catch (\Exception $e) {
     exit($e->getMessage() . "\n");
