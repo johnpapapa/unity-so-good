@@ -20,7 +20,7 @@
 </div>
 
 <h3 class="mb10" id="contact">連絡先</h3>
-<div class="disp-flex just-center dir-column" style="font-size: 1.2em; row-gap: 10px;">
+<div class="mb30 disp-flex just-center dir-column" style="font-size: 1.2em; row-gap: 10px;">
     <a class="disp-iblock" href="https://www.instagram.com/unity.s.tennis/">
         <div class="disp-flex align-center dir-row" style="column-gap: 10px;">
             <div><i class="fab fa-instagram" style="font-size: 1.5em;"></i></div>
@@ -43,7 +43,8 @@
     </a>
 </div>
 
-<h3 class="mb10" id="change-log">更新履歴</h3>
-<div>
+<h3 class="mb10">更新履歴</h3>
+<div class="mb30">
     
 </div>
+
