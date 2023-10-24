@@ -213,7 +213,7 @@ class loginComponent extends Component
     {
         $user_data = FactoryLocator::get('Table')->get('Users')->find('all', ['conditions' => ['line_user_id' => $line_user_data['line_user_id']]])->first();
         if (!$user_data) { //該当するline_user_idが存在しない場合新規ユーザー作成
-            $line_user_id = $user_data['line_user_id'];
+            $line_user_id = $line_user_data['line_user_id'];
             if($this->isRejected($line_user_id)){ //reject対象の場合ユーザー作成を拒否
                 $this->Flash->error(__('有効なアカウントとして認められません'));
                 return false;
