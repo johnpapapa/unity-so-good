@@ -28,6 +28,7 @@ use Authentication\AuthenticationService;
 // use Authentication\AuthenticationServiceProviderInterface;
 use Authentication\Middleware\AuthenticationMiddleware;
 // use Psr\Http\Message\ServerRequestInterface;
+use Cake\Http\Middleware\BodyParserMiddleware;
 
 return static function (RouteBuilder $routes) {
     /*
@@ -106,4 +107,17 @@ return static function (RouteBuilder $routes) {
      * });
      * ```
      */
+    // API
+    $routes->scope('/api', ['prefix' => 'Api'], function (RouteBuilder $routes) {
+        $routes->registerMiddleware('bodies', new BodyParserMiddleware());
+        $routes->applyMiddleware('bodies');
+
+        $routes->setExtensions(['json']);
+
+        // Task
+        $routes->connect('/events/list', ['controller' => 'Event', 'action' => 'list'])->setMethods(['GET']);
+        $routes->connect('/events/detail/:id', ['controller' => 'Event', 'action' => 'detail'])->setPass(['id'])->setMethods(['GET']);
+        // $routes->get('/events/detail/{id}',['controller' => 'Event', 'action' => 'detail']);
+        // $builder->connect('/task/update/:id', ['controller' => 'Task', 'action' => 'update'])->setPass(['id'])->setMethods(['PUT']);
+    });
 };

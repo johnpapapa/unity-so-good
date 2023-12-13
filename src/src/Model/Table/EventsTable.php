@@ -10,6 +10,7 @@ use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
 use Cake\Validation\Validator;
+use Cake\Collection\Collection;
 
 /**
  * Events Model
@@ -243,13 +244,18 @@ class EventsTable extends Table
      * @param bool $contain_deleted_event 削除済のイベントを含める
      * @param bool $contain_held_event 開催済みのイベントを含める
      * @param bool $contain_not_held_event 未開催のイベントを含める
-     * @return array|false eventResponses.*
+     * @param bool $is_disp_comment コメントの詳細を表示する
+     * @param bool $is_disp_response 反応の詳細を表示する
+     * @return array|collection|false eventResponses.*
      */
     public function getEventList(
         $organizer_user_id = false,
         $contain_deleted_event = false,
         $contain_held_event = false,
-        $contain_not_held_event = false
+        $contain_not_held_event = false,
+        $is_disp_comment = true,
+        $is_disp_response = true,
+        $is_to_array = true
     ) {
         $Events = TableRegistry::getTableLocator()->get('Events');
 
@@ -266,34 +272,51 @@ class EventsTable extends Table
         if ($organizer_user_id) {
             $conditions['Events.organizer_id IN'] = $organizer_user_id;
         }
+
+
+        $contain_arr = ['Locations'];
+        if($is_disp_comment){
+            $contain_arr['Comments'] = function (Query $query) {
+                return $query
+                    ->contain('Users')
+                    ->where(['Comments.deleted_at' => 0])
+                    ->order(['Comments.updated_at' => 'DESC']);
+            };
+        }
+
+        if($is_disp_response){ //反応の詳細を表示する場合ユーザー名表示
+            $contain_arr['EventResponses'] = function (Query $query) {
+                return $query
+                    ->contain([
+                        'Users' => function (Query $uquery){
+                            return $uquery->where(['Users.deleted_at'=>0]);
+                        }
+                    ])
+                    ->order([
+                        'EventResponses.updated_at' => 'ASC',
+                        'EventResponses.response_state' => 'DESC',
+                    ]);
+            };
+        } else { //反応の詳細を表示しない場合ユーザー名非表示
+            $contain_arr['EventResponses'] = function (Query $query) {
+                return $query
+                    ->select(["EventResponses.event_id", "EventResponses.response_state"])
+                    ->contain([
+                        'Users' => function (Query $uquery){
+                            return $uquery->where(['Users.deleted_at'=>0]);
+                        }
+                    ]);
+            };
+        }
+
         $events_query = $Events->find('all', ['conditions' => $conditions]);
-        $events_query = $events_query
-            ->contain([
-                'Locations',
-                'Comments' => function (Query $query) {
-                    return $query
-                        ->contain('Users')
-                        ->where(['Comments.deleted_at' => 0])
-                        ->order(['Comments.updated_at' => 'DESC']);
-                },
-                'EventResponses' => function (Query $query) {
-                    return $query
-                        ->contain([
-                            'Users' => function (Query $uquery){
-                                return $uquery->where(['Users.deleted_at'=>0]);
-                            }
-                        ])
-                        ->order([
-                            'EventResponses.updated_at' => 'ASC',
-                            'EventResponses.response_state' => 'DESC',
-                        ]);
-                },
-            ])
+        $events_query = $events_query->contain($contain_arr)
         ->order(['Events.start_time' => 'ASC'])
         ->limit(Configure::read('event_item_limit'));
-        $events = $events_query->all()->toArray();
-
-        return $events;
+        if ($is_to_array) {
+            return $events_query->all()->toArray();
+        }
+        return new Collection($events_query->all());
     }
 
     public function getDeletedEventList($organizer_user_id=false){
@@ -378,35 +401,53 @@ class EventsTable extends Table
     /**
      * 指定したevent_idでeventの取得
      */
-    public function getEventByEventId($event_id)
+    public function getEventByEventId(
+        $event_id, 
+        $is_disp_comment = true,
+        $is_disp_response = true
+    )
     {
-        $event = $this->find('all', [
+        $contain_arr = ['Locations'];
+        if($is_disp_comment){
+            $contain_arr['Comments'] = function (Query $query) {
+                return $query
+                    ->contain('Users')
+                    ->where(['Comments.deleted_at' => 0])
+                    ->order(['Comments.updated_at' => 'DESC']);
+            };
+        }
+
+        if($is_disp_response){ //反応の詳細を表示する場合ユーザー名表示
+            $contain_arr['EventResponses'] = function (Query $query) {
+                return $query
+                    ->contain([
+                        'Users' => function (Query $uquery){
+                            return $uquery->where(['Users.deleted_at'=>0]);
+                        }
+                    ])
+                    ->order([
+                        'EventResponses.updated_at' => 'ASC',
+                        'EventResponses.response_state' => 'DESC',
+                    ]);
+            };
+        } else { //反応の詳細を表示しない場合ユーザー名非表示
+            $contain_arr['EventResponses'] = function (Query $query) {
+                return $query
+                    ->select(["EventResponses.event_id", "EventResponses.response_state"])
+                    ->contain([
+                        'Users' => function (Query $uquery){
+                            return $uquery->where(['Users.deleted_at'=>0]);
+                        }
+                    ]);
+            };
+        }
+
+        $events_query = $this->find('all', [
             'conditions' => ['Events.id' => $event_id],
         ])
-            ->contain([
-                'Locations',
-                'Comments' => function (Query $query) {
-                    return $query
-                        ->contain('Users')
-                        ->where(['Comments.deleted_at' => 0])
-                        ->order(['Comments.updated_at' => 'DESC']);
-                },
-                'EventResponses' => function (Query $query) {
-                    return $query
-                        ->contain([
-                            'Users' => function (Query $uquery){
-                                return $uquery->where(['Users.deleted_at'=>0]);
-                            }
-                        ])
-                        ->order([
-                            'EventResponses.updated_at' => 'ASC',
-                            'EventResponses.response_state' => 'DESC',
-                        ]);
-                },
-            ])
-        ->first();
+        ->contain($contain_arr);
 
-        return $event;
+        return $events_query->first()->toArray();
     }
 
     /**

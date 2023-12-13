@@ -8,6 +8,7 @@ use Cake\Datasource\ConnectionManager;
 use Cake\Event\EventInterface;
 use Cake\ORM\Query;
 use Cake\Utility\Hash;
+use Psr\Log\LogLevel;
 
 /**
  * Administrators Controller
