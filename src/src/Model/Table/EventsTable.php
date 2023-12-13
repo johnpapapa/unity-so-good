@@ -447,7 +447,7 @@ class EventsTable extends Table
         ])
         ->contain($contain_arr);
 
-        return $events_query->first()->toArray();
+        return $events_query->first();
     }
 
     /**
