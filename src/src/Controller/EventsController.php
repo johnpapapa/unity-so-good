@@ -392,7 +392,7 @@ class EventsController extends AppController
             $start_time = FrozenTime::createFromFormat('H:i', $data['start_time'])->i18nFormat('HH:mm:00');
             $end_time = FrozenTime::createFromFormat('H:i', $data['end_time'])->i18nFormat('HH:mm:00');
             //使用料算出
-            $area = str_replace(['、', '，', '､'], ',', mb_convert_kana($data['area'], 'as'));
+            $area = str_replace(['、', '，', '､', '.'], ',', mb_convert_kana($data['area'], 'as'));
 
             $event_data = $this->Events->newEntity([
                 'organizer_id' => $uid,
@@ -510,13 +510,13 @@ class EventsController extends AppController
 
                 return $this->redirect(['controller' => 'Events','action' => 'created']);
             }
-            $area = str_replace(['、', '，', '､'], ',', mb_convert_kana($data['area'], 'as'));
+            $area = str_replace(['、', '，', '､', '.'], ',', mb_convert_kana($data['area'], 'as'));
 
             $event_data = $this->Events->patchEntity($event_data, [
                 'organizer_id' => $uid,
                 'start_time' => $data['event_date'] . ' ' . $data['start_time'],
                 'end_time' => $data['event_date'] . ' ' . $data['end_time'],
-                'area' => h($data['area']),
+                'area' => h($area),
                 'participants_limit' => $data['participants_limit'],
                 'comment' => h($data['comment']),
                 'location_id' => $data['location_id'],
