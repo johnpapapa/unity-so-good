@@ -15,6 +15,7 @@ docker/phpmyadmin/
 
 # OS generated files #
 ######################
+dev
 .DS_Store
 .DS_Store?
 ._*
