@@ -148,7 +148,9 @@
 </style>
 
 <nav id="top-nav">
-  <div id="snow"  data-count="50"></div>
+  <div id="snow"  data-count="50" style="display: contents;">
+    
+  </div>
   <span class="material-symbols-outlined navOpenBtn">double_arrow</span>
   <a href="<?= $this->Url->build(['prefix' => false, 'controller' => 'informations', 'action' => 'about']); ?>" id="top-nav-logo">UNITY
   </a>
