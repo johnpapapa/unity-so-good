@@ -28,7 +28,7 @@ $mv config/app_local.example.php config/app_local.php
 
 ## メモ
 * 本番環境のDB接続情報などは`app_local.php`の`Datasources`に書き込む。
-* 現状constにLINEログイン用のキーが露出してる状態なので、新しく発行する。
+* CAKE_ENV周りの設定が結構強引だからスマァトな方法考えてる=>現状configのapp.php,app_local.php,.envをコミットしないようにしてるだけ
 * 実装がひと段落つくたびにannotateをつける  
   (cakephp4/IDE Helperを使用=>`$bin/cake annotate all -r`)
 * Seederはかなり適当に書いてる。

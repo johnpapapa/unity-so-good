@@ -9,14 +9,19 @@
     use Cake\Core\Configure; 
     $host = $this->request->host();
     $param_linelogin = Configure::read('param_linelogin');
-    $url_linelogin = 'https://access.line.me/oauth2/v2.1/authorize?'.
-        'response_type=code'.
-        '&client_id='. $param_linelogin['client_id'].
-        '&redirect_uri='. $param_linelogin['redirect_uri'][$host].
-        '&state='. bin2hex(openssl_random_pseudo_bytes(16)).
-        '&scope='. $param_linelogin['scope'].
-        '&nonce='. bin2hex(openssl_random_pseudo_bytes(16));
-        
+    $param_linelogin_secret = Configure::read('param_linelogin_secre');
+    if(is_null($param_linelogin_secret)){
+        echo '<div style="color:red;font-weight: bold;font-size: large;">LINEログインが使用出来ない状態になっています<br>const_secret.phpを確認してください</div>';
+        $url_linelogin = '';
+    } else {
+        $url_linelogin = 'https://access.line.me/oauth2/v2.1/authorize?'.
+            'response_type=code'.
+            '&client_id='. $param_linelogin_secret['client_id'].
+            '&redirect_uri='. $param_linelogin['redirect_uri'][$host].
+            '&state='. bin2hex(openssl_random_pseudo_bytes(16)).
+            '&scope='. $param_linelogin['scope'].
+            '&nonce='. bin2hex(openssl_random_pseudo_bytes(16));
+    }
 ?>
 <style>
     .login-content .line-login-btn {
