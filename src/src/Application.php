@@ -121,23 +121,7 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
             'queryParam' => 'redirect',
         ]);
 
-        // メールアドレスとパスワードを認証情報とする
-        $authenticationService->loadIdentifier('Authentication.Password', [
-            'fields' => [
-                'username' => 'user_id',
-                'password' => 'password',
-            ],
-        ]);
-
         $authenticationService->loadAuthenticator('Authentication.Session');
-        // メールアドレスとパスワードを認証情報としてチェックする設定
-        $authenticationService->loadAuthenticator('Authentication.Form', [
-            'fields' => [
-                'username' => 'user_id',
-                'password' => 'password',
-            ],
-            'loginUrl' => '/login',
-        ]);
 
         return $authenticationService;
     }

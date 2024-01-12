@@ -7,6 +7,10 @@ use Cake\Controller\Component;
 use Cake\Datasource\FactoryLocator;
 // use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\I18n\FrozenTime;
+use Cake\Log\LogTrait;
+use Cake\Utility\Hash;
+use Psr\Log\LogLevel;
+use Cake\Collection\Collection;
 
 /**
  * @property \App\Model\Table\EventsTable $Events
@@ -23,10 +27,45 @@ class eventComponent extends Component
         $this->Events = FactoryLocator::get('Table')->get('Events');
         $this->Users = FactoryLocator::get('Table')->get('Users');
         $this->EventResponses = FactoryLocator::get('Table')->get('EventResponses');
+        $this->log('testini', LogLevel::DEBUG);
+    }
+
+    // API用 -- イベントのリストを取得
+    public function getEventListForApi(){
+        $event_list = $this->Events->getEventList(
+            $organizer_user_id=false,
+            $contain_deleted_event=false,
+            $contain_held_event=true,
+            $contain_not_held_event=true,
+            $is_disp_comment=true,
+            $is_disp_response=false,
+            $is_to_array=false
+        );
+        
+        // 反応をグループごとにカウント
+        $event_list = $event_list->map(function ($value, $key) {
+            $value['event_responses'] = (new Collection($value['event_responses']))->countBy('response_state')->toArray();
+            return $value;
+        });
+        return $event_list;
+    }
+
+    public function getEventByEventIdForApi($event_id)
+    {
+        $event_data = $this->Events->getEventByEventId(
+            $event_id,
+            $is_disp_comment=false,
+            $is_disp_response=false,
+            $is_to_array=false
+        );
+        $event_data['event_responses'] = (new Collection($event_data['event_responses']))->countBy('response_state')->toArray();
+        // dd(array_count_values($event_data["event_responses"]));
+        // dd($event_data);
+        // $event_data = $event_data
+        return $event_data;
     }
 
     // 指定した条件に応じたevent配列の取得
-
     public function getEventList($organizer_user_id = false, $contain_deleted_event = false, $contain_held_event = false, $contain_not_held_event = false)
     {
         return $this->Events->getEventList($organizer_user_id, $contain_deleted_event, $contain_held_event, $contain_not_held_event);

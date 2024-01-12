@@ -54,8 +54,11 @@ class AppController extends Controller
 
     public function beforeFilter(EventInterface $event)
     {
-
-        //ログイン情報をページ表示する前に取得//ログインページではこれらのチェックをスルー
+        //ログイン情報をページ表示する前に取得//API経由のアクセスではこれらのチェックをスルー
+        $prefix = $this->getRequest()->getParam('prefix');
+        if($prefix == 'Api'){    
+            return;        
+        }
         $controller = $this->getRequest()->getParam('controller');
         $action = $this->getRequest()->getParam('action');
         if (!($controller == 'Users' && $action == 'login')) {

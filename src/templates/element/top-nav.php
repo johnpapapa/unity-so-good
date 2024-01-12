@@ -6,6 +6,8 @@
 ?>
 <head>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/css/pure-snow.js" defer></script>
 </head>
 
 <style>
@@ -146,6 +148,9 @@
 </style>
 
 <nav id="top-nav">
+  <div id="snow"  data-count="50" style="display: contents;">
+    
+  </div>
   <span class="material-symbols-outlined navOpenBtn">double_arrow</span>
   <a href="<?= $this->Url->build(['prefix' => false, 'controller' => 'informations', 'action' => 'about']); ?>" id="top-nav-logo">UNITY
   </a>
