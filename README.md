@@ -17,13 +17,21 @@ https://unity-so-good.com/
 
 # 開発手順
 Docker利用した開発を推奨。
+
+1. コンテナの用意
 ```sh
 $mkdir [directory]
 $cd [directory]
 $git clone [clone_url]
 $docker-compose up -d
 $docker-compose exec app /bin/bash
-$mv config/app_local.example.php config/app_local.php
+```
+
+2. app_local.phpとconst_secret.phpを用意
+3. app_local.phpとconst_secret.phpを配置
+```sh
+$cp [app_local_path] [directory]/src/config/app_local.php
+$cp [const_secret_path] [directory]/src/config/const_secret.php
 ```
 
 ## メモ
@@ -61,11 +69,13 @@ exit;
 ```  
 
 ## ブランチの管理
-ローカルには`main` `develop` `feature/[topic]`を用意して、リモートには`main`のみで管理。  
-`main` : デプロイ中の最新ver, 直接コミットx  
+ローカルには`master` `develop` `feature/[topic]`を用意。  
+リモートには`master`と`develop`。  
+
+`master` : デプロイ中の最新ver, 直接コミットx  
 `develop` : テスト環境の最新ver
 `feature/[topic]` : 機能の追加
 
-大小問わず適当な修正は`develop`ブランチ内で修正したのち、テスト環境で問題ないことを確認してから`main`ブランチへのmergeを行なってる。
+大小問わず適当な修正は`develop`ブランチ内で修正したのち、テスト環境で問題ないことを確認してから`master`ブランチへのmergeを行なってる。
 
 また`feature/[topic]`ブランチにて機能を追加後には`develop`ブランチへのmergeを行なってる。
