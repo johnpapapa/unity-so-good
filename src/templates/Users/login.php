@@ -9,7 +9,7 @@
     use Cake\Core\Configure; 
     $host = $this->request->host();
     $param_linelogin = Configure::read('param_linelogin');
-    $param_linelogin_secret = Configure::read('param_linelogin_secre');
+    $param_linelogin_secret = Configure::read('param_linelogin_secret');
     if(is_null($param_linelogin_secret)){
         echo '<div style="color:red;font-weight: bold;font-size: large;">LINEログインが使用出来ない状態になっています<br>const_secret.phpを確認してください</div>';
         $url_linelogin = '';
