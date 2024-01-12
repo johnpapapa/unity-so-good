@@ -259,7 +259,7 @@ class loginComponent extends Component
             'grant_type'    => 'authorization_code',
             'code'          => $this->request->getQuery('code'),
             'redirect_uri'  => Configure::read('param_linelogin.redirect_uri')[$this->request->host()],
-            'client_id'     => Configure::read('param_linelogin.client_id'),
+            'client_id'     => Configure::read('param_linelogin_secret.client_id'),
             'client_secret' => Configure::read('param_linelogin_secret.client_secret'),
         ];
 
