@@ -28,7 +28,7 @@ $mv config/app_local.example.php config/app_local.php
 
 ## メモ
 * 本番環境のDB接続情報などは`app_local.php`の`Datasources`に書き込む。
-* CAKE_ENV周りの設定が結構強引だからスマァトな方法考えてる=>現状configのapp.php,app_local.php,.envをコミットしないようにしてるだけ
+* CAKE_ENV周りの設定はapp_local.phpでSeed/DB設定管理, const_secret.phpでLINEログイン等設定管理してる=>ignoreに追加
 * 実装がひと段落つくたびにannotateをつける  
   (cakephp4/IDE Helperを使用=>`$bin/cake annotate all -r`)
 * Seederはかなり適当に書いてる。
