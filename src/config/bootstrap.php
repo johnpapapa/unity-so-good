@@ -228,3 +228,12 @@ TypeFactory::map('time', StringType::class);
 //Inflector::rules('plural', ['/^(inflect)or$/i' => '\1ables']);
 //Inflector::rules('irregular', ['red' => 'redlings']);
 //Inflector::rules('uninflected', ['dontinflectme']);
+
+// //axiosにauthorizationヘッダをつけた際のプリフライト対策
+// if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+//     header('Access-Control-Allow-Origin: *');
+//     header('Access-Control-Allow-Methods: POST, PUT, PATCH, DELETE, OPTIONS');
+//     header('Access-Control-Allow-Headers: authorization');
+//     header('Access-Control-Expose-Headers: authorization');
+//     exit(0);
+// }

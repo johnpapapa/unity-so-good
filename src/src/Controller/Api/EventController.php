@@ -25,6 +25,7 @@ class EventController extends AppController
     {
         parent::beforeFilter($event);
         $this->Authentication->addUnauthenticatedActions(['list', 'detail']); //認証不要のアクション
+        header('Access-Control-Allow-Origin: *'); //cors対策
     }
 
     public function list(){
