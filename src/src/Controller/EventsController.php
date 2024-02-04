@@ -515,7 +515,6 @@ class EventsController extends AppController
             $area = str_replace(['、', '，', '､', '.'], ',', mb_convert_kana($data['area'], 'as'));
 
             $event_data = $this->Events->patchEntity($event_data, [
-                'organizer_id' => $uid,
                 'start_time' => $data['event_date'] . ' ' . $data['start_time'],
                 'end_time' => $data['event_date'] . ' ' . $data['end_time'],
                 'area' => h($area),
