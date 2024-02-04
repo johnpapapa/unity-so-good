@@ -144,6 +144,15 @@ if($count_responses > 0){
 
 
 <div class="detail">
+    <?php if($is_admin): ?>
+    <div class="event-edit mb20 disp-flex just-space">
+        <a class="buttons pure-u-1-5" href="<?= $this->Url->build(['controller' => 'events','action' => 'edit', $event_data->id]); ?>">
+            <button class="pure-button w100" type="button" style="background-color:#dfb31d7d;">
+                編集
+            </button>
+        </a>
+    </div>
+    <?php endif; ?>
     <div class="event-jump disp-flex just-space mb20">
         <?php if ($event_prev_id) : ?>
             <div class="disp-iblock fl">

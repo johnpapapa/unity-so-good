@@ -182,7 +182,9 @@ class EventsController extends AppController
         $event_prev_id = $this->Event->getNeighberEventId($event_data['start_time'], 'previous');
         $event_next_id = $this->Event->getNeighberEventId($event_data['start_time'], 'next');
 
-        $this->set(compact('event_data', 'event_prev_id', 'event_next_id'));
+
+        $is_admin = $this->Login->isAdministrator();
+        $this->set(compact('event_data', 'event_prev_id', 'event_next_id', 'is_admin'));
     }
 
     public function ajaxChangeResponseState()
@@ -453,7 +455,7 @@ class EventsController extends AppController
 
             return $this->redirect(['controller' => 'Events', 'action' => 'index']);
         }
-        if ($event_data->organizer_id != $uid) {
+        if ($event_data->organizer_id != $uid && !$this->Login->isAdministrator()) {
             $this->Flash->error(__('イベント編集の権限がありません'));
 
             return $this->redirect(['controller' => 'Events', 'action' => 'created']);
