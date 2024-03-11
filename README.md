@@ -19,6 +19,7 @@ https://unity-so-good.com/
 Docker利用した開発を推奨。
 
 1. コンテナの用意
+
 ```sh
 $mkdir [directory]
 $cd [directory]
@@ -29,12 +30,28 @@ $docker-compose exec app /bin/bash
 
 2. app_local.phpとconst_secret.phpを用意
 3. app_local.phpとconst_secret.phpを配置
+
 ```sh
 $cp [app_local_path] [directory]/src/config/app_local.php
 $cp [const_secret_path] [directory]/src/config/const_secret.php
 ```
 
+4. composerのインストール(3/12時点)
+
+```sh
+$composer install
+```
+
+5. migration(3/12時点)
+
+```sh
+$bash migrate.sh
+```
+
+
+
 ## メモ
+* 環境用意するときの`PHP Warning:  PHP Startup: Unable to load dynamic library '/path/to/intl.so'`はまだ解消してない(開発できればいいやの精神)
 * 本番環境のDB接続情報などは`app_local.php`の`Datasources`に書き込む。
 * CAKE_ENV周りの設定はapp_local.phpでSeed/DB設定管理, const_secret.phpでLINEログイン等設定管理してる=>ignoreに追加
 * 実装がひと段落つくたびにannotateをつける  
