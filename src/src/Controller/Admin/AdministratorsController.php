@@ -284,6 +284,122 @@ class AdministratorsController extends AppController
         $this->set(compact('participants_count_list'));
     }
 
+    public function cancellationList()
+    {
+        $this->loadComponent('Event');
+        $this->Events = $this->fetchTable('Events');
+        $this->Users = $this->fetchTable('Users');
+        $this->EventResponses = $this->fetchTable('EventResponses');
+        $this->EventResponseLogs = $this->fetchTable('EventResponseLogs');
+
+        //イベント数も少ないので、開催済みまたはイベント開始1日前のイベントで状態変更したユーザーをイテレーションする形でDB問い合わせ
+        // q:イベント開始1日前のイベントで状態変更した回数をカウントするSQLは作成できるか？
+        // a:
+        // 1.イベント開始1日前のイベントを取得
+        // 2.イベント開始1日前のイベントに参加したユーザーを取得
+        // 3.イベント開始1日前のイベントに参加したユーザーが状態変更した回数をカウント
+
+        $sql_statement = <<<EOF
+        select 
+            e.id as eid,
+            e.start_time,
+            e.end_time,
+            u.id as uid,
+            u.display_name,
+            erl.response_state
+        from (
+            select events.id, events.start_time, events.end_time
+            from events
+            where events.start_time BETWEEN cast('1970-01-01' as date) AND cast(CURRENT_DATE as date)
+        ) as e
+        EOF;
+        
+        // $sql_statement = <<<EOF
+        // select t.uid as uid, count(t.uid) as cnt
+        // from (
+        //     select events.id as eid, users.id as uid, users.display_name
+        //     from (
+        //         select e.id as eid, u.id as uid
+        //         from (
+        //             select events.id
+        //             from events
+        //             where events.start_time BETWEEN cast('1970-01-01' as date) AND cast(CURRENT_DATE as date)
+        //         ) as e
+        //         cross join (select users.id from users where users.deleted_at=0) as u
+        //     ) as cross_t
+        //     inner join events on events.id = cross_t.eid
+        //     inner join users on users.id = cross_t.uid
+        //     WHERE events.start_time > users.created_at AND events.start_time < NOW()
+        // ) as t
+        // inner join  event_responses
+        // on t.eid = event_responses.event_id AND t.uid = event_responses.responder_id
+        // group by (t.uid)
+        // EOF;
+
+        // $participants_count_data = ConnectionManager::get('default')->execute($sql_statement)->fetchAll('assoc');
+
+        // $sql_statement = <<<EOF
+        // select users.id as uid, count(users.id) as cnt, users.display_name
+        // from (
+        //     select e.id as eid, u.id as uid
+        //     from (
+        //         select events.id
+        //         from events
+        //         where events.start_time BETWEEN cast('1970-01-01' as date) AND cast(CURRENT_DATE as date)
+        //     ) as e
+        //     cross join (select users.id from users where users.deleted_at=0) as u
+        // ) as cross_t
+        // inner join events on events.id = cross_t.eid
+        // inner join users on users.id = cross_t.uid
+        // WHERE events.start_time > users.created_at AND events.start_time < NOW()
+        // group by (users.id)
+        // EOF;
+        // $all_count_data = ConnectionManager::get('default')->execute($sql_statement)->fetchAll('assoc');
+
+        // $participants_count_list = [];
+        // $pcd_idx_diff  = 0; //$participants_count_dataを参照する時に$all_count_dataとのoffsetを表すindex
+        // for ($idx = 0; $idx < count($all_count_data); $idx++) {
+        //     $cnt = 0;
+
+        //     // $this->log("{$idx}");
+        //     // $this->log("{$pcd_idx_diff}");
+
+        //     $isset_response_data = isset($participants_count_data[$pcd_idx_diff]);
+        //     if ($isset_response_data) {
+        //         $issame_responder = ($all_count_data[$idx]['uid'] == $participants_count_data[$pcd_idx_diff]['uid']);
+        //         $all_uid = $all_count_data[$idx]['uid'];
+        //         $p_uid = $participants_count_data[$pcd_idx_diff]['uid'];
+        //         $dis = $all_count_data[$idx]['display_name'];
+        //         $all_c = $all_count_data[$idx]['cnt'];
+        //         $p_c = $participants_count_data[$pcd_idx_diff]['cnt'];
+        //         $cc = $all_count_data[$idx]['cnt'] - $participants_count_data[$pcd_idx_diff]['cnt'];
+        //         $this->log("( all:{$all_uid} == p:{$p_uid} ) = {$issame_responder}, {$dis}");
+        //         $this->log("all:{$all_c} - p:{$p_c} = {$cc}");
+        //     } else {
+        //         $an = $all_count_data[$idx]['display_name'];
+        //         $this->log("{$an}");
+        //     }
+
+        //     if ($isset_response_data && $issame_responder) {
+        //         $cnt = $all_count_data[$idx]['cnt'] - $participants_count_data[$pcd_idx_diff]['cnt'];
+        //         $pcd_idx_diff++;
+        //     } else {
+        //         $cnt = $all_count_data[$idx]['cnt'];
+        //     }
+
+        //     $participants_count_list[] = [
+        //         'id' => $all_count_data[$idx]['uid'],
+        //         'display_name' => $all_count_data[$idx]['display_name'],
+        //         'cnt' => $cnt,
+        //     ];
+        // }
+        // $this->log("{$idx}");
+        // $this->log("{$pcd_idx_diff}");
+        // $participants_count_list = Hash::sort($participants_count_list, '{n}.cnt', 'desc', 'numeric');
+
+        // $this->set(compact('participants_count_list'));
+    }
+
     public function eventDetail($id = null)
     {
         if (!$id) {

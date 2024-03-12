@@ -27,6 +27,7 @@ class eventComponent extends Component
         $this->Events = FactoryLocator::get('Table')->get('Events');
         $this->Users = FactoryLocator::get('Table')->get('Users');
         $this->EventResponses = FactoryLocator::get('Table')->get('EventResponses');
+        $this->EventResponseLogs = FactoryLocator::get('Table')->get('EventResponseLogs');
         $this->log('testini', LogLevel::DEBUG);
     }
 

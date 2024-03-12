@@ -197,12 +197,30 @@ class EventsController extends AppController
 
         $before_response_state = 'null';
         if (!$event_response) {
-            $event_response = $this->EventResponses->newEntity(['responder_id' => $data['user_id'],'event_id' => $data['event_id']]);
+            $event_response = $this->EventResponses->newEntity([
+                'responder_id' => $data['user_id'],
+                'event_id' => $data['event_id'],
+                'response_state' => $data['response_state']
+            ]);
         } else {
-            $before_response_state = $event_response->response_state;
+            $before_response_state = $event_response->response_state; //更新前のresponse_stateは取得してViewの更新に使用
+            $event_response = $this->EventResponses->patchEntity($event_response, [
+                'response_state' => $data['response_state']
+            ]);
         }
-        $event_response = $this->EventResponses->patchEntity($event_response, ['response_state' => $data['response_state']]);
+        
         if ($this->EventResponses->save($event_response)) {
+            try{
+                $event_response_log = $this->fetchTable('EventResponseLogs')->newEntity([
+                    'responder_id' => $data['user_id'],
+                    'event_id' => $data['event_id'],
+                    'response_state' => $data['response_state']
+                ]);
+                $this->fetchTable('EventResponseLogs')->saveOrFail($event_response_log);
+            } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
+                //TODO:エラー時の$event_responseの中身をログに送出
+            }
+
             $response = [
                 'status' => 'ok',
                 'response_state' => $event_response->response_state,
@@ -210,7 +228,10 @@ class EventsController extends AppController
                 'updated_at' => $event_response->updated_at->i18nFormat('MM-dd HH:mm:ss'),
             ];
         } else {
-            $response = ['status' => 'bad'];
+            //TODO:エラー時の$event_responseの中身をログに送出
+            $response = [
+                'status' => 'bad'
+            ];
         }
 
         $this->RequestHandler->respondAs('application/json; charset=UTF-8');

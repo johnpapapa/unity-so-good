@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @var \App\View\AppView $this
  */
@@ -9,7 +10,7 @@
 
 <div class="disp-flex just-center align-center dir-column w100">
     <div class="mb30">
-        <a href="<?= $this->Url->build(['prefix'=>'Admin', 'controller' => 'administrators','action' => 'user-list']); ?>">
+        <a href="<?= $this->Url->build(['prefix' => 'Admin', 'controller' => 'administrators', 'action' => 'user-list']); ?>">
             <button class="pure-button">
                 ユーザーの一覧
             </button>
@@ -17,7 +18,7 @@
     </div>
 
     <div class="mb30">
-        <a href="<?= $this->Url->build(['prefix'=>'Admin', 'controller' => 'administrators','action' => 'event-list']); ?>">
+        <a href="<?= $this->Url->build(['prefix' => 'Admin', 'controller' => 'administrators', 'action' => 'event-list']); ?>">
             <button class="pure-button">
                 イベントの一覧
             </button>
@@ -25,7 +26,7 @@
     </div>
 
     <div class="mb30">
-        <a href="<?= $this->Url->build(['prefix'=>'Admin', 'controller' => 'administrators','action' => 'participants-count']); ?>">
+        <a href="<?= $this->Url->build(['prefix' => 'Admin', 'controller' => 'administrators', 'action' => 'participants-count']); ?>">
             <button class="pure-button">
                 未反応の一覧
             </button>
@@ -33,7 +34,15 @@
     </div>
 
     <div class="mb30">
-        <a href="<?= $this->Url->build(['prefix'=>'Admin', 'controller' => 'administrators','action' => 'edit-information']); ?>">
+        <a href="<?= $this->Url->build(['prefix' => 'Admin', 'controller' => 'administrators', 'action' => 'cancellation-list']); ?>">
+            <button class="pure-button">
+                参加変更の一覧
+            </button>
+        </a>
+    </div>
+
+    <div class="mb30">
+        <a href="<?= $this->Url->build(['prefix' => 'Admin', 'controller' => 'administrators', 'action' => 'edit-information']); ?>">
             <button class="pure-button">
                 概要・ルールの編集
             </button>

@@ -104,11 +104,11 @@ class Initial extends AbstractMigration
                 'signed' => false,
             ])
             ->addPrimaryKey(['id'])
-            ->addColumn('created_at', 'timestamp', [
-                'default' => null,
-                'limit' => null,
-                'null' => true,
-            ])
+            // ->addColumn('created_at', 'timestamp', [
+            //     'default' => null,
+            //     'limit' => null,
+            //     'null' => true,
+            // ])
             ->addColumn('updated_at', 'timestamp', [
                 'default' => null,
                 'limit' => null,

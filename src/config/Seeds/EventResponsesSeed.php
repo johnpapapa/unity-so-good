@@ -24,10 +24,9 @@ class EventResponsesSeed extends AbstractSeed
         $location_count = 5;
         
         $user_count = 10;
-        $event_count = 10;
-        $event_datetime_min = strtotime('2023-9-10 00:00:00');
-        $event_datetime_max = strtotime('2023-10-20 00:00:00');
-
+        $event_count = 30;
+        $event_datetime_min = strtotime('2024-01-01 00:00:00');
+        $event_datetime_max = strtotime('2024-12-31 00:00:00');
 
         // $user_count = 150; //負荷チェック(unityの多い時100人よりも少し多いくらいの場合)
         // $event_count = 416 * 4; //負荷チェック(土日4回 * 1年)
@@ -198,6 +197,7 @@ class EventResponsesSeed extends AbstractSeed
     public function gen_event_response_data($faker, $user_count, $event_id, $start_time){
         $comment_data = [];
         $event_response_data = [];
+        $event_response_logs_data = [];
 
         $rand_val = random_int(0, $user_count); //eventに反応した人数の生成
         $event_response_count = ($rand_val % 2 == 0) ? $rand_val : $rand_val+1; //event反応人数はペアができるように
@@ -208,21 +208,34 @@ class EventResponsesSeed extends AbstractSeed
         $responder_ids = array_slice($rand_ids, 0, $event_response_count);
 
         for($er_idx=0; $er_idx < $event_response_count; $er_idx++){
-            $response_time = rand(strtotime($start_time), strtotime($start_time . "-7day")); //反応時間はevent開始時間から7日前までの範囲
-            $response_time = date("Y-m-d H:i:s", $response_time);
+            // $response_time = rand(strtotime($start_time), strtotime($start_time . "-7day")); //反応時間はevent開始時間から7日前までの範囲
+            // $response_time = date("Y-m-d H:i:s", $response_time);
 
             $state_prob_list = [0=>5, 1=>20, 2=>100]; //未定5%参加15%不参加80%:todoここガチ適当
             $p = random_int(1, 100);
             $response_state = 0; //参加状態はある程度偏らせたかった
             foreach($state_prob_list as $state=>$prob){if($p <= $prob){$response_state = $state;break;}}
             
+            
+            for ($i = 0; $i < random_int(1, 10); $i++) {
+                $response_time = rand(strtotime($start_time), strtotime($start_time . "-7day")); //反応時間はevent開始時間から7日前までの範囲
+                $response_time = date("Y-m-d H:i:s", $response_time);
+                $response_state = random_int(0, 2);
+                $event_response_logs_data[] = [
+                    'created_at' => $response_time,
+                    'response_state' => $response_state,
+                    'responder_id' => $responder_ids[$er_idx],
+                    'event_id' => $event_id
+                ];
+            }
             $event_response_data[] = [
-                'created_at' => $response_time,
+                // 'created_at' => $response_time,
                 'updated_at' => $response_time,
                 'response_state' => $response_state,
                 'responder_id' => $responder_ids[$er_idx],
                 'event_id' => $event_id
             ];
+            
 
             $p = random_int(1, 100);
             if($p < 10){ //15%の確率でこめんと
@@ -238,6 +251,9 @@ class EventResponsesSeed extends AbstractSeed
         }
         $event_response_table = $this->table('event_responses');
         $event_response_table->insert($event_response_data)->save();
+
+        $event_response_logs_table = $this->table('event_response_logs');
+        $event_response_logs_table->insert($event_response_logs_data)->save();
 
         $comment_table = $this->table('comments');
         $comment_table->insert($comment_data)->save();

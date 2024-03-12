@@ -56,7 +56,6 @@ class EventResponsesTable extends Table
         $this->addBehavior('Timestamp', [
             'events' => [
                 'Model.beforeSave' => [
-                    'created_at' => 'new',
                     'updated_at' => 'always',
                 ],
             ],
@@ -71,10 +70,6 @@ class EventResponsesTable extends Table
      */
     public function validationDefault(Validator $validator): Validator
     {
-        $validator
-            ->dateTime('created_at')
-            ->allowEmptyDateTime('created_at');
-
         $validator
             ->dateTime('updated_at')
             ->allowEmptyDateTime('updated_at');

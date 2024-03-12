@@ -61,6 +61,9 @@ class EventsTable extends Table
         $this->hasMany('EventResponses', [
             'foreignKey' => 'event_id',
         ]);
+        $this->hasMany('EventResponseLogs', [
+            'foreignKey' => 'event_id',
+        ]);
         $this->hasMany('Comments', [
             'foreignKey' => 'event_id',
         ]);
