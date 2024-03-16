@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Controller\Admin;
@@ -9,6 +10,7 @@ use Cake\Event\EventInterface;
 use Cake\ORM\Query;
 use Cake\Utility\Hash;
 use Psr\Log\LogLevel;
+use Cake\Core\Configure;
 
 /**
  * Administrators Controller
@@ -24,7 +26,7 @@ class AdministratorsController extends AppController
         if (!$this->Login->isAdministrator()) {
             $this->Flash->error(__('管理者権限がありません。'));
 
-            return $this->redirect(['prefix' => false,'controller' => 'Events', 'action' => 'index']);
+            return $this->redirect(['prefix' => false, 'controller' => 'Events', 'action' => 'index']);
         }
     }
 
@@ -40,14 +42,14 @@ class AdministratorsController extends AppController
     public function userList()
     {
         $this->Users = $this->fetchTable('Users');
-        $user_data = $this->Users->find('all', ['conditions'=>['deleted_at'=>false]])->toArray();
+        $user_data = $this->Users->find('all', ['conditions' => ['deleted_at' => false]])->toArray();
         $this->set(compact('user_data'));
     }
 
     public function deletedUserList()
     {
         $this->Users = $this->fetchTable('Users');
-        $user_data = $this->Users->find('all', ['conditions'=>['deleted_at'=>true]])->toArray();
+        $user_data = $this->Users->find('all', ['conditions' => ['deleted_at' => true]])->toArray();
         $this->set(compact('user_data'));
     }
 
@@ -91,8 +93,8 @@ class AdministratorsController extends AppController
 
             return $this->redirect($this->request->referer());
         }
-        $this->set(['user_id'=>$id]);
-        
+        $this->set(['user_id' => $id]);
+
         $this->Users = $this->fetchTable('Users');
         $user_data = $this->Users->find('all', ['conditions' => ['id' => $id]])->first();
         if (!$user_data) {
@@ -100,7 +102,7 @@ class AdministratorsController extends AppController
 
             return $this->redirect($this->request->referer());
         }
-        $this->set(['is_user_deleted'=>$user_data["deleted_at"]]);
+        $this->set(['is_user_deleted' => $user_data["deleted_at"]]);
 
         $this->loadComponent('Event');
 
@@ -191,7 +193,7 @@ class AdministratorsController extends AppController
 
     public function participantsCount()
     {
- //イベント参加率の統計を表示
+        //イベント参加率の統計を表示
         $this->loadComponent('Event');
         $this->Events = $this->fetchTable('Events');
         $this->Locations = $this->fetchTable('Locations');
@@ -292,112 +294,79 @@ class AdministratorsController extends AppController
         $this->EventResponses = $this->fetchTable('EventResponses');
         $this->EventResponseLogs = $this->fetchTable('EventResponseLogs');
 
-        //イベント数も少ないので、開催済みまたはイベント開始1日前のイベントで状態変更したユーザーをイテレーションする形でDB問い合わせ
-        // q:イベント開始1日前のイベントで状態変更した回数をカウントするSQLは作成できるか？
-        // a:
-        // 1.イベント開始1日前のイベントを取得
-        // 2.イベント開始1日前のイベントに参加したユーザーを取得
-        // 3.イベント開始1日前のイベントに参加したユーザーが状態変更した回数をカウント
+        //NOTE:イベント数も少ないので、開催済みまたはイベント開始1日前のイベントで状態変更したユーザーをイテレーションする形でDB問い合わせ
+        //DBへの問い合わせ数が多いのでイベント数が増えれば増えるほどえぐい
 
-        $sql_statement = <<<EOF
-        select 
-            e.id as eid,
-            e.start_time,
-            e.end_time,
-            u.id as uid,
-            u.display_name,
-            erl.response_state
-        from (
-            select events.id, events.start_time, events.end_time
-            from events
-            where events.start_time BETWEEN cast('1970-01-01' as date) AND cast(CURRENT_DATE as date)
-        ) as e
-        EOF;
-        
-        // $sql_statement = <<<EOF
-        // select t.uid as uid, count(t.uid) as cnt
-        // from (
-        //     select events.id as eid, users.id as uid, users.display_name
-        //     from (
-        //         select e.id as eid, u.id as uid
-        //         from (
-        //             select events.id
-        //             from events
-        //             where events.start_time BETWEEN cast('1970-01-01' as date) AND cast(CURRENT_DATE as date)
-        //         ) as e
-        //         cross join (select users.id from users where users.deleted_at=0) as u
-        //     ) as cross_t
-        //     inner join events on events.id = cross_t.eid
-        //     inner join users on users.id = cross_t.uid
-        //     WHERE events.start_time > users.created_at AND events.start_time < NOW()
-        // ) as t
-        // inner join  event_responses
-        // on t.eid = event_responses.event_id AND t.uid = event_responses.responder_id
-        // group by (t.uid)
-        // EOF;
 
-        // $participants_count_data = ConnectionManager::get('default')->execute($sql_statement)->fetchAll('assoc');
+        //未開催またはイベント開始1日前のイベントを取得
+        $eventQuery = $this->Events->find()
+            ->contain(['Locations'])
+            ->where(['start_time <=' => new \DateTime('now')])
+            ->order(['Events.start_time' => 'DESC']);
+        $event_data_list = $eventQuery->toArray();
 
-        // $sql_statement = <<<EOF
-        // select users.id as uid, count(users.id) as cnt, users.display_name
-        // from (
-        //     select e.id as eid, u.id as uid
-        //     from (
-        //         select events.id
-        //         from events
-        //         where events.start_time BETWEEN cast('1970-01-01' as date) AND cast(CURRENT_DATE as date)
-        //     ) as e
-        //     cross join (select users.id from users where users.deleted_at=0) as u
-        // ) as cross_t
-        // inner join events on events.id = cross_t.eid
-        // inner join users on users.id = cross_t.uid
-        // WHERE events.start_time > users.created_at AND events.start_time < NOW()
-        // group by (users.id)
-        // EOF;
-        // $all_count_data = ConnectionManager::get('default')->execute($sql_statement)->fetchAll('assoc');
+        $responder_grouped_by_event = [];
+        foreach ($event_data_list as $event_data) {
 
-        // $participants_count_list = [];
-        // $pcd_idx_diff  = 0; //$participants_count_dataを参照する時に$all_count_dataとのoffsetを表すindex
-        // for ($idx = 0; $idx < count($all_count_data); $idx++) {
-        //     $cnt = 0;
 
-        //     // $this->log("{$idx}");
-        //     // $this->log("{$pcd_idx_diff}");
+            //同じイベントに対して2回以上応答したresponder_idのリストを取得
+            $subQuery = $this->EventResponseLogs->find()
+                ->select(['responder_id'])
+                ->where(['event_id IN' => $event_data->id])
+                ->group(['event_id', 'responder_id'])
+                ->having(['count(event_id) >=' => 2]);
 
-        //     $isset_response_data = isset($participants_count_data[$pcd_idx_diff]);
-        //     if ($isset_response_data) {
-        //         $issame_responder = ($all_count_data[$idx]['uid'] == $participants_count_data[$pcd_idx_diff]['uid']);
-        //         $all_uid = $all_count_data[$idx]['uid'];
-        //         $p_uid = $participants_count_data[$pcd_idx_diff]['uid'];
-        //         $dis = $all_count_data[$idx]['display_name'];
-        //         $all_c = $all_count_data[$idx]['cnt'];
-        //         $p_c = $participants_count_data[$pcd_idx_diff]['cnt'];
-        //         $cc = $all_count_data[$idx]['cnt'] - $participants_count_data[$pcd_idx_diff]['cnt'];
-        //         $this->log("( all:{$all_uid} == p:{$p_uid} ) = {$issame_responder}, {$dis}");
-        //         $this->log("all:{$all_c} - p:{$p_c} = {$cc}");
-        //     } else {
-        //         $an = $all_count_data[$idx]['display_name'];
-        //         $this->log("{$an}");
-        //     }
+            //同じイベントに対して２回以上応答したuserから、状態変更の履歴を取得
+            $query = $this->EventResponseLogs->find()
+                ->where([
+                    'responder_id IN' => $subQuery,
+                    'event_id IN' => $event_data->id,
+                ])
+                ->contain(['Users'])
+                ->order(['EventResponseLogs.created_at' => 'ASC']);
+            $results = $query->all();
 
-        //     if ($isset_response_data && $issame_responder) {
-        //         $cnt = $all_count_data[$idx]['cnt'] - $participants_count_data[$pcd_idx_diff]['cnt'];
-        //         $pcd_idx_diff++;
-        //     } else {
-        //         $cnt = $all_count_data[$idx]['cnt'];
-        //     }
+            //Hashを使って、同じresponder_idでグループを作成する
+            $results = collection($results)->groupBy('responder_id')->toArray();
 
-        //     $participants_count_list[] = [
-        //         'id' => $all_count_data[$idx]['uid'],
-        //         'display_name' => $all_count_data[$idx]['display_name'],
-        //         'cnt' => $cnt,
-        //     ];
-        // }
-        // $this->log("{$idx}");
-        // $this->log("{$pcd_idx_diff}");
-        // $participants_count_list = Hash::sort($participants_count_list, '{n}.cnt', 'desc', 'numeric');
+            //最新の状態変更をしたユーザーを取得
+            $latest_modified_list = [];
+            foreach ($results as $result) {
+                for ($result_idx = 0; $result_idx < count($result) - 1; $result_idx++) {
+                    //イベント開始後に状態変更したのは無視
+                    if ($result[$result_idx]->created_at > $event_data->start_time) {
+                        continue;
+                    }
 
-        // $this->set(compact('participants_count_list'));
+                    //イベント開始1日前に状態変更したユーザーを取得
+                    if ($result[$result_idx]->created_at > $event_data->start_time->modify('-5 day')) {
+
+                        //イベント開始直前に参加から不参加にした人を取得
+                        // if ($result[$result_idx]->response_state == 1 && $result[$result_idx + 1]->response_state == 0) {
+                        $latest_modified_list[] = [
+                            "responder_id" => $result[$result_idx]->responder_id,
+                            "responder_name" => $result[$result_idx]->user->display_name,
+                        ];
+                        // }
+                    }
+
+                    break;
+                }
+            }
+
+            if(count($latest_modified_list) > 0){
+                $responder_grouped_by_event[] = [
+                    "event_id" => $event_data->id,
+                    "event_date" => $event_data->start_time->i18nFormat('YYYY/MM/dd'),
+                    "event_start_time" => $event_data->start_time->i18nFormat('HH:mm'),
+                    "event_end_time" => $event_data->end_time->i18nFormat('HH:mm'),
+                    "location_name" => $event_data->location->display_name,
+                    "latest_modified_list" => $latest_modified_list
+                ];
+            }
+        }
+
+        $this->set(compact('responder_grouped_by_event'));
     }
 
     public function eventDetail($id = null)
@@ -431,7 +400,7 @@ class AdministratorsController extends AppController
                         ]);
                 },
             ])
-        ->first();
+            ->first();
         $event = $this->Event->getFormatEventData($event);
 
         $event_response_list = $this->Event->getEventResponseListByEventId($id);
@@ -439,9 +408,10 @@ class AdministratorsController extends AppController
 
         $this->set(compact('event', 'categorized_event_response_list'));
     }
-    
 
-    public function editInformation(){
+
+    public function editInformation()
+    {
         $login_user_data = $this->Login->getLoginUserData();
 
         if (!$login_user_data) {
@@ -502,7 +472,7 @@ class AdministratorsController extends AppController
         $this->Users = $this->fetchTable('Users');
         $data = $this->request->getData();
         $user_id = $data['user_id'];
-        $user_data = $this->Users->find('all', ['conditions'=>['id'=>$user_id]])->first();
+        $user_data = $this->Users->find('all', ['conditions' => ['id' => $user_id]])->first();
         if (!$user_data) {
             $this->Flash->error(__('ユーザ情報取得に失敗しました'));
         }
@@ -520,7 +490,7 @@ class AdministratorsController extends AppController
             return $this->response->withStringBody(json_encode($response));
         }
 
-        if(!$user_data['line_user_id']){
+        if (!$user_data['line_user_id']) {
             $response['status'] = 'ok';
             $response['status2'] = 'not found line_user_id this user.';
             $this->RequestHandler->respondAs('application/json; charset=UTF-8');
@@ -528,19 +498,18 @@ class AdministratorsController extends AppController
         }
 
         $this->RejectedTokens = $this->fetchTable('RejectedTokens');
-        $rejected_token_data =$this->RejectedTokens->find('all', ['conditions'=>['line_user_id'=>$user_data['line_user_id']]])->first();
-        
-        if (!$rejected_token_data){
-            $rejected_token_data = $this->RejectedTokens->newEntity(['line_user_id'=>$user_data['line_user_id']]);
+        $rejected_token_data = $this->RejectedTokens->find('all', ['conditions' => ['line_user_id' => $user_data['line_user_id']]])->first();
+
+        if (!$rejected_token_data) {
+            $rejected_token_data = $this->RejectedTokens->newEntity(['line_user_id' => $user_data['line_user_id']]);
             try {
                 $result = $this->RejectedTokens->saveOrFail($rejected_token_data);
             } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
                 $response['error'] = print_r($e);
             }
-            
         }
 
-        
+
 
         if ($result) {
             $response['status'] = 'ok';
