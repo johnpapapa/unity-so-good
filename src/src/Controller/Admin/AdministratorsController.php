@@ -9,6 +9,7 @@ use Cake\Event\EventInterface;
 use Cake\ORM\Query;
 use Cake\Utility\Hash;
 use Psr\Log\LogLevel;
+use Cake\Core\Configure;
 
 /**
  * Administrators Controller
@@ -293,26 +294,73 @@ class AdministratorsController extends AppController
         $this->EventResponseLogs = $this->fetchTable('EventResponseLogs');
 
         //イベント数も少ないので、開催済みまたはイベント開始1日前のイベントで状態変更したユーザーをイテレーションする形でDB問い合わせ
-        // q:イベント開始1日前のイベントで状態変更した回数をカウントするSQLは作成できるか？
-        // a:
-        // 1.イベント開始1日前のイベントを取得
-        // 2.イベント開始1日前のイベントに参加したユーザーを取得
-        // 3.イベント開始1日前のイベントに参加したユーザーが状態変更した回数をカウント
 
-        $sql_statement = <<<EOF
-        select 
-            e.id as eid,
-            e.start_time,
-            e.end_time,
-            u.id as uid,
-            u.display_name,
-            erl.response_state
-        from (
-            select events.id, events.start_time, events.end_time
-            from events
-            where events.start_time BETWEEN cast('1970-01-01' as date) AND cast(CURRENT_DATE as date)
-        ) as e
-        EOF;
+        //未開催またはイベント開始1日前のイベントを取得
+        $query = $this->Events->find()
+        ->where(function ($exp, $q) {
+            return $exp->or_([
+                'start_time <=' => new \DateTime('1 day ago'), // イベント開始1日前のイベント
+            ]);
+        });
+
+        $event_data_list = $query->toArray();
+        foreach ($event_data_list as $event_data){
+            //同じイベントに対して2回以上応答したresponder_idのリストを取得
+            $subQuery = $this->EventResponseLogs->find()
+                ->select(['responder_id'])
+                ->where(['event_id' => $event_data->id])
+                ->group(['event_id','responder_id'])
+                ->having(['count(event_id) >=' => 2]);
+            
+            //同じイベントに対して２回以上応答したuserから、状態変更の履歴を取得
+            $query = $this->EventResponseLogs->find()
+                ->where([
+                    'responder_id IN' => $subQuery,
+                    'event_id' => $event_data->id
+                ])
+                ->order(['created_at' => 'ASC']);
+            $results = $query->all();
+
+            //NOTE:イベント開始後に状態変更したユーザーがいる場合この処理に問題あり
+
+            //Hashを使って、同じresponder_idでグループを作成する
+            $results = collection($results)->groupBy('responder_id')->toArray();
+            // dd($event_data);
+            //最新の状態変更をしたユーザーを取得
+            foreach ($results as $result){
+                // $result_idx = 0
+                for($result_idx=0; $result_idx<count($result)-1; $result_idx++){
+                    //イベント開始前に状態変更したユーザーを取得
+                    if ($result[$result_idx]->created_at < $event_data->start_time){ continue; }
+                    if ($result[$result_idx]->created_at < $event_data->start_time->modify('-1 day')){ 
+                        debug($result[$result_idx]->created_at);
+                        break; 
+                    }
+                    // if ($result[$result_idx]->response_state == 1 && $result[$result_idx+1]->response_state == 2){
+                    // }
+                }
+
+                dd("");
+                
+                
+                // if ($result[$result_idx]->created_at < $event_data->start_time){ continue; }
+
+                // if (
+                //     $result[0]->created_at > $event_data->start_time->modify('-5 day')
+                // ) {
+                //     // Do something
+                //     debug($event_data->start_time);
+                //     debug($result[0]);
+                // } else break;
+
+                // // if($result[0]["created_at"] < )
+                // if ($result[0]["response_state"] == 1 && $result[1]["response_state"] == 2){
+                // }
+            }
+            dd("");
+
+        }
+        
         
         // $sql_statement = <<<EOF
         // select t.uid as uid, count(t.uid) as cnt
