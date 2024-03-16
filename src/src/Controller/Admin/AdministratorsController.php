@@ -298,10 +298,10 @@ class AdministratorsController extends AppController
         //DBへの問い合わせ数が多いのでイベント数が増えれば増えるほどえぐい
 
 
-        //未開催またはイベント開始1日前のイベントを取得
+        //未開催またはイベント開始が今から1日後のイベントを取得
         $eventQuery = $this->Events->find()
             ->contain(['Locations'])
-            ->where(['start_time <=' => new \DateTime('now')])
+            ->where(['start_time <=' => new \DateTime('+ 1 day')])
             ->order(['Events.start_time' => 'DESC']);
         $event_data_list = $eventQuery->toArray();
 
@@ -323,16 +323,27 @@ class AdministratorsController extends AppController
                     'event_id IN' => $event_data->id,
                 ])
                 ->contain(['Users'])
-                ->order(['EventResponseLogs.created_at' => 'ASC']);
+                ->order(['EventResponseLogs.created_at' => 'DESC']);
             $results = $query->all();
-
             //Hashを使って、同じresponder_idでグループを作成する
             $results = collection($results)->groupBy('responder_id')->toArray();
 
+            
             //最新の状態変更をしたユーザーを取得
             $latest_modified_list = [];
             foreach ($results as $result) {
+                //Hashを使って、resultからresponse_stateとcreated_atの配列を取得
+                
+
+                // $pp = collection($result)->extract('response_state', 'created_at')->toArray();
+                // $pprs = collection($result)->extract('response_state')->toArray();
+                // $ppc = collection($result)->extract('created_at')->toArray();
+                // $pp = array_merge($pprs, $ppc);
+                // print_r("<pre />");
+                // print_r($pp);
+
                 for ($result_idx = 0; $result_idx < count($result) - 1; $result_idx++) {
+                    
                     //イベント開始後に状態変更したのは無視
                     if ($result[$result_idx]->created_at > $event_data->start_time) {
                         continue;
@@ -340,14 +351,23 @@ class AdministratorsController extends AppController
 
                     //イベント開始1日前に状態変更したユーザーを取得
                     if ($result[$result_idx]->created_at > $event_data->start_time->modify('-5 day')) {
-
+                        // $pp = [
+                        //     "0" => $result[$result_idx]->user->display_name,
+                        //     "1" =>$result[$result_idx]->response_state,
+                        //     "2" => $result[$result_idx]->created_at->i18nFormat('YYYY/MM/dd HH:mm:ss'),
+                        // ];
+                        // print_r("<pre />");
+                        // print_r($pp);
+                        
                         //イベント開始直前に参加から不参加にした人を取得
-                        // if ($result[$result_idx]->response_state == 1 && $result[$result_idx + 1]->response_state == 0) {
-                        $latest_modified_list[] = [
-                            "responder_id" => $result[$result_idx]->responder_id,
-                            "responder_name" => $result[$result_idx]->user->display_name,
-                        ];
-                        // }
+                        if ($result[$result_idx]->response_state == 2 && $result[$result_idx + 1]->response_state == 1) {
+                            $latest_modified_list[] = [
+                                "responder_id" => $result[$result_idx]->responder_id,
+                                "responder_name" => $result[$result_idx]->user->display_name,
+                                "logs" => array_slice($result, $result_idx, 5) //状態変更の履歴を最大5つ取得
+                            ];
+                        }
+                        break;
                     }
 
                     break;
