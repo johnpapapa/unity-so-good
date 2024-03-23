@@ -148,21 +148,12 @@
                         </div>
                     </div>
 
-                    <div class="content-right w50 disp-flex dir-column dir-m-column just-space align-center" style="gap: 10px">
+                    <div class="content-right w50 disp-flex dir-column dir-m-column just-space align-center">
                         <a class="buttons" href="<?= $this->Url->build(['controller' => 'events','action' => 'detail', $event->id]); ?>">
                             <button class="pure-button" type="button">
                             参加表明/詳細
                             </button>
                         </a>
-                        <div class="disp-flex" style="gap: 10px">
-                            <button class="pure-button" type="button">
-                                参加
-                            </button>
-                            <button class="pure-button" type="button">
-                                不参加
-                            </button>
-
-                        </div>
                     </div>
                 </div>
                 
