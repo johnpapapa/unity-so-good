@@ -227,6 +227,8 @@ class eventComponent extends Component
     public function categorizedEventResponseList($event_response_list)
     {
         $categorized_event_response_list = [0 => [], 1 => [], 2 => [], 'null' => []];
+        // debug($event_response_list);
+        
         foreach ($event_response_list as $event_response) {
             if (isset($event_response->user)) {
                 $user_id = $event_response->user->id;
@@ -248,6 +250,10 @@ class eventComponent extends Component
                 'time' => $time,
             ];
         }
+
+        //NOTE: 不参加の場合は上に新しいデータが表示されると確認しやすく、参加や未定の場合は下にどんどん新しいデータが追加されると自然
+        //response_stateが2の場合(不参加)のみupdated_atの降順でソート
+        $categorized_event_response_list[2] = Hash::sort($categorized_event_response_list[2], '{n}.updated_at', 'desc');
 
         return $categorized_event_response_list;
     }

@@ -326,7 +326,12 @@ if($count_responses > 0){
                     <div style="height:200px; overflow:scroll;" id="state-contents-<?= $state_idx ?>">
                         <?php foreach ($event_data->event_responses[$state_idx] as $event_response) : ?>
                             <div <?= ($event_response['id'] == $current_user['id']) ? "id='user-state'":"" ?> class="state-content over-ellipsis">
-                                <div class="fs-medium  fs-m-midium"><?= h($event_response["display_name"]); ?></div>
+                                <div class="fs-medium  fs-m-midium">
+                                    <?= h($event_response["display_name"]); ?>
+                                    <?php if($is_admin): ?>
+                                        <div class="time disp-iblock fr fs-small fs-m-small"><?= $event_response["time"]->i18nFormat('MM-dd HH:mm') ?></div>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         <?php endforeach; ?>
                     </div>
