@@ -279,21 +279,6 @@ if ($count_responses > 0) {
                 <button class="pure-button response-btn pure-u-1 absent " value="2" <?= ($event_data->user_response_state === 2 | $is_closed) ? 'disabled' : '' ?>>不参加</button>
             </div>
         </div>
-
-        <div class="row mb20">
-            <div class="label mb5">参加表明</div>
-            <?php $is_closed = FrozenTime::now() > $event_data->end_time; ?>
-            <button class="pure-button w100" id="open" <?= ($is_closed) ? 'disabled' : '' ?>>参加状態を変更する</button>
-
-            <dialog class="w100" id="responseModal">
-                <div class="disp-flex dir-column" style="gap: 10px">
-                    <button class="pure-button response-btn pure-u-1 undecided" value="0" <?= ($event_data->user_response_state === 0) ? 'disabled' : '' ?>>参加未定</button>
-                    <button class="pure-button response-btn pure-u-1 present" value="1" <?= ($event_data->user_response_state === 1) ? 'disabled' : '' ?>>参加</button>
-                    <button class="pure-button response-btn pure-u-1 absent " value="2" <?= ($event_data->user_response_state === 2) ? 'disabled' : '' ?>>不参加</button>
-                </div>
-            </dialog>
-        </div>
-
     </div>
 
     <div class="row mb20">

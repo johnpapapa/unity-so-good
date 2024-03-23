@@ -71,10 +71,9 @@ $(function(){
         clickSpriteStars(centerX, centerY);
 
         //送信する前に本当に送信していいのかを確認するダイアログを表示する処理
-        var confirmAnswer = window.confirm('本当に送信しますか？');
+        let button_current = $(this);
+        var confirmAnswer = window.confirm(button_current.html() + 'にしますか？');
         if(confirmAnswer){
-
-            let button_current = $(this);
             button_current.prop('disabled', true);
             let button_siblings = $(this).siblings();
             button_siblings.each(function(index, element){
@@ -233,17 +232,4 @@ $(function(){
         });
         document.body.appendChild(newsprite);
     }
-
-    // モーダルウィンドウの表示
-    $('#open').on('click', function() {
-        $('#responseModal')[0].showModal();
-    });
-
-    //myModalの範囲外をタップするとmyModalが閉じる
-    $('#responseModal').on('click', function(event) {
-        if (event.target === this) {
-            $('#responseModal')[0].close();
-        }
-    });
-
 });
