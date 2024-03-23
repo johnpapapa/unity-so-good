@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @var \App\View\AppView $this
  * @var mixed $current_user
@@ -15,6 +16,7 @@
     <br>イベントへの参加表明やコメント記入が可能です。
 </p>
 <?php
+
 use Cake\Core\Configure;
 use Cake\I18n\FrozenTime;
 
@@ -30,13 +32,13 @@ $usage_price_per_responses = 0;
 $night_price_per_responses = 0;
 $count_responses = count($event_data->event_responses[1]);
 
-if($count_responses > 0){
-    if($event_data->location->usage_price > 0){
-        $usage_price_total = ($event_data->location->usage_price > 0 ? $event_data->location->usage_price:0) * $area_count;
+if ($count_responses > 0) {
+    if ($event_data->location->usage_price > 0) {
+        $usage_price_total = ($event_data->location->usage_price > 0 ? $event_data->location->usage_price : 0) * $area_count;
         $usage_price_per_responses = ceil($usage_price_total / count($event_data->event_responses[1]));
     }
-    if($event_data->location->night_price > 0){
-        $night_price_total = ($event_data->location->night_price > 0 ? $event_data->location->night_price:0) * $area_count;
+    if ($event_data->location->night_price > 0) {
+        $night_price_total = ($event_data->location->night_price > 0 ? $event_data->location->night_price : 0) * $area_count;
         $night_price_per_responses = ceil($night_price_total / count($event_data->event_responses[1]));
     }
 }
@@ -124,6 +126,13 @@ if($count_responses > 0){
         pointer-events: none;
     }
 
+    dialog {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
     @keyframes glitter {
         0% {
             transform: scale(0);
@@ -144,14 +153,14 @@ if($count_responses > 0){
 
 
 <div class="detail">
-    <?php if($is_admin): ?>
-    <div class="event-edit mb20 disp-flex just-space">
-        <a class="buttons pure-u-1-5" href="<?= $this->Url->build(['controller' => 'events','action' => 'edit', $event_data->id]); ?>">
-            <button class="pure-button w100" type="button" style="background-color:#dfb31d7d;">
-                編集
-            </button>
-        </a>
-    </div>
+    <?php if ($is_admin) : ?>
+        <div class="event-edit mb20 disp-flex just-space">
+            <a class="buttons pure-u-1-5" href="<?= $this->Url->build(['controller' => 'events', 'action' => 'edit', $event_data->id]); ?>">
+                <button class="pure-button w100" type="button" style="background-color:#dfb31d7d;">
+                    編集
+                </button>
+            </a>
+        </div>
     <?php endif; ?>
     <div class="event-jump disp-flex just-space mb20">
         <?php if ($event_prev_id) : ?>
@@ -206,11 +215,11 @@ if($count_responses > 0){
 
                 <div class="mt10" style="border-left: 10px orange solid;padding-left: 10px;">
                     昼間料金 : <?= $usage_price_total ?>円
-                    <br>(<?= (($event_data->location->usage_price > 0) ? $event_data->location->usage_price : 0).'円' ?> × <?= $area_count ?>コート)
+                    <br>(<?= (($event_data->location->usage_price > 0) ? $event_data->location->usage_price : 0) . '円' ?> × <?= $area_count ?>コート)
                     <span style="color:light-gray;">
-                        <?php if($event_data->location->usage_price > 0 && count($event_data->event_responses[1])): ?>
+                        <?php if ($event_data->location->usage_price > 0 && count($event_data->event_responses[1])) : ?>
                             <br>一人あたり<?= $usage_price_per_responses ?>円
-                        <?php else: ?>
+                        <?php else : ?>
                             <br>一人あたり0円
                         <?php endif; ?>
                         <br>(参加人数<?= count($event_data->event_responses[1]) ?>人の場合)
@@ -218,29 +227,29 @@ if($count_responses > 0){
                 </div>
                 <div class="mt10" style="border-left: 10px blue solid;padding-left: 10px;">
                     夜間料金 : <?= $night_price_total ?>円
-                    <br>(<?= (($event_data->location->night_price > 0) ? $event_data->location->night_price : 0).'円' ?> × <?= $area_count ?>コート)
+                    <br>(<?= (($event_data->location->night_price > 0) ? $event_data->location->night_price : 0) . '円' ?> × <?= $area_count ?>コート)
                     <span style="color:light-gray;">
-                    <?php if($event_data->location->night_price > 0 && count($event_data->event_responses[1])): ?>
-                        <br>一人あたり<?= $night_price_per_responses ?>円
-                    <?php else: ?>
-                        <br>一人あたり0円
-                    <?php endif; ?>
+                        <?php if ($event_data->location->night_price > 0 && count($event_data->event_responses[1])) : ?>
+                            <br>一人あたり<?= $night_price_per_responses ?>円
+                        <?php else : ?>
+                            <br>一人あたり0円
+                        <?php endif; ?>
                         <br>(参加人数<?= count($event_data->event_responses[1]) ?>人の場合)
-                    </span>    
+                    </span>
                 </div>
-                
-                
+
+
                 <p class="note-p mt10">
                     コート料金が設定されていない場合0円が表示されます。
                     <br>ナイター料金が設定されていない場合、夜の料金は昼と同じ合計金額が表示されます。
                 </p>
-                
+
             </div>
         </div>
         <div class="row mb20">
             <div class="label mb5">コメント・注意事項</div>
             <div class="content">
-                <?= ($event_data->comment == "")?'特になし':h($event_data->comment) ?>
+                <?= ($event_data->comment == "") ? '特になし' : h($event_data->comment) ?>
             </div>
         </div>
         <div class="row mb20">
@@ -272,73 +281,89 @@ if($count_responses > 0){
         </div>
 
         <div class="row mb20">
-            <div class="label mb5">コメント</div>
-            <div class="content">
-                <p class="note-p mb5">遅刻などの連絡事項に使用してください</p>
-                <textarea name="comment" class="w100" id="comment_body" maxlength="255" placeholder="コメント・連絡事項" rows="3"></textarea>
-                <button class="pure-button submit-comment-btn w100">コメントの投稿</button>
-            
-            </div>
-        </div>
-        <div class="row">
-            <div class="label mb5">参加者一覧</div>
-            <div class="content states">
-                <?php $state_idx = 1; ?>
-                <div class="states-active-perhaps disp-flex">
-                    <div class="state state-<?= $state_idx ?> p10 pure-u-1-2">
-                        <div class="state-title text-center p5">
-                            <?= Configure::read('response_states')[$state_idx]["text"] ?>
-                        </div>
-                        <div id="state-contents-<?= $state_idx ?>">
-                            <?php foreach($event_data->event_responses[$state_idx] as $event_response): ?>
-                                <div <?= ($event_response['id'] == $current_user['id']) ? "id='user-state'":""  ?> class="state-content over-ellipsis disp-iblock pure-u-1 mt10">
-                                    <div class="name disp-m-block disp-iblock over-ellipsis fs-large fs-m-large"><?= h($event_response["display_name"]); ?></div>
-                                    <?php if($event_data->participants_limit > 0): ?>
-                                        <div class="time disp-iblock fr fs-small fs-m-small"><?= $event_response["time"]->i18nFormat('MM-dd HH:mm:ss') ?></div>
-                                    <?php endif; ?>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
+            <div class="label mb5">参加表明</div>
+            <?php $is_closed = FrozenTime::now() > $event_data->end_time; ?>
+            <button class="pure-button w100" id="open" <?= ($is_closed) ? 'disabled' : '' ?>>参加状態を変更する</button>
 
-                    <?php $state_idx = 0; ?>
-                    <div class="state state-<?= $state_idx ?> p10 pure-u-1-2">
-                        <div class="state-title text-center p5">
-                            <?= Configure::read('response_states')[$state_idx]["text"] ?>
-                        </div>
-                        <div id="state-contents-<?= $state_idx ?>">
-                        <?php foreach($event_data->event_responses[$state_idx] as $event_response): ?>
-                            <div <?= ($event_response['id'] == $current_user['id']) ? "id='user-state'":""  ?> class="state-content over-ellipsis disp-iblock pure-u-1 mt10">
+            <dialog class="w100" id="responseModal">
+                <div class="disp-flex dir-column" style="gap: 10px">
+                    <button class="pure-button response-btn pure-u-1 undecided" value="0" <?= ($event_data->user_response_state === 0) ? 'disabled' : '' ?>>参加未定</button>
+                    <button class="pure-button response-btn pure-u-1 present" value="1" <?= ($event_data->user_response_state === 1) ? 'disabled' : '' ?>>参加</button>
+                    <button class="pure-button response-btn pure-u-1 absent " value="2" <?= ($event_data->user_response_state === 2) ? 'disabled' : '' ?>>不参加</button>
+                </div>
+            </dialog>
+        </div>
+
+    </div>
+
+    <div class="row mb20">
+        <div class="label mb5">コメント</div>
+        <div class="content">
+            <p class="note-p mb5">遅刻などの連絡事項に使用してください</p>
+            <textarea name="comment" class="w100" id="comment_body" maxlength="255" placeholder="コメント・連絡事項" rows="3"></textarea>
+            <button class="pure-button submit-comment-btn w100">コメントの投稿</button>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="label mb5">参加者一覧</div>
+        <div class="content states">
+            <?php $state_idx = 1; ?>
+            <div class="states-active-perhaps disp-flex">
+                <div class="state state-<?= $state_idx ?> p10 pure-u-1-2">
+                    <div class="state-title text-center p5">
+                        <?= Configure::read('response_states')[$state_idx]["text"] ?>
+                    </div>
+                    <div id="state-contents-<?= $state_idx ?>">
+                        <?php foreach ($event_data->event_responses[$state_idx] as $event_response) : ?>
+                            <div <?= ($event_response['id'] == $current_user['id']) ? "id='user-state'" : ""  ?> class="state-content over-ellipsis disp-iblock pure-u-1 mt10">
                                 <div class="name disp-m-block disp-iblock over-ellipsis fs-large fs-m-large"><?= h($event_response["display_name"]); ?></div>
-                                <?php if($event_data->participants_limit > 0): ?>
+                                <?php if ($event_data->participants_limit > 0) : ?>
+                                    <div class="time disp-iblock fr fs-small fs-m-small"><?= $event_response["time"]->i18nFormat('MM-dd HH:mm:ss') ?></div>
+                                <?php endif; ?>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+
+                <?php $state_idx = 0; ?>
+                <div class="state state-<?= $state_idx ?> p10 pure-u-1-2">
+                    <div class="state-title text-center p5">
+                        <?= Configure::read('response_states')[$state_idx]["text"] ?>
+                    </div>
+                    <div id="state-contents-<?= $state_idx ?>">
+                        <?php foreach ($event_data->event_responses[$state_idx] as $event_response) : ?>
+                            <div <?= ($event_response['id'] == $current_user['id']) ? "id='user-state'" : ""  ?> class="state-content over-ellipsis disp-iblock pure-u-1 mt10">
+                                <div class="name disp-m-block disp-iblock over-ellipsis fs-large fs-m-large"><?= h($event_response["display_name"]); ?></div>
+                                <?php if ($event_data->participants_limit > 0) : ?>
                                     <div class="time disp-iblock fr fs-small fs-m-small"><?= $event_response["time"]->i18nFormat('MM-dd HH:mm:ss') ?></div>
                                 <?php endif ?>
                             </div>
                         <?php endforeach; ?>
-                        </div>
-                    </div>
-                </div>
-                <?php $state_idx = 2; ?>
-                <div class="state-<?= $state_idx ?> p10">
-                    <div class="state-title mb10">
-                        <?= Configure::read('response_states')[$state_idx]["text"] ?>
-                    </div>
-                    <div style="height:200px; overflow:scroll;" id="state-contents-<?= $state_idx ?>">
-                        <?php foreach ($event_data->event_responses[$state_idx] as $event_response) : ?>
-                            <div <?= ($event_response['id'] == $current_user['id']) ? "id='user-state'":"" ?> class="state-content over-ellipsis">
-                                <div class="fs-medium  fs-m-midium">
-                                    <?= h($event_response["display_name"]); ?>
-                                    <?php if($is_admin): ?>
-                                        <div class="time disp-iblock fr fs-small fs-m-small"><?= $event_response["time"]->i18nFormat('MM-dd HH:mm') ?></div>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
                     </div>
                 </div>
             </div>
+            <?php $state_idx = 2; ?>
+            <div class="state-<?= $state_idx ?> p10">
+                <div class="state-title mb10">
+                    <?= Configure::read('response_states')[$state_idx]["text"] ?>
+                </div>
+                <div style="height:200px; overflow:scroll;" id="state-contents-<?= $state_idx ?>">
+                    <?php foreach ($event_data->event_responses[$state_idx] as $event_response) : ?>
+                        <div <?= ($event_response['id'] == $current_user['id']) ? "id='user-state'" : "" ?> class="state-content over-ellipsis">
+                            <div class="fs-medium  fs-m-midium">
+                                <?= h($event_response["display_name"]); ?>
+                                <?php if ($is_admin) : ?>
+                                    <div class="time disp-iblock fr fs-small fs-m-small"><?= $event_response["time"]->i18nFormat('MM-dd HH:mm') ?></div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
         </div>
-        <?php if (count($event_data->comments) > 0) : ?>
+    </div>
+    <?php if (count($event_data->comments) > 0) : ?>
         <div class="row mb20">
             <div class="label mb5">コメント一覧</div>
             <div class="content comments">
@@ -347,8 +372,8 @@ if($count_responses > 0){
                         <div class="comment-header mb5 w100 disp-flex just-center align-center dir-row">
                             <div class="name w100 over-ellipsis"><?= $comment->user->display_name ?></div>
                             <div class="w100 disp-flex align-center" style="justify-content: flex-end;">
-                                <?php if($comment->user_id == $current_user->id): ?>
-                                <div class="delete-comment-btn w100 tr">コメントを削除<input type="hidden" value="<?= $comment->id ?>"></div>
+                                <?php if ($comment->user_id == $current_user->id) : ?>
+                                    <div class="delete-comment-btn w100 tr">コメントを削除<input type="hidden" value="<?= $comment->id ?>"></div>
                                 <?php endif; ?>
                                 <div class="time w100 tr"><?= $comment->updated_at->i18nFormat('yyyy-MM-dd HH:mm') ?></div>
                             </div>
@@ -360,6 +385,6 @@ if($count_responses > 0){
                 <?php endforeach; ?>
             </div>
         </div>
-        <?php endif; ?>
-    </div>
+    <?php endif; ?>
+</div>
 </div>

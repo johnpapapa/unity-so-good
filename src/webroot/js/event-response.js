@@ -70,39 +70,45 @@ $(function(){
         }
         clickSpriteStars(centerX, centerY);
 
-        let button_current = $(this);
-        button_current.prop('disabled', true);
-        let button_siblings = $(this).siblings();
-        button_siblings.each(function(index, element){
-            $(this).prop('disabled', false);
-        });
-        
-        let send_data = {
-            "response_state": button_current.prop('value'),
-            "user_id": current_user.id,
-            "event_id": event_data.id
-        };
-        
-        getAjaxProperty(response_ajax_send_url, send_data)
-        .done(function(response){
-            if(response['status'] != 'ok'){
-                console.error('Error.');
-                return;
-            } 
-            updateResponseList(
-                current_user.display_name,
-                response['response_state'],
-                response['bef_response_state'],
-                response['updated_at'],
-                event_data.participants_limit
-            )
-        }).fail(function(jqXHR){
-            console.error('Error : ', jqXHR.status, jqXHR.statusText);
-        });
+        //送信する前に本当に送信していいのかを確認するダイアログを表示する処理
+        var confirmAnswer = window.confirm('本当に送信しますか？');
+        if(confirmAnswer){
 
-        clearInterval(interval);
-        if(button_current.prop('value') == 1){
-            interval = setInterval(function(){createStar(button_current)}, 200);    
+            let button_current = $(this);
+            button_current.prop('disabled', true);
+            let button_siblings = $(this).siblings();
+            button_siblings.each(function(index, element){
+                $(this).prop('disabled', false);
+            });
+
+            console.log(confirmAnswer);
+            let send_data = {
+                "response_state": button_current.prop('value'),
+                "user_id": current_user.id,
+                "event_id": event_data.id
+            };
+            
+            getAjaxProperty(response_ajax_send_url, send_data)
+            .done(function(response){
+                if(response['status'] != 'ok'){
+                    console.error('Error.');
+                    return;
+                } 
+                updateResponseList(
+                    current_user.display_name,
+                    response['response_state'],
+                    response['bef_response_state'],
+                    response['updated_at'],
+                    event_data.participants_limit
+                )
+            }).fail(function(jqXHR){
+                console.error('Error : ', jqXHR.status, jqXHR.statusText);
+            });
+
+            clearInterval(interval);
+            if(button_current.prop('value') == 1){
+                interval = setInterval(function(){createStar(button_current)}, 200);    
+            }
         }
     });
 
@@ -227,4 +233,17 @@ $(function(){
         });
         document.body.appendChild(newsprite);
     }
+
+    // モーダルウィンドウの表示
+    $('#open').on('click', function() {
+        $('#responseModal')[0].showModal();
+    });
+
+    //myModalの範囲外をタップするとmyModalが閉じる
+    $('#responseModal').on('click', function(event) {
+        if (event.target === this) {
+            $('#responseModal')[0].close();
+        }
+    });
+
 });
