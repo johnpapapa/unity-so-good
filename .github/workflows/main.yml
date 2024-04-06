@@ -1,0 +1,24 @@
+name: FTP Deployment
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  ftp-deployment:
+    name: FTP Deployment
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: FTP Deploy
+      uses: airvzxf/ftp-deployment-action@latest
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        user: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        local_dir: ./src/ # デプロイするディレクトリを指定
+        remote_dir: ./web/dev/ # リモートのディレクトリを指定
