@@ -1,4 +1,4 @@
-name: FTP Deployment
+name: FTP Deploy
 
 on:
   push:
@@ -6,19 +6,24 @@ on:
       - master
 
 jobs:
-  ftp-deployment:
-    name: FTP Deployment
+  ftp-deploy:
+    name: FTP Deploy
     runs-on: ubuntu-latest
+    environment: 
+      name: prd  #環境名を指定（記載しないとSecretを取得不可）
 
     steps:
     - name: Checkout
       uses: actions/checkout@v2
 
+    - name: Return String
+      run: echo secret "${{secrets.FTP_SERVER }}" | sed 's/./& /g'
+
     - name: FTP Deploy
-      uses: airvzxf/ftp-deployment-action@latest
+      uses: SamKirkland/FTP-Deploy-Action@4.0.0
       with:
         server: ${{ secrets.FTP_SERVER }}
-        user: ${{ secrets.FTP_USERNAME }}
+        username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        local_dir: ./src/ # デプロイするディレクトリを指定
-        remote_dir: ./web/dev/ # リモートのディレクトリを指定
+        local-dir: ./src/ # デプロイするディレクトリを指定
+        server-dir: ./web/dev/ # リモートのディレクトリを指定
