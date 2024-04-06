@@ -12,7 +12,7 @@
 <?php $this->assign('content-title', 'イベント詳細'); ?>
 <?= $this->Html->script('event-response', array('inline' => false));  ?>
 <p class="note-p mb20">
-    イベントの詳細です。
+    イぺントの詳細です。
     <br>イベントへの参加表明やコメント記入が可能です。
 </p>
 <?php
