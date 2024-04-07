@@ -1,29 +1,44 @@
-name: FTP Deploy
+name: Unity-Ftp-Deploy
 
 on:
   push:
     branches:
-      - master
+      - develop # developブランチにpushされた時
+      - master # masterブランチにpushされた時
 
 jobs:
-  ftp-deploy:
-    name: FTP Deploy
+  develop-deploy:
+    if: github.ref == 'refs/heads/develop'
+    name: Develop Deploy
     runs-on: ubuntu-latest
     environment: 
-      name: prd  #環境名を指定（記載しないとSecretを取得不可）
-
+      name: prd 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: FTP Deploy
+        uses: SamKirkland/FTP-Deploy-Action@4.0.0
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./src/
+          server-dir: ${{ secrets.FTP_SERVER_DIR_DEV }}
 
-    - name: Return String
-      run: echo secret "${{secrets.FTP_SERVER }}" | sed 's/./& /g'
-
-    - name: FTP Deploy
-      uses: SamKirkland/FTP-Deploy-Action@4.0.0
-      with:
-        server: ${{ secrets.FTP_SERVER }}
-        username: ${{ secrets.FTP_USERNAME }}
-        password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: ./src/ # デプロイするディレクトリを指定
-        server-dir: ./web/dev/ # リモートのディレクトリを指定
+  master-deploy:
+    if: github.ref == 'refs/heads/master'
+    name: Master Deploy
+    runs-on: ubuntu-latest
+    environment: 
+      name: prd 
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: FTP Deploy
+        uses: SamKirkland/FTP-Deploy-Action@4.0.0
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./src/
+          server-dir: ${{ secrets.FTP_SERVER_DIR_PRD }}
