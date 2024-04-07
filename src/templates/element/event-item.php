@@ -116,7 +116,8 @@
                 </div>
 
                 <div class="schedule mb5 bold">
-                    <?= $event->start_time->i18nFormat('yyyy-MM-dd'); ?>
+                    <?= sprintf('%4d年', $event->start_time->year) ?>
+                    <?= sprintf('%2d月%2d日', $event->start_time->month, $event->start_time->day); ?>
                     <span>(<?= $day_of_week ?>)</span>
                 </div>
 
@@ -139,9 +140,18 @@
                         </div>
 
                         <div class="count mb5">
-                            o:<?= $response_count[1] ?>
-                            ?:<?= $response_count[0] ?>
-                            x:<?= $response_count[2] ?>
+                            <table border="1" style="border-collapse: collapse">
+                                <tr>
+                                    <th style="width:30px;background-color: #90ee907F;">o</th>
+                                    <th style="width:30px;background-color: #d3d3d37F;">?</th>
+                                    <th style="width:30px;background-color: #f080807F;">x</th>
+                                </tr>
+                                <tr>
+                                    <td class="tc"><?= $response_count[1] ?></td>
+                                    <td class="tc"><?= $response_count[0] ?></td>
+                                    <td class="tc"><?= $response_count[2] ?></td>
+                                </tr>
+                            </table>
                         </div>
                         <div class="total mb5">
                             (合計:<?= array_sum($response_count) ?>人)
