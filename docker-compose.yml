@@ -3,10 +3,13 @@ services:
  app:
    ports:
      - "8001:80"
-   build: ./docker/app
+   build: 
+    context: .
+    dockerfile: ./docker/app/Dockerfile
    container_name: laravel_app
    volumes:
      - ./src:/var/www/html
+     - /var/www/html/vendor
  db:
    image: mysql:5.7
    container_name: unitydb
