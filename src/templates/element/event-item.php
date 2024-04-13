@@ -31,9 +31,9 @@
             $day_of_week = $day_of_weeks[$event->start_time->dayOfWeek]; 
             $response_count = [0 => count($event->event_responses[0]),1 => count($event->event_responses[1]),2 => count($event->event_responses[2])];
         ?> 
-        <div class="event-item event-outer mb20 <?= ($event->deleted_at)?'delete-item':'' ?>">
+        <div id='<?= $event->id ?>' class="event-item event-outer mb20 <?= ($event->deleted_at)?'delete-item':'' ?>">
             <?php if(isset($displayCreatedBtn)): ?>
-                <div class="disp-flex align-center ">
+                <div class="disp-flex align-center">
                     <a class="buttons pure-u-2-3" href="<?= $this->Url->build(['controller' => 'events','action' => 'edit', $event->id]); ?>">
                         <button class="pure-button w100" type="button" style="background-color:#dfb31d7d;">
                             編集
@@ -123,7 +123,7 @@
                         <div class="mb10">
                             <a class="buttons" href="<?= $this->Url->build(['controller' => 'events','action' => 'detail', $event->id]); ?>">
                                 <button class="pure-button" type="button">
-                                    参加表明/詳細
+                                    詳細
                                 </button>
                             </a>
                         </div>

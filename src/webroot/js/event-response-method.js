@@ -19,6 +19,8 @@ $(function(){
                 userId,
                 responseState
             ).then(function(response) {
+                window.location.hash = eventId;
+                window.location.reload();
             })
             .catch(function(error) {
             });            
