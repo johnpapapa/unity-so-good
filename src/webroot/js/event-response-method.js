@@ -9,7 +9,7 @@ $(function(){
         if(confirmAnswer){
             disableButton(currentButtonElement); //押下したボタンを無効化し、他のボタンを有効化
 
-            let eventId = (eventData !== 'undefined') ? eventData.id:currentButtonElement.siblings('input[type="hidden"]').val();
+            let eventId = (typeof eventData !== 'undefined') ? eventData.id:currentButtonElement.siblings('input[type="hidden"]').val();
             let userId = currentUser.id
             let responseState = currentButtonElement.prop('value')
             
