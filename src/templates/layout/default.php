@@ -58,16 +58,18 @@
         padding-bottom: 100px;
     }
     /* 背景色->背景画像の周りの色に合わせてる */
-    #default-body {background-image: linear-gradient(to right, rgb(92, 224, 229), rgb(0, 74, 173));}
+    #default-body {
+        background-image: linear-gradient(to right, rgba(92, 224, 229, 0.8), rgba(0, 74, 173, 0.8));
+    }
     /* 背景画像->alpha0.8 */
     #default-body::before {
         content: "";
         display: block;
         position: fixed;
-        background-image:url("<?= $this->Url->image('unity-background.avif'); ?>"); 
+        background-image:url("<?= $this->Url->image('unity-background.png'); ?>"); 
         background-color: rgba(255, 255, 255, 0.8);
         background-blend-mode: overlay;
-        background-size: contain;
+        background-size: auto 50%;
         background-repeat: no-repeat;
         background-position-x: center;
         background-position-y: center;
