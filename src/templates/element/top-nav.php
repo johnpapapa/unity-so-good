@@ -27,6 +27,7 @@
     justify-content: space-between;
     max-height: 50px;
     position: fixed;
+    z-index: 1;
   }
 
   #top-nav,
