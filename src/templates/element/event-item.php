@@ -16,14 +16,12 @@
     $day_of_weeks = Configure::read('day_of_weeks');
 ?>
 <?= $this->Html->css(['event-item']) ?>
-<?= $this->Html->script('event-response', array('inline' => false));  ?>
+<?= $this->Html->script('event-response-method', array('inline' => false));  ?>
+
 <script>
-    let current_user = <?= json_encode($current_user) ?>;
-    let event_data = <?= json_encode($event_data) ?>;
-    let response_ajax_send_url = "<?= $this->Url->build(['controller' => 'Events', 'action' => 'ajaxChangeResponseState']) ?>";
-    let comment_submit_ajax_send_url = "<?= $this->Url->build(['controller' => 'Events', 'action' => 'ajaxSubmitComment']) ?>";
-    let comment_delete_ajax_send_url = "<?= $this->Url->build(['controller' => 'Events', 'action' => 'ajaxDeleteComment']) ?>";
-    let ajax_send_token = "<?= $this->request->getAttribute('csrfToken') ?>";
+    let currentUser = <?= json_encode($current_user) ?>;
+    let responseAjaxSendUrl = "<?= $this->Url->build(['controller' => 'Events', 'action' => 'ajaxChangeResponseState']) ?>";
+    let ajaxSendToken = "<?= $this->request->getAttribute('csrfToken') ?>";
 </script>
 <div>
     <?php foreach($events as $event): ?> 
@@ -41,7 +39,6 @@
                             編集
                         </button>
                     </a>
-
                     <?php if($event->deleted_at): ?>
                         <a class="buttons pure-u-1-3" href="<?= $this->Url->build(['controller' => 'events','action' => 'restore', $event->id]); ?>">
                             <button class="pure-button w100" type="button">
