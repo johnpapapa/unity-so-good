@@ -131,7 +131,7 @@
 
                     
                 </div>
-
+                <?php if($current_user): ?>
                 <div class="content disp-flex just-center ">
                     <?php $is_closed = FrozenTime::now(null) > $event->end_time; ?>
                     <input type="hidden" name="event_id" value="<?= $event->id ?>">
@@ -139,6 +139,7 @@
                     <button class="pure-button response-btn pure-u-4-5 present" style="padding:.25em .5em" value="1" <?= ($event->user_response_state === 1 | $is_closed) ? 'disabled' : '' ?>>参加</button>
                     <button class="pure-button response-btn pure-u-4-5 absent " style="padding:.25em .5em" value="2" <?= ($event->user_response_state === 2 | $is_closed) ? 'disabled' : '' ?>>不参加</button>
                 </div>
+                <?php endif; ?>
             
                 <?php if ($current_user) : ?>
                     <div class="description_toggle disp-flex just-center align-center mb10">
