@@ -7,6 +7,7 @@
  */
     //一覧内部で繰り返し使用する変数の宣言
     use Cake\Core\Configure;
+    use Cake\I18n\FrozenTime;
     //ユーザーの参加情報をconstから読出
     $response_states = Configure::read('response_states');
     //イベントの開催状況をconstから読出
@@ -14,53 +15,16 @@
     //dayOfWeekの返り値に対応する曜日をconstから読出
     $day_of_weeks = Configure::read('day_of_weeks');
 ?>
-<style>
-    .event-item.event-outer {
-        border: 2px solid;
-        border-radius: 5px;
-        box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
-    }
-
-    .event-item.delete-item {
-    background-color: darkgray;
-    }
-
-    .event-item .event-inner {
-        margin: 5px;
-    }
-
-    .event-item .tag {
-        padding: 5px 15px;
-        border-radius: 5px;
-        font-size: .7rem;
-    }
-
-    .event-item .location {
-        font-size: 1.5rem;
-    }
-
-    .event-item .state-title {
-        color: #00000055;
-        font-size: 1.2rem;
-    }
-
-    .event-item .comments .comments-title {
-        font-size: 1.2rem;
-    }
-
-    .event-item .comments .comment {
-    border: black 1px solid;
-    border-radius: 5px;
-    }
-
-    .event-item .comment-header .time {
-    font-size: .7rem;
-    }
-
-    .event-item .state-0 {background-color: #d3d3d37F;}
-    .event-item .state-1 {background-color: #90ee907F;}
-    .event-item .state-2 {background-color: #f080807F;}
-</style>
+<?= $this->Html->css(['event-item']) ?>
+<?= $this->Html->script('event-response', array('inline' => false));  ?>
+<script>
+    let current_user = <?= json_encode($current_user) ?>;
+    let event_data = <?= json_encode($event_data) ?>;
+    let response_ajax_send_url = "<?= $this->Url->build(['controller' => 'Events', 'action' => 'ajaxChangeResponseState']) ?>";
+    let comment_submit_ajax_send_url = "<?= $this->Url->build(['controller' => 'Events', 'action' => 'ajaxSubmitComment']) ?>";
+    let comment_delete_ajax_send_url = "<?= $this->Url->build(['controller' => 'Events', 'action' => 'ajaxDeleteComment']) ?>";
+    let ajax_send_token = "<?= $this->request->getAttribute('csrfToken') ?>";
+</script>
 <div>
     <?php foreach($events as $event): ?> 
         <?php 
@@ -159,14 +123,26 @@
                     </div>
 
                     <div class="content-right w50 disp-flex dir-column dir-m-column just-space align-center">
-                        <a class="buttons" href="<?= $this->Url->build(['controller' => 'events','action' => 'detail', $event->id]); ?>">
-                            <button class="pure-button" type="button">
-                            参加表明/詳細
-                            </button>
-                        </a>
+                        <div class="mb10">
+                            <a class="buttons" href="<?= $this->Url->build(['controller' => 'events','action' => 'detail', $event->id]); ?>">
+                                <button class="pure-button" type="button">
+                                    参加表明/詳細
+                                </button>
+                            </a>
+                        </div>
                     </div>
+
+                    
                 </div>
-                
+
+                <div class="content disp-flex just-center ">
+                    <?php $is_closed = FrozenTime::now(null) > $event->end_time; ?>
+                    <input type="hidden" name="event_id" value="<?= $event->id ?>">
+                    <button class="pure-button response-btn pure-u-4-5 undecided" style="padding:.25em .5em" value="0" <?= ($event->user_response_state === 0 | $is_closed) ? 'disabled' : '' ?>>参加未定</button>
+                    <button class="pure-button response-btn pure-u-4-5 present" style="padding:.25em .5em" value="1" <?= ($event->user_response_state === 1 | $is_closed) ? 'disabled' : '' ?>>参加</button>
+                    <button class="pure-button response-btn pure-u-4-5 absent " style="padding:.25em .5em" value="2" <?= ($event->user_response_state === 2 | $is_closed) ? 'disabled' : '' ?>>不参加</button>
+                </div>
+            
                 <?php if ($current_user) : ?>
                     <div class="description_toggle disp-flex just-center align-center mb10">
                         <span class="material-symbols-outlined">expand_all</span>
