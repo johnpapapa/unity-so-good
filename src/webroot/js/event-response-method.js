@@ -1,31 +1,44 @@
 $(function(){
     'use strict';
-    let $responseButtonElement = $(".response-btn");
-    $responseButtonElement.on("touchstart mousedown", function(){
-        let currentButtonElement = $(this);
+    let responseButtonElement = $(".response-btn");
 
-        //送信する前に本当に送信していいのかを確認するダイアログを表示する処理
-        let confirmAnswer = window.confirm(currentButtonElement.html() + 'にしますか？');
+    var tapEnable =false; // 有効なタップかを保持する
+    responseButtonElement.on('touchstart', function () {
+        tapEnable = true;
+    }).on('touchmove', function () { // スクロール用のタップは発火させない。
+        tapEnable = false;
+    }).on('touchend', function () {
+        if (tapEnable) {
+            tapEnable = false;
+            processButtonAction($(this));
+        }
+    });
+    responseButtonElement.on('mousedown', function () {
+        processButtonAction($(this));
+    });
+
+    //ボタンを押した時の処理
+    function processButtonAction(buttonElement){
+        let confirmAnswer = window.confirm(buttonElement.html() + 'にしますか？');
         if(confirmAnswer){
-            disableButton(currentButtonElement); //押下したボタンを無効化し、他のボタンを有効化
-
-            let eventId = (typeof eventData !== 'undefined') ? eventData.id:currentButtonElement.siblings('input[type="hidden"]').val();
+            disableButton(buttonElement);
+            let eventId = (typeof eventData !== 'undefined') ? eventData.id:buttonElement.siblings('input[type="hidden"]').val();
             let userId = currentUser.id
-            let responseState = currentButtonElement.prop('value')
-            
+            let responseState = buttonElement.prop('value')
             sendAjaxProperty(
                 responseAjaxSendUrl,
                 eventId,
                 userId,
                 responseState
             ).then(function(response) {
-                window.location.hash = eventId;
+                //ページ再読み込み時アンカーリンクをスクロール位置を調整
+                window.location.hash = eventId; 
                 window.location.reload();
             })
             .catch(function(error) {
             });            
         }
-    });
+    }
 
     //押下したボタンを無効化し、他のボタンを有効化する関数
     function disableButton(buttonElement){
