@@ -3,18 +3,15 @@ $(function(){
     let responseButtonElement = $(".response-btn");
 
     var tapEnable =false; // 有効なタップかを保持する
-    responseButtonElement.on('touchstart', function () {
+    responseButtonElement.on('mousedown', function (event) {
         tapEnable = true;
     }).on('touchmove', function () { // スクロール用のタップは発火させない。
         tapEnable = false;
-    }).on('touchend', function () {
+    }).on('touchend mouseup', function () {
         if (tapEnable) {
             tapEnable = false;
             processButtonAction($(this));
         }
-    });
-    responseButtonElement.on('mousedown', function () {
-        processButtonAction($(this));
     });
 
     //ボタンを押した時の処理
