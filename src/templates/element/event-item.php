@@ -88,6 +88,10 @@
                     <div class="week <?php if($day_of_week=="土"){echo "week-color-sat";} elseif($day_of_week=="日"){echo "week-color-sun";}?>">
                         <?= $day_of_week ?>
                     </div>
+
+                    <div class="time">
+                        <?= $event->start_time->i18nFormat('HH:mm'); ?> - <?= $event->end_time->i18nFormat('HH:mm');  ?>
+                    </div>
                 </div>
 
                 <div class="location mb10 bold over-ellipsis">
@@ -98,10 +102,6 @@
                     <div class="content-left w50">
                         <div class="area over-ellipsis mb5">
                             <?= is_null($event->area) ? '' : h($event->area)."コート" ?>
-                        </div>
-
-                        <div class="time mb5">
-                            <?= $event->start_time->i18nFormat('HH:mm'); ?> ~ <?= $event->end_time->i18nFormat('HH:mm');  ?>
                         </div>
 
                         <div class="limit mb5">

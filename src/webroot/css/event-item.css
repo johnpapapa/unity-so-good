@@ -1,19 +1,18 @@
 .event-item .schedule-inner {
     align-items: end;
-    gap: 5px; 
+        gap: 5px; 
 }
 .event-item .schedule {
     align-items: center;
+        gap: 10px;
 }
 .event-item .schedule-inner .month,
 .event-item .schedule-inner .day {
     white-space: pre-wrap;
 }
-
 .event-item .schedule .week {
     -webkit-text-stroke: 1px;
 }
-
 .event-item .week-color-sun {
     color: rgba(255, 0, 0, .5);
 }
@@ -21,12 +20,17 @@
     color: rgba(0, 0, 255, .5);
 }
 .event-item .schedule .week {
-    margin-left: 5px;
+    /* margin-left: 5px; */
     padding: 2px;
     font-size: 12px;
     border: black 1px;
     border-style: solid;
     border-radius: 5px;
+}
+.event-item .schedule .time {
+    font-weight: bold;
+    padding: 0px 10px;
+    border-bottom: black 1px solid;
 }
 
 
@@ -50,10 +54,12 @@
     .event-item .schedule .week {
         font-size: 12px;
     }
+
+    .event-item .schedule .time {
+        text-align: center;
+        flex-grow: 1;
+    }
 }
-
-
-
 
 
 .event-item.event-outer {
