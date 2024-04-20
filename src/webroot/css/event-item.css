@@ -59,6 +59,8 @@
         text-align: center;
         flex-grow: 1;
     }
+
+    
 }
 
 
@@ -86,6 +88,10 @@ background-color: darkgray;
     font-size: 1.5rem;
 }
 
+.event-item .count table {
+    margin: auto;
+}
+
 .event-item .state-title {
     color: #00000055;
     font-size: 1.2rem;
@@ -102,6 +108,11 @@ border-radius: 5px;
 
 .event-item .comment-header .time {
 font-size: .7rem;
+}
+
+
+.event-item .pure-button.button-detail {
+    width: 75%;
 }
 
 .event-item .state-0 {background-color: #d3d3d37F;}
