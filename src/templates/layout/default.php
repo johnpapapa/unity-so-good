@@ -33,6 +33,18 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css" integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls" crossorigin="anonymous">
     <script rel="preload" src="https://code.jquery.com/jquery-3.7.0.js"  integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
 
+    <link type="text/css" rel="stylesheet" media="screen" href="/css/jquery-sakura.css" />
+    <script src="/js/jquery-sakura.js"></script>
+    <script>
+        // domReady
+        $(function() {
+            $('#container').sakura('start', {
+                fallSpeed: 1,
+                newOn: 500,
+            });
+        });
+    </script>
+
     <?= $this->fetch('meta') ?>
     <?= $this->fetch('css') ?>
     <?= $this->fetch('script') ?>
