@@ -153,11 +153,13 @@ $day_of_weeks = Configure::read('day_of_weeks');
                             <button class="pure-button response-btn pure-u-4-5 present" style="padding:.25em .5em; background-color: #90ee907F;" value="1" <?= ($event->user_response_state === 1 | $is_closed) ? 'disabled' : '' ?>>参加</button>
                             <button class="pure-button response-btn pure-u-4-5 absent " style="padding:.25em .5em; background-color: #f080807F;" value="2" <?= ($event->user_response_state === 2 | $is_closed) ? 'disabled' : '' ?>>不参加</button>
                         <?php else : ?>
-                            <a class="buttons" href="<?= $this->Url->build(['controller' => 'events', 'action' => 'detail', $event->id]); ?>">
-                                <button class="pure-button button-detail" type="button">
-                                    詳細
-                                </button>
-                            </a>
+                            <div class="text-center mb10 w100">
+                                <a class="buttons" href="<?= $this->Url->build(['controller' => 'events', 'action' => 'detail', $event->id]); ?>">
+                                    <button class="pure-button button-detail" type="button">
+                                        詳細
+                                    </button>
+                                </a>
+                            </div>
                         <?php endif; ?>
 
                     </div>
