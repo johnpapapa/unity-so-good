@@ -29,7 +29,7 @@
             $user_response_state = (!is_null($event->user_response_state)) ? $response_states[$event->user_response_state] : null;
             $event_state = $event_states[$event->event_state];
             $day_of_week = $day_of_weeks[$event->start_time->dayOfWeek]; 
-            $response_count = [0 => count($event->event_responses[0]),1 => count($event->event_responses[1]),2 => count($event->event_responses[2])];
+            $response_count = [0 => count($event->event_responses[0]), 1 => count($event->event_responses[1]), 2 => count($event->event_responses[2])];
         ?> 
         <div id='<?= $event->id ?>' class="event-item event-outer mb20 <?= ($event->deleted_at)?'delete-item':'' ?>">
             <?php if(isset($displayCreatedBtn)): ?>
@@ -76,10 +76,18 @@
                     <?php endif; ?>
                 </div>
 
-                <div class="schedule mb5 bold">
-                    <?= sprintf('%4d年', $event->start_time->year) ?>
-                    <?= sprintf('%2d月%2d日', $event->start_time->month, $event->start_time->day); ?>
-                    <span>(<?= $day_of_week ?>)</span>
+                <div class="disp-flex schedule mb5">
+                    <div class="disp-flex schedule-inner bold">
+                        <span class="year"><?= sprintf('%4d', $event->start_time->year) ?></span>
+                        <span class="year-label">年</span>
+                        <span class="month"><?= sprintf('%2d', $event->start_time->month) ?></span>
+                        <span class="month-label">月</span>
+                        <span class="day"><?= sprintf('%2d', $event->start_time->day) ?></span>
+                        <span class="day-label">日</span>
+                    </div>
+                    <div class="week <?php if($day_of_week=="土"){echo "week-color-sat";} elseif($day_of_week=="日"){echo "week-color-sun";}?>">
+                        <?= $day_of_week ?>
+                    </div>
                 </div>
 
                 <div class="location mb10 bold over-ellipsis">
@@ -139,6 +147,7 @@
                     <button class="pure-button response-btn pure-u-4-5 present" style="padding:.25em .5em" value="1" <?= ($event->user_response_state === 1 | $is_closed) ? 'disabled' : '' ?>>参加</button>
                     <button class="pure-button response-btn pure-u-4-5 absent " style="padding:.25em .5em" value="2" <?= ($event->user_response_state === 2 | $is_closed) ? 'disabled' : '' ?>>不参加</button>
                 </div>
+
                 <?php endif; ?>
             
                 <?php if ($current_user) : ?>

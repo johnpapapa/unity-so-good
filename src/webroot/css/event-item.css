@@ -1,3 +1,60 @@
+.event-item .schedule-inner {
+    align-items: end;
+    gap: 5px; 
+}
+.event-item .schedule {
+    align-items: center;
+}
+.event-item .schedule-inner .month,
+.event-item .schedule-inner .day {
+    white-space: pre-wrap;
+}
+
+.event-item .schedule .week {
+    -webkit-text-stroke: 1px;
+}
+
+.event-item .week-color-sun {
+    color: rgba(255, 0, 0, .5);
+}
+.event-item .week-color-sat {
+    color: rgba(0, 0, 255, .5);
+}
+.event-item .schedule .week {
+    margin-left: 5px;
+    padding: 2px;
+    font-size: 12px;
+    border: black 1px;
+    border-style: solid;
+    border-radius: 5px;
+}
+
+
+@media screen and (max-width: 768px) {
+    .event-item .schedule-inner .year,
+    .event-item .schedule-inner .week {
+        font-size: 11px;
+    }
+
+    .event-item .schedule-inner .year-label,
+    .event-item .schedule-inner .month-label,
+    .event-item .schedule-inner .day-label {
+        font-size: 9px;
+    }
+
+    .event-item .schedule-inner .month,
+    .event-item .schedule-inner .day {
+        font-size: 14px;
+    }
+
+    .event-item .schedule .week {
+        font-size: 12px;
+    }
+}
+
+
+
+
 
 .event-item.event-outer {
     border: 2px solid;
