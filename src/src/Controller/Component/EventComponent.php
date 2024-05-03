@@ -100,6 +100,12 @@ class eventComponent extends Component
         return $events;
     }
 
+    public function getCreatedEventList($organizer_user_id){
+        $events = $this->Events->getCreatedEventList($organizer_user_id);
+        $events = $this->getFormatEventDataList($events);
+        return $events;
+    }
+
     // 指定したuserに紐づく未反応のeventId配列の取得
 
     public function getUnrespondedEventIdListByUserId($uid, $conditions)

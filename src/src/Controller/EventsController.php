@@ -106,9 +106,9 @@ class EventsController extends AppController
 
             return $this->redirect(['controller' => 'Users', 'action' => 'login']);
         }
-
-        $events = $this->Event->getEventList($uid, false, true, true);
-        $events = $this->Event->getFormatEventDataList($events, $uid);
+        
+        $organizer_user_id = $uid;
+        $events = $this->Event->getCreatedEventList($organizer_user_id);
 
         $this->set(compact('events'));
     }

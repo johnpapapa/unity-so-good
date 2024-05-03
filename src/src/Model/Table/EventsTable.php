@@ -515,6 +515,56 @@ class EventsTable extends Table
         return $events;
     }
 
+    public function getCreatedEventList($organizer_user_id){
+        $events_query = $this->find('all', [
+            'conditions' => [
+                'OR' => [
+                    'Events.end_time <=' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . 'now')),
+                    'Events.end_time >=' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . 'now'))
+                ],
+                'Events.deleted_at' => 0,
+                'Events.organizer_id IN' => $organizer_user_id
+            ]
+        ]);
+        
+        $events_query = $events_query->contain(['Locations']);
+        $events_query = $events_query->contain(
+            [
+                'Comments' => function (Query $query) {
+                    return $query
+                        ->contain('Users')
+                        ->where(['Comments.deleted_at' => 0])
+                        ->order(['Comments.updated_at' => 'DESC']);
+                }
+            ]
+        );
+        $events_query = $events_query->contain(
+            [
+                'EventResponses' => function (Query $query) {
+                    return $query
+                        ->contain([
+                            'Users' => function (Query $uquery) {
+                                return $uquery->where(['Users.deleted_at' => 0]);
+                            }
+                        ])
+                        ->order([
+                            'EventResponses.updated_at' => 'ASC',
+                            'EventResponses.response_state' => 'DESC',
+                        ]);
+                },
+            ]
+        );
+
+        
+        
+
+        $events_query = $events_query->order(['Events.start_time' => 'DESC']);
+        $events_query = $events_query->limit(Configure::read('event_item_limit'));
+        $events = $events_query->all()->toArray();
+
+        return $events;
+    }
+
     /**
      * 指定したevent_idでeventの取得
      */
