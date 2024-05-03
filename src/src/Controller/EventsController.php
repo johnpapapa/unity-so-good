@@ -51,8 +51,8 @@ class EventsController extends AppController
         $this->set(["canonical_url"=>"events/archived"]);
         $uid = $this->Login->getLoginUserData(true);
 
-        $events = $this->Event->getEventList(false, false, true, false);
-        $events = $this->Event->getFormatEventDataList($events);
+        $is_logged_in = true;
+        $events = $this->Event->getArchivedEventList($is_logged_in);
 
         $this->set(compact('events'));
     }

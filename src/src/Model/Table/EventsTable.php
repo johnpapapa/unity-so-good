@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Model\Table;
@@ -11,6 +12,111 @@ use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
 use Cake\Validation\Validator;
 use Cake\Collection\Collection;
+
+
+class queryClass
+{
+    private $conditions = [];
+    private $contain_arr = [];
+    private $Events;
+    private $query;
+
+    public function __construct()
+    {
+        $this->Events = TableRegistry::getTableLocator()->get('Events');
+    }
+
+    public function getConditions()
+    {
+        return $this->conditions;
+    }
+
+    public function getContainArr()
+    {
+        return $this->contain_arr;
+    }
+
+    public function createQueryFind()
+    {
+        $this->query = $this->Events->find('all', ['conditions' => $this->conditions]);
+        return $this;
+    }
+
+    public function createQueryContain()
+    {
+        $this->query = $this->query->contain($this->contain_arr);
+        return $this;
+    }
+
+    public function createQueryEventOrder()
+    {
+    }
+
+    public function createConditionEventNotDeleted()
+    {
+        $this->conditions['AND']['Events.deleted_at'] = 0;
+        return $this;
+    }
+
+    public function createConditionEventDeleted()
+    {
+        $this->conditions['AND']['Events.deleted_at'] = 1;
+        return $this;
+    }
+
+    public function createConditionEventNotHeld()
+    {
+        $this->conditions['OR']['Events.end_time >='] = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . 'now'));
+        return $this;
+    }
+
+    public function createConditionEventHeld()
+    {
+        $this->conditions['OR']['Events.start_time <='] = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . 'now'));
+        return $this;
+    }
+
+    public function createConditionOrganizer($organizer_user_id)
+    {
+        $this->conditions['Events.organizer_id IN'] = $organizer_user_id;
+        return $this;
+    }
+
+    public function createContainLocations()
+    {
+        $this->contain_arr[] = ['Locations'];
+        return $this;
+    }
+
+    public function createContainEventResponses($is_logged_in)
+    {
+        if ($is_logged_in) {
+            $this->contain_arr['EventResponses'] = function (Query $query) {
+                return $query
+                    ->contain([
+                        'Users' => function (Query $uquery) {
+                            return $uquery->where(['Users.deleted_at' => 0]);
+                        }
+                    ])
+                    ->order([
+                        'EventResponses.updated_at' => 'ASC',
+                        'EventResponses.response_state' => 'DESC',
+                    ]);
+            };
+        } else { //ログインしていない場合ユーザー名非表示
+            $contain_arr['EventResponses'] = function (Query $query) {
+                return $query
+                    ->select(["EventResponses.event_id", "EventResponses.response_state"])
+                    ->contain([
+                        'Users' => function (Query $uquery) {
+                            return $uquery->where(['Users.deleted_at' => 0]);
+                        }
+                    ]);
+            };
+        }
+        return $this;
+    }
+}
 
 /**
  * Events Model
@@ -278,7 +384,7 @@ class EventsTable extends Table
 
 
         $contain_arr = ['Locations'];
-        if($is_disp_comment){
+        if ($is_disp_comment) {
             $contain_arr['Comments'] = function (Query $query) {
                 return $query
                     ->contain('Users')
@@ -287,12 +393,12 @@ class EventsTable extends Table
             };
         }
 
-        if($is_disp_response){ //反応の詳細を表示する場合ユーザー名表示
+        if ($is_disp_response) { //反応の詳細を表示する場合ユーザー名表示
             $contain_arr['EventResponses'] = function (Query $query) {
                 return $query
                     ->contain([
-                        'Users' => function (Query $uquery){
-                            return $uquery->where(['Users.deleted_at'=>0]);
+                        'Users' => function (Query $uquery) {
+                            return $uquery->where(['Users.deleted_at' => 0]);
                         }
                     ])
                     ->order([
@@ -305,8 +411,8 @@ class EventsTable extends Table
                 return $query
                     ->select(["EventResponses.event_id", "EventResponses.response_state"])
                     ->contain([
-                        'Users' => function (Query $uquery){
-                            return $uquery->where(['Users.deleted_at'=>0]);
+                        'Users' => function (Query $uquery) {
+                            return $uquery->where(['Users.deleted_at' => 0]);
                         }
                     ]);
             };
@@ -314,22 +420,24 @@ class EventsTable extends Table
 
         $events_query = $Events->find('all', ['conditions' => $conditions]);
         $events_query = $events_query->contain($contain_arr)
-        ->order(['Events.start_time' => 'ASC'])
-        ->limit(Configure::read('event_item_limit'));
+            ->order(['Events.start_time' => 'ASC'])
+            ->limit(Configure::read('event_item_limit'));
         if ($is_to_array) {
             return $events_query->all()->toArray();
         }
         return new Collection($events_query->all());
     }
 
-    public function getDeletedEventList($organizer_user_id=false){
-        if(!$organizer_user_id){
+    public function getDeletedEventList($organizer_user_id = false)
+    {
+        if (!$organizer_user_id) {
             return false;
         }
 
-        $events_query = $this->find('all', ['conditions' => [
-                'Events.organizer_id'=>$organizer_user_id, 
-                'Events.deleted_at'=>1
+        $events_query = $this->find('all', [
+            'conditions' => [
+                'Events.organizer_id' => $organizer_user_id,
+                'Events.deleted_at' => 1
             ]
         ]);
         $events_query = $events_query
@@ -344,8 +452,8 @@ class EventsTable extends Table
                 'EventResponses' => function (Query $query) {
                     return $query
                         ->contain([
-                            'Users' => function (Query $uquery){
-                                return $uquery->where(['Users.deleted_at'=>0]);
+                            'Users' => function (Query $uquery) {
+                                return $uquery->where(['Users.deleted_at' => 0]);
                             }
                         ])
                         ->order([
@@ -354,48 +462,54 @@ class EventsTable extends Table
                         ]);
                 },
             ])
-        ->order(['Events.start_time' => 'ASC'])
-        ->limit(Configure::read('event_item_limit'));
+            ->order(['Events.start_time' => 'ASC'])
+            ->limit(Configure::read('event_item_limit'));
         $events = $events_query->all()->toArray();
 
         return $events;
     }
 
-    public function getArchivedEventList($organizer_user_id=false){
-        if(!$organizer_user_id){
-            return false;
-        }
-
-        $events_query = $this->find('all', ['conditions' => [
-                'Events.organizer_id'=>$organizer_user_id, 
-                'Events.end_time >='=>date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . 'now')),
-                'Events.deleted_at'=>0,
+    public function getArchivedEventList($is_logged_in)
+    {
+        $events_query = $this->find('all', [
+            'conditions' => [
+                'Events.end_time <=' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . 'now')),
+                'Events.deleted_at' => 0,
             ]
         ]);
-        $events_query = $events_query
-            ->contain([
-                'Locations',
-                'Comments' => function (Query $query) {
-                    return $query
-                        ->contain('Users')
-                        ->where(['Comments.deleted_at' => 0])
-                        ->order(['Comments.updated_at' => 'DESC']);
-                },
-                'EventResponses' => function (Query $query) {
-                    return $query
-                        ->contain([
-                            'Users' => function (Query $uquery){
-                                return $uquery->where(['Users.deleted_at'=>0]);
-                            }
-                        ])
-                        ->order([
-                            'EventResponses.updated_at' => 'ASC',
-                            'EventResponses.response_state' => 'DESC',
-                        ]);
-                },
-            ])
-        ->order(['Events.start_time' => 'ASC'])
-        ->limit(Configure::read('event_item_limit'));
+        if ($is_logged_in) {
+
+            $events_query = $events_query->contain(['Locations']);
+            $events_query = $events_query->contain(
+                [
+                    'Comments' => function (Query $query) {
+                        return $query
+                            ->contain('Users')
+                            ->where(['Comments.deleted_at' => 0])
+                            ->order(['Comments.updated_at' => 'DESC']);
+                    }
+                ]
+            );
+            $events_query = $events_query->contain(
+                [
+                    'EventResponses' => function (Query $query) {
+                        return $query
+                            ->contain([
+                                'Users' => function (Query $uquery) {
+                                    return $uquery->where(['Users.deleted_at' => 0]);
+                                }
+                            ])
+                            ->order([
+                                'EventResponses.updated_at' => 'ASC',
+                                'EventResponses.response_state' => 'DESC',
+                            ]);
+                    },
+                ]
+            );
+
+        }
+        $events_query = $events_query->order(['Events.start_time' => 'DESC']);
+        $events_query = $events_query->limit(Configure::read('event_item_limit'));
         $events = $events_query->all()->toArray();
 
         return $events;
@@ -405,13 +519,12 @@ class EventsTable extends Table
      * 指定したevent_idでeventの取得
      */
     public function getEventByEventId(
-        $event_id, 
+        $event_id,
         $is_disp_comment = true,
         $is_disp_response = true
-    )
-    {
+    ) {
         $contain_arr = ['Locations'];
-        if($is_disp_comment){
+        if ($is_disp_comment) {
             $contain_arr['Comments'] = function (Query $query) {
                 return $query
                     ->contain('Users')
@@ -420,12 +533,12 @@ class EventsTable extends Table
             };
         }
 
-        if($is_disp_response){ //反応の詳細を表示する場合ユーザー名表示
+        if ($is_disp_response) { //反応の詳細を表示する場合ユーザー名表示
             $contain_arr['EventResponses'] = function (Query $query) {
                 return $query
                     ->contain([
-                        'Users' => function (Query $uquery){
-                            return $uquery->where(['Users.deleted_at'=>0]);
+                        'Users' => function (Query $uquery) {
+                            return $uquery->where(['Users.deleted_at' => 0]);
                         }
                     ])
                     ->order([
@@ -438,8 +551,8 @@ class EventsTable extends Table
                 return $query
                     ->select(["EventResponses.event_id", "EventResponses.response_state"])
                     ->contain([
-                        'Users' => function (Query $uquery){
-                            return $uquery->where(['Users.deleted_at'=>0]);
+                        'Users' => function (Query $uquery) {
+                            return $uquery->where(['Users.deleted_at' => 0]);
                         }
                     ]);
             };
@@ -448,7 +561,7 @@ class EventsTable extends Table
         $events_query = $this->find('all', [
             'conditions' => ['Events.id' => $event_id],
         ])
-        ->contain($contain_arr);
+            ->contain($contain_arr);
 
         return $events_query->first();
     }
@@ -483,8 +596,8 @@ class EventsTable extends Table
                 'EventResponses' => function (Query $query) {
                     return $query
                         ->contain([
-                            'Users' => function (Query $uquery){
-                                return $uquery->where(['Users.deleted_at'=>0]);
+                            'Users' => function (Query $uquery) {
+                                return $uquery->where(['Users.deleted_at' => 0]);
                             }
                         ])
                         ->order([

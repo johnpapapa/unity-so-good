@@ -31,6 +31,27 @@ class eventComponent extends Component
         $this->log('testini', LogLevel::DEBUG);
     }
 
+    /**
+     * eventの配列を一覧で表示するために整形
+     *
+     * @param array $event_list
+     * @param int $uid
+     * @return array
+     */
+    public function getFormatEventDataList($event_list = [], $uid = null)
+    {
+        if (count($event_list) <= 0) {
+            return [];
+        }
+        $formated_event_list = []; //整形後のevent
+        $now_datetime = $this->getNow();
+        foreach ($event_list as $event_data) {
+            $formated_event_list[] = $this->formatEventData($event_data, $now_datetime, $uid);
+        }
+
+        return $formated_event_list;
+    }
+
     // API用 -- イベントのリストを取得
     public function getEventListForApi(){
         $event_list = $this->Events->getEventList(
@@ -70,6 +91,13 @@ class eventComponent extends Component
     public function getEventList($organizer_user_id = false, $contain_deleted_event = false, $contain_held_event = false, $contain_not_held_event = false)
     {
         return $this->Events->getEventList($organizer_user_id, $contain_deleted_event, $contain_held_event, $contain_not_held_event);
+    }
+
+    public function getArchivedEventList($is_logged_in)
+    {
+        $events = $this->Events->getArchivedEventList($is_logged_in);
+        $events = $this->getFormatEventDataList($events);
+        return $events;
     }
 
     // 指定したuserに紐づく未反応のeventId配列の取得
@@ -146,26 +174,7 @@ class eventComponent extends Component
         return new FrozenTime('now');
     }
 
-    /**
-     * eventの配列を一覧で表示するために整形
-     *
-     * @param array $event_list
-     * @param int $uid
-     * @return array
-     */
-    public function getFormatEventDataList($event_list = [], $uid = null)
-    {
-        if (count($event_list) <= 0) {
-            return [];
-        }
-        $formated_event_list = []; //整形後のevent
-        $now_datetime = $this->getNow();
-        foreach ($event_list as $event_data) {
-            $formated_event_list[] = $this->formatEventData($event_data, $now_datetime, $uid);
-        }
-
-        return $formated_event_list;
-    }
+    
 
     /**
      * eventを一覧で表示するために整形
